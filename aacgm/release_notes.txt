@@ -1,0 +1,14 @@
+
+v2.6 Changes
+
+Features:
+
++ 20191229 minor changes to igrflib_v2.pro to extend data range to GUFM1/IGRF13
+           coefficient range [1590-20205)
+
+Bug fixes:
+
++ 20191229 small change to aacgm_v2.pro (moved definition of aacgm_v2_datetime
+           to location after out-of-bounds check in order to make error msg
+           consistent with that of DLM.)
+
