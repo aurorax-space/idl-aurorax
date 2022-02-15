@@ -19,6 +19,8 @@ Please note, this IDL library only provides the ability to **retrieve** data fro
 
 Installation can be done two different ways: 1) using the `ipm` command, or 2) manually adding the files to your IDL path.
 
+You can view all previous versions by browsing the AuroraX data tree [here](https://data.aurorax.space/software/idl-aurorax).
+
 ### Using ipm
 
 Since IDL 8.7.1, there exists an IDL package manager called [ipm](https://www.l3harrisgeospatial.com/docs/ipm.html#INSTALL). We can use this to install the idl-aurorax library with a single command.
@@ -26,13 +28,17 @@ Since IDL 8.7.1, there exists an IDL package manager called [ipm](https://www.l3
 On the IDL command prompt, run the following:
 
 ```
-IDL> ipm,/install,'https://github.com/aurorax-space/idl-aurorax/archive/refs/heads/main.zip'
+IDL> ipm,/install,'https://data.aurorax.space/software/idl-aurorax/latest.zip'
 ```
 
-To upgrade, run the following:
+Then, add the following to your startup file, or run the commands manually using the IDL command prompt:
 
 ```
-IDL> ipm,/upgrade,'https://github.com/aurorax-space/idl-aurorax/archive/refs/heads/main.zip'
+.run aurorax_availability
+.run aurorax_conjunctions
+.run aurorax_data_products
+.run aurorax_ephemeris
+.run aurorax_util
 ```
 
 ### Manually
@@ -45,3 +51,13 @@ For usage details, please visit the AuroraX documentation website, and the basic
 
 - [IDL-AuroraX documentation](https://docs.aurorax.space/code/overview)
 - [Basic usage examples](https://docs.aurorax.space/code/basic_usage/overview)
+
+## Updating
+
+If you used `ipm` to install idl-aurorax, you can update it using:
+
+```
+ipm,/update,'https://data.aurorax.space/software/idl-aurorax/latest.zip'
+```
+
+If you installed the code manually, you can download the latest Zip file and overwite the existing files.
