@@ -62,7 +62,7 @@ For usage details, please visit the AuroraX documentation website, and the basic
 If you used `ipm` to install idl-aurorax, you can update it using:
 
 ```idl
-ipm,/update,'idl-aurorax'
+IDL> ipm,/update,'idl-aurorax'
 ```
 
 If you installed the code manually, you can download the latest Zip file and overwite the existing files.
