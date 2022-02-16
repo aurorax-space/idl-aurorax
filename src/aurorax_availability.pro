@@ -61,48 +61,48 @@ function __aurorax_retrieve_availability,start_yy,start_mm,start_dd,end_yy,end_m
 end
 
 
-  ;-------------------------------------------------------------
-  ;+
-  ; NAME:
-  ;       AURORAX_AVAILABILITY_EPHEMERIS
-  ;
-  ; PURPOSE:
-  ;       Retrieve data availability information for ephemeris records
-  ;
-  ; EXPLANATION:
-  ;       Retrieve data availability information for ephemeris records
-  ;       in the AuroraX platform. Optional parameters are used to filter
-  ;       unwanted data sources out.
-  ;
-  ; CALLING SEQUENCE:
-  ;       aurorax_availability_ephemeris(start_yy, start_mm, start_dd, end_yy, end_mm, end_dd)
-  ;
-  ; PARAMETERS:
-  ;       start_yy          start year to use, integer
-  ;       start_mm          start month to use, integer
-  ;       start_dd          start day to use, integer
-  ;       end_yy            end year to use, integer
-  ;       end_mm            end month to use, integer
-  ;       end_dd            end day to use, integer
-  ;       program           program to filter on, string, optional
-  ;       platform          platform to filter on, string, optional
-  ;       instrument_type   instrument type to filter on, string, optional
-  ;       source_type       source type to filter on (valid values are: leo, heo,
-  ;                         lunar, ground, event_list), string, optional
-  ;
-  ; OUTPUT
-  ;       retrieved data availability information
-  ;
-  ; OUTPUT TYPE:
-  ;       a list of structs
-  ;
-  ; EXAMPLES:
-  ;       data = aurorax_availability_ephemeris(2020,1,1,2020,1,5,program='swarm')
-  ;
-  ; REVISION HISTORY:
-  ;   - Initial implementation, Feb 2022, Darren Chaddock
-  ;+
-  ;-------------------------------------------------------------
+;-------------------------------------------------------------
+;+
+; NAME:
+;       AURORAX_AVAILABILITY_EPHEMERIS
+;
+; PURPOSE:
+;       Retrieve data availability information for ephemeris records
+;
+; EXPLANATION:
+;       Retrieve data availability information for ephemeris records
+;       in the AuroraX platform. Optional parameters are used to filter
+;       unwanted data sources out.
+;
+; CALLING SEQUENCE:
+;       aurorax_availability_ephemeris(start_yy, start_mm, start_dd, end_yy, end_mm, end_dd)
+;
+; PARAMETERS:
+;       start_yy          start year to use, integer
+;       start_mm          start month to use, integer
+;       start_dd          start day to use, integer
+;       end_yy            end year to use, integer
+;       end_mm            end month to use, integer
+;       end_dd            end day to use, integer
+;       program           program to filter on, string, optional
+;       platform          platform to filter on, string, optional
+;       instrument_type   instrument type to filter on, string, optional
+;       source_type       source type to filter on (valid values are: leo, heo,
+;                         lunar, ground, event_list), string, optional
+;
+; OUTPUT
+;       retrieved data availability information
+;
+; OUTPUT TYPE:
+;       a list of structs
+;
+; EXAMPLES:
+;       data = aurorax_availability_ephemeris(2020,1,1,2020,1,5,program='swarm')
+;
+; REVISION HISTORY:
+;   - Initial implementation, Feb 2022, Darren Chaddock
+;+
+;-------------------------------------------------------------
 function aurorax_availability_ephemeris,start_yy,start_mm,start_dd,end_yy,end_mm,end_dd,program=program,platform=platform,instrument_type=instrument_type,source_type=source_type
   data = __aurorax_retrieve_availability(start_yy,start_mm,start_dd,end_yy,end_mm,end_dd,program,platform,instrument_type,source_type,'api/v1/availability/ephemeris')
   return,data
