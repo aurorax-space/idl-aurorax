@@ -38,11 +38,11 @@
 ;       aurorax_sources_list()
 ;
 ; PARAMETERS:
-;       program           program to filter on, optional
-;       platform          platform to filter on, optional
-;       instrument_type   instrument type to filter on, optional
+;       program           program to filter on, string, optional
+;       platform          platform to filter on, string, optional
+;       instrument_type   instrument type to filter on, string, optional
 ;       source_type       source type to filter on (valid values are: leo, heo,
-;                         lunar, ground, event_list), optional
+;                         lunar, ground, event_list), string, optional
 ;
 ; KEYWORDS:
 ;       /FORMAT_FULL_RECORD       data sources returned have all availabile information
@@ -50,10 +50,13 @@
 ;       /FORMAT_IDENTIFIER_ONLY   data sources returned have minimal information about
 ;                                 them, just the identifier
 ;
-; OUTPUTS
-;       the found data sources in the format of a list of structs
+; OUTPUT:
+;       the found data sources
 ;
-; EXAMPLE:
+; OUTPUT TYPE:
+;       a list of structs
+;
+; EXAMPLES:
 ;       data = aurorax_sources_list()
 ;       data = aurorax_sources_list(program='swarm',/FORMAT_FULL_RECORD)
 ;       data = aurorax_sources_list(platform='gillam')
@@ -61,6 +64,7 @@
 ;
 ; REVISION HISTORY:
 ;   - Initial implementation, Feb 2022, Darren Chaddock
+;+
 ;-------------------------------------------------------------
 function aurorax_sources_list,program=program,platform=platform,instrument_type=instrument_type,source_type=source_type,FORMAT_FULL_RECORD=format_full_record,FORMAT_IDENTIFIER_ONLY=format_identifier_only
   ; set format
@@ -94,7 +98,7 @@ function aurorax_sources_list,program=program,platform=platform,instrument_type=
   ; make request
   output = req->Get(/STRING_ARRAY)
 
-  ; parse
+  ; serialize into struct
   data = json_parse(output,/TOSTRUCT)
 
   ; cleanup
