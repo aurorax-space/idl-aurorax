@@ -26,26 +26,38 @@
 ;+
 ; NAME:
 ;       AURORAX_SOURCES_LIST
-; 
+;
 ; PURPOSE:
 ;       Retrieve AuroraX data sources
-; 
+;
 ; EXPLANATION:
 ;       Retrieve a list of data sources from the AuroraX platform, with optional
 ;       parameters used to filter unwanted data sources out.
-;       
+;
 ; CALLING SEQUENCE:
-;       data = aurorax_sources_list()
-; 
-; INPUTS
+;       aurorax_sources_list()
+;
+; PARAMETERS:
+;       program           program to filter on, optional
+;       platform          platform to filter on, optional
+;       instrument_type   instrument type to filter on, optional
+;       source_type       source type to filter on (valid values are: leo, heo,
+;                         lunar, ground, event_list), optional
+;
+; KEYWORDS:
+;       /FORMAT_FULL_RECORD       data sources returned have all availabile information
+;                                 about them
+;       /FORMAT_IDENTIFIER_ONLY   data sources returned have minimal information about
+;                                 them, just the identifier
 ;
 ; OUTPUTS
-;
-; OPTIONAL INPUT KEYWORD:
+;       the found data sources in the format of a list of structs
 ;
 ; EXAMPLE:
-; 
-; NOTES:
+;       data = aurorax_sources_list()
+;       data = aurorax_sources_list(program='swarm',/FORMAT_FULL_RECORD)
+;       data = aurorax_sources_list(platform='gillam')
+;       data = aurorax_sources_list(program='trex', platform='fort smith')
 ;
 ; REVISION HISTORY:
 ;   - Initial implementation, Feb 2022, Darren Chaddock
