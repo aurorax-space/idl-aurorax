@@ -27,13 +27,13 @@ Since IDL 8.7.1, there exists an IDL package manager called [ipm](https://www.l3
 
 On the IDL command prompt, run the following:
 
-```
+```idl
 IDL> ipm,/install,'https://data.aurorax.space/data/software/idl-aurorax/latest.zip'
 ```
 
 Then, add the following to your startup file, or run the commands manually using the IDL command prompt:
 
-```
+```idl
 .run aurorax_availability
 .run aurorax_conjunctions
 .run aurorax_data_products
@@ -61,7 +61,7 @@ For usage details, please visit the AuroraX documentation website, and the basic
 
 If you used `ipm` to install idl-aurorax, you can update it using:
 
-```
+```idl
 ipm,/update,'idl-aurorax'
 ```
 
