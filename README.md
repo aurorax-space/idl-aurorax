@@ -11,7 +11,7 @@ Some links to help:
 - [AuroraX main website](https://aurorax.space)
 - [IDL-AuroraX documentation](https://docs.aurorax.space/code/overview)
 
-## Capabilities
+## Limitations
 
 Please note, this IDL library only provides the ability to **retrieve** data from the AuroraX platform. It does not have functions for uploading or editing data on AuroraX. Please use the Python library, [PyAuroraX](https://github.com/aurorax-space/pyaurorax) for this functionality.
 
@@ -19,7 +19,7 @@ Please note, this IDL library only provides the ability to **retrieve** data fro
 
 Installation can be done two different ways: 1) using the `ipm` command, or 2) manually adding the files to your IDL path.
 
-You can view all previous versions by browsing the AuroraX data tree [here](https://data.aurorax.space/software/idl-aurorax).
+You can view all previous versions by browsing the AuroraX data tree [here](https://data.aurorax.space/data/software/idl-aurorax).
 
 ### Using ipm
 
@@ -28,7 +28,7 @@ Since IDL 8.7.1, there exists an IDL package manager called [ipm](https://www.l3
 On the IDL command prompt, run the following:
 
 ```
-IDL> ipm,/install,'https://data.aurorax.space/software/idl-aurorax/latest.zip'
+IDL> ipm,/install,'https://data.aurorax.space/data/software/idl-aurorax/latest.zip'
 ```
 
 Then, add the following to your startup file, or run the commands manually using the IDL command prompt:
@@ -41,14 +41,14 @@ Then, add the following to your startup file, or run the commands manually using
 .run aurorax_util
 ```
 
-For further information, you can view what packages are installed using 'ipm,/list'. You can also view the package details using `ipm,/query,'idl-aurorax'`.
+For further information, you can view what packages are installed using `ipm,/list`. You can also view the package details using `ipm,/query,'idl-aurorax'`.
 
 ### Manually
 
 Alternatively, you can install the idl-aurorax library manually by downloading the ZIP file and extracting it into, or adding it to, your IDL path. 
 
-- [Latest packaged release](https://data.aurorax.space/software/idl-aurorax/latest.zip)
-- [Browse previous releases](https://data.aurorax.space/software/idl-aurorax)
+- [Latest packaged release](https://data.aurorax.space/data/software/idl-aurorax/latest.zip)
+- [Browse previous releases](https://data.aurorax.space/data/software/idl-aurorax)
 
 ## Usage
 
@@ -67,5 +67,5 @@ ipm,/update,'idl-aurorax'
 
 If you installed the code manually, you can download the latest Zip file and overwite the existing files.
 
-- [Latest packaged release](https://data.aurorax.space/software/idl-aurorax/latest.zip)
-- [Browse previous releases](https://data.aurorax.space/software/idl-aurorax)
+- [Latest packaged release](https://data.aurorax.space/data/software/idl-aurorax/latest.zip)
+- [Browse previous releases](https://data.aurorax.space/data/software/idl-aurorax)
