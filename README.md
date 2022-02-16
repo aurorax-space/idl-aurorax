@@ -41,9 +41,14 @@ Then, add the following to your startup file, or run the commands manually using
 .run aurorax_util
 ```
 
+For further information, you can view what packages are installed using 'ipm,/list'. You can also view the package details using `ipm,/query,'idl-aurorax'`.
+
 ### Manually
 
-Alternatively, you can install the idl-aurorax library manually by downloading the ZIP file and extracting it into, or adding it to, your IDL path.
+Alternatively, you can install the idl-aurorax library manually by downloading the ZIP file and extracting it into, or adding it to, your IDL path. 
+
+- [Latest packaged release](https://data.aurorax.space/software/idl-aurorax/latest.zip)
+- [Browse previous releases](https://data.aurorax.space/software/idl-aurorax)
 
 ## Usage
 
@@ -57,7 +62,10 @@ For usage details, please visit the AuroraX documentation website, and the basic
 If you used `ipm` to install idl-aurorax, you can update it using:
 
 ```
-ipm,/update,'https://data.aurorax.space/software/idl-aurorax/latest.zip'
+ipm,/update,'idl-aurorax'
 ```
 
 If you installed the code manually, you can download the latest Zip file and overwite the existing files.
+
+- [Latest packaged release](https://data.aurorax.space/software/idl-aurorax/latest.zip)
+- [Browse previous releases](https://data.aurorax.space/software/idl-aurorax)
