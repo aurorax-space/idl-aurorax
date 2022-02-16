@@ -65,7 +65,21 @@ If you used `ipm` to install idl-aurorax, you can update it using:
 IDL> ipm,/update,'idl-aurorax'
 ```
 
-If you installed the code manually, you can download the latest Zip file and overwite the existing files.
+If you installed the code manually, you can download the latest Zip file and overwite the existing files. Then, add and new `.run` commands to your startup file as defined in the "Installation" section above.
 
 - [Latest packaged release](https://data.aurorax.space/data/software/idl-aurorax/latest.zip)
 - [Browse previous releases](https://data.aurorax.space/data/software/idl-aurorax)
+
+## Development
+
+### Preparing a new distributable package
+
+When a new release is ready for deployment, there are a few tasks that need to be done.
+
+1. Increment the version number and change the date in `idlpackage.json`.
+2. Generate a new distributable Zip file ([more info](https://www.l3harrisgeospatial.com/docs/ipm.html#CREATE))
+```
+IDL> ipm,/create,'path_to_code',name='idl-aurorax'
+```
+3. Upload the generated Zip file to https://data.aurorax.space, and update the symlink for latest.zip
+4. Create a new release in Github repository
