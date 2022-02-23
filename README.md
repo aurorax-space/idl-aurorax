@@ -26,7 +26,7 @@ You can view all previous versions by browsing the AuroraX data tree [here](http
 
 Since IDL 8.7.1, there exists an IDL package manager called [ipm](https://www.l3harrisgeospatial.com/docs/ipm.html#INSTALL). We can use this to install the idl-aurorax library with a single command.
 
-On the IDL command prompt, run the following:
+From the IDL command prompt, run the following:
 
 ```idl
 IDL> ipm,/install,'https://data.aurorax.space/data/software/idl-aurorax/latest.zip'
