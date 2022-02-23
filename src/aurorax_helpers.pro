@@ -22,8 +22,7 @@
 ; SOFTWARE.
 ;-------------------------------------------------------------
 
-
-function aurorax_date_parser,input_str,INTERPRET_AS_START=start_kw,INTERPRET_AS_END=end_kw
+function aurorax_datetime_parser,input_str,INTERPRET_AS_START=start_kw,INTERPRET_AS_END=end_kw
   ; input of a datetime string of various formats, output is a full datetime
   ; string in the YYYY-MM-DDTHH:MM:SS format that will be used by the AuroraX
   ; API as part of requests

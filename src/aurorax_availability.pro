@@ -22,10 +22,16 @@
 ; SOFTWARE.
 ;-------------------------------------------------------------
 
-function __aurorax_retrieve_availability,start_yy,start_mm,start_dd,end_yy,end_mm,end_dd,program,platform,instrument_type,source_type,url_path
+function __aurorax_retrieve_availability,start_date,end_date,program,platform,instrument_type,source_type,url_path
+  ; convert dates to ISO format
+  start_iso_dt = aurorax_datetime_parser(start_date,/interpret_as_start)
+  end_iso_dt = aurorax_datetime_parser(end_date,/interpret_as_end)
+  if (start_iso_dt eq '') then return,[]
+  if (end_iso_dt eq '') then return,[]
+
   ; set params
-  param_str = 'start=' + string(start_yy, format='(i4.4)') + '-' + string(start_mm, format='(i2.2)') + '-' + string(start_dd, format='(i2.2)')
-  param_str += '&end=' + string(end_yy, format='(i4.4)') + '-' + string(end_mm, format='(i2.2)') + '-' + string(end_dd, format='(i2.2)')
+  param_str = 'start=' + strmid(start_iso_dt,0,10)
+  param_str += '&end=' + strmid(end_iso_dt,0,10)
   if (isa(program) eq 1) then begin
     param_str += '&program=' + program
   endif
@@ -60,7 +66,6 @@ function __aurorax_retrieve_availability,start_yy,start_mm,start_dd,end_yy,end_m
   return,data
 end
 
-
 ;-------------------------------------------------------------
 ;+
 ; NAME:
@@ -75,15 +80,11 @@ end
 ;       unwanted data sources out.
 ;
 ; CALLING SEQUENCE:
-;       aurorax_availability_ephemeris(start_yy, start_mm, start_dd, end_yy, end_mm, end_dd)
+;       aurorax_availability_ephemeris(start_date, end_date)
 ;
 ; PARAMETERS:
-;       start_yy          start year to use, integer
-;       start_mm          start month to use, integer
-;       start_dd          start day to use, integer
-;       end_yy            end year to use, integer
-;       end_mm            end month to use, integer
-;       end_dd            end day to use, integer
+;       start_date        start year to use, string (YYYY, YYYYMM, or YYYYMMDD)
+;       end_date          end year to use, string (YYYY, YYYYMM, or YYYYMMDD)
 ;       program           program to filter on, string, optional
 ;       platform          platform to filter on, string, optional
 ;       instrument_type   instrument type to filter on, string, optional
@@ -97,17 +98,17 @@ end
 ;       a list of structs
 ;
 ; EXAMPLES:
-;       data = aurorax_availability_ephemeris(2020,1,1,2020,1,5,program='swarm')
+;       data = aurorax_availability_ephemeris('20200101','20200105',program='swarm')
+;       data = aurorax_availability_ephemeris('2020-01-01','2020-03-15',program='themis',platform='themisc')
 ;
 ; REVISION HISTORY:
 ;   - Initial implementation, Feb 2022, Darren Chaddock
 ;+
 ;-------------------------------------------------------------
-function aurorax_availability_ephemeris,start_yy,start_mm,start_dd,end_yy,end_mm,end_dd,program=program,platform=platform,instrument_type=instrument_type,source_type=source_type
-  data = __aurorax_retrieve_availability(start_yy,start_mm,start_dd,end_yy,end_mm,end_dd,program,platform,instrument_type,source_type,'api/v1/availability/ephemeris')
+function aurorax_availability_ephemeris,start_date,end_date,program=program,platform=platform,instrument_type=instrument_type,source_type=source_type
+  data = __aurorax_retrieve_availability(start_date,end_date,program,platform,instrument_type,source_type,'api/v1/availability/ephemeris')
   return,data
 end
-
 
 ;-------------------------------------------------------------
 ;+
@@ -123,15 +124,11 @@ end
 ;       unwanted data sources out.
 ;
 ; CALLING SEQUENCE:
-;       aurorax_availability_data_products(start_yy, start_mm, start_dd, end_yy, end_mm, end_dd)
+;       aurorax_availability_data_products(start_date, end_date)
 ;
 ; PARAMETERS:
-;       start_yy          start year to use, integer
-;       start_mm          start month to use, integer
-;       start_dd          start day to use, integer
-;       end_yy            end year to use, integer
-;       end_mm            end month to use, integer
-;       end_dd            end day to use, integer
+;       start_date        start year to use, string (YYYY, YYYYMM, or YYYYMMDD)
+;       end_date          end year to use, string (YYYY, YYYYMM, or YYYYMMDD)
 ;       program           program to filter on, string, optional
 ;       platform          platform to filter on, string, optional
 ;       instrument_type   instrument type to filter on, string, optional
@@ -145,13 +142,14 @@ end
 ;       a list of structs
 ;
 ; EXAMPLES:
-;       data = aurorax_availability_data_products(2020,1,1,2020,1,5,program='auroramax')
+;       data = aurorax_availability_data_products('20200101','20200105',program='auroramax')
+;       data = aurorax_availability_data_products('2020-01-01','2020-03-15',program='trex',platform='gillam')
 ;
 ; REVISION HISTORY:
 ;   - Initial implementation, Feb 2022, Darren Chaddock
 ;+
 ;-------------------------------------------------------------
-function aurorax_availability_data_products,start_yy,start_mm,start_dd,end_yy,end_mm,end_dd,program=program,platform=platform,instrument_type=instrument_type,source_type=source_type
-  data = __aurorax_retrieve_availability(start_yy,start_mm,start_dd,end_yy,end_mm,end_dd,program,platform,instrument_type,source_type,'api/v1/availability/data_products')
+function aurorax_availability_data_products,start_date,end_date,program=program,platform=platform,instrument_type=instrument_type,source_type=source_type
+  data = __aurorax_retrieve_availability(start_date,end_date,program,platform,instrument_type,source_type,'api/v1/availability/data_products')
   return,data
 end
