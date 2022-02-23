@@ -69,7 +69,7 @@ end
 ;-------------------------------------------------------------
 ;+
 ; NAME:
-;       AURORAX_AVAILABILITY_EPHEMERIS
+;       AURORAX_EPHEMERIS_AVAILABILITY
 ;
 ; PURPOSE:
 ;       Retrieve data availability information for ephemeris records
@@ -80,7 +80,7 @@ end
 ;       unwanted data sources out.
 ;
 ; CALLING SEQUENCE:
-;       aurorax_availability_ephemeris(start_date, end_date)
+;       aurorax_ephemeris_availability(start_date, end_date)
 ;
 ; PARAMETERS:
 ;       start_date        start year to use, string (YYYY, YYYYMM, or YYYYMMDD)
@@ -98,14 +98,14 @@ end
 ;       a list of structs
 ;
 ; EXAMPLES:
-;       data = aurorax_availability_ephemeris('20200101','20200105',program='swarm')
-;       data = aurorax_availability_ephemeris('2020-01-01','2020-03-15',program='themis',platform='themisc')
+;       data = aurorax_ephemeris_availability('20200101','20200105',program='swarm')
+;       data = aurorax_ephemeris_availability('2020-01-01','2020-03-15',program='themis',platform='themisc')
 ;
 ; REVISION HISTORY:
 ;   - Initial implementation, Feb 2022, Darren Chaddock
 ;+
 ;-------------------------------------------------------------
-function aurorax_availability_ephemeris,start_date,end_date,program=program,platform=platform,instrument_type=instrument_type,source_type=source_type
+function aurorax_ephemeris_availability,start_date,end_date,program=program,platform=platform,instrument_type=instrument_type,source_type=source_type
   data = __aurorax_retrieve_availability(start_date,end_date,program,platform,instrument_type,source_type,'api/v1/availability/ephemeris')
   return,data
 end
@@ -113,7 +113,7 @@ end
 ;-------------------------------------------------------------
 ;+
 ; NAME:
-;       AURORAX_AVAILABILITY_DATA_PRODUCTS
+;       AURORAX_DATA_PRODUCTS_AVAILABILITY
 ;
 ; PURPOSE:
 ;       Retrieve data availability information for data product records
@@ -124,7 +124,7 @@ end
 ;       unwanted data sources out.
 ;
 ; CALLING SEQUENCE:
-;       aurorax_availability_data_products(start_date, end_date)
+;       aurorax_data_products_availability(start_date, end_date)
 ;
 ; PARAMETERS:
 ;       start_date        start year to use, string (YYYY, YYYYMM, or YYYYMMDD)
@@ -142,14 +142,14 @@ end
 ;       a list of structs
 ;
 ; EXAMPLES:
-;       data = aurorax_availability_data_products('20200101','20200105',program='auroramax')
-;       data = aurorax_availability_data_products('2020-01-01','2020-03-15',program='trex',platform='gillam')
+;       data = aurorax_data_products_availability('20200101','20200105',program='auroramax')
+;       data = aurorax_data_products_availability('2020-01-01','2020-03-15',program='trex',platform='gillam')
 ;
 ; REVISION HISTORY:
 ;   - Initial implementation, Feb 2022, Darren Chaddock
 ;+
 ;-------------------------------------------------------------
-function aurorax_availability_data_products,start_date,end_date,program=program,platform=platform,instrument_type=instrument_type,source_type=source_type
+function aurorax_data_products_availability,start_date,end_date,program=program,platform=platform,instrument_type=instrument_type,source_type=source_type
   data = __aurorax_retrieve_availability(start_date,end_date,program,platform,instrument_type,source_type,'api/v1/availability/data_products')
   return,data
 end
