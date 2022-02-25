@@ -24,10 +24,9 @@
 
 function __aurorax_retrieve_availability,start_date,end_date,program,platform,instrument_type,source_type,url_path
   ; convert dates to ISO format
-  start_iso_dt = aurorax_datetime_parser(start_date,/interpret_as_start)
-  end_iso_dt = aurorax_datetime_parser(end_date,/interpret_as_end)
-  if (start_iso_dt eq '') then return,[]
-  if (end_iso_dt eq '') then return,[]
+  start_iso_dt = __aurorax_datetime_parser(start_date,/interpret_as_start)
+  end_iso_dt = __aurorax_datetime_parser(end_date,/interpret_as_end)
+  if (start_iso_dt eq '' or end_iso_dt eq '') then return,[]
 
   ; set params
   param_str = 'start=' + strmid(start_iso_dt,0,10)
@@ -60,7 +59,7 @@ function __aurorax_retrieve_availability,start_date,end_date,program,platform,in
   data = json_parse(output,/TOSTRUCT)
 
   ; cleanup
-  OBJ_DESTROY,req
+  obj_destroy,req
 
   ; return
   return,data

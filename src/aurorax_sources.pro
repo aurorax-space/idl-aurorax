@@ -69,8 +69,8 @@
 function aurorax_sources_list,program=program,platform=platform,instrument_type=instrument_type,source_type=source_type,FORMAT_FULL_RECORD=format_full_record,FORMAT_IDENTIFIER_ONLY=format_identifier_only
   ; set format
   format = 'basic_info'
-  if (n_elements(format_full_record) eq 1) then format = 'full_record'
-  if (n_elements(format_identifier_only) eq 1) then format = 'identifier_only'
+  if keyword_set(format_full_record) then format = 'full_record'
+  if keyword_set(format_identifier_only) then format = 'identifier_only'
 
   ; set params
   param_str = 'format=' + format
@@ -102,7 +102,7 @@ function aurorax_sources_list,program=program,platform=platform,instrument_type=
   data = json_parse(output,/TOSTRUCT)
 
   ; cleanup
-  OBJ_DESTROY,req
+  obj_destroy,req
 
   ; return
   return,data

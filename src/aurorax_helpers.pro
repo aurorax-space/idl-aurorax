@@ -22,7 +22,34 @@
 ; SOFTWARE.
 ;-------------------------------------------------------------
 
-function aurorax_datetime_parser,input_str,INTERPRET_AS_START=start_kw,INTERPRET_AS_END=end_kw
+pro __aurorax_message,msg
+  ; set datetime string
+  dt_str = systime()
+
+  ; print message
+  print,'[' + dt_str + '] ' + msg
+end
+
+function __aurorax_humanize_bytes,bytes
+  ; figure out which of bytes, kilobytes, megabytes, or gigabytes; and then convert it
+  if (bytes ge long64(1024)^long64(3)) then begin
+    bytes_converted = idlunit(strtrim(bytes,2) + ' bytes -> gigabytes')
+    converted_str = strtrim(string(bytes_converted.quantity, format='(f6.2)') + ' GB', 2)
+  endif else if (bytes ge long64(1024)^long64(2)) then begin
+    bytes_converted = idlunit(strtrim(bytes,2) + ' bytes -> megabytes')
+    converted_str = strtrim(string(bytes_converted.quantity, format='(f6.2)') + ' MB', 2)
+  endif else if (bytes ge long64(1024)) then begin
+    bytes_converted = idlunit(strtrim(bytes,2) + ' bytes -> kilobytes')
+    converted_str = strtrim(string(bytes_converted.quantity, format='(f6.2)') + ' KB', 2)
+  endif else begin
+    converted_str = strtrim(bytes,2) + ' bytes'
+  endelse
+
+  ; return
+  return,converted_str
+end
+
+function __aurorax_datetime_parser,input_str,INTERPRET_AS_START=start_kw,INTERPRET_AS_END=end_kw
   ; input of a datetime string of various formats, output is a full datetime
   ; string in the YYYY-MM-DDTHH:MM:SS format that will be used by the AuroraX
   ; API as part of requests
@@ -106,4 +133,21 @@ function aurorax_datetime_parser,input_str,INTERPRET_AS_START=start_kw,INTERPRET
 
   ; return
   return,iso_str
+end
+
+
+function __aurorax_extract_request_id_from_response_headers,headers,url_add_length
+  ; init
+  request_id = ''
+
+  ; find the location line and extract the request ID
+  location_start_pos = strpos(headers,'Location: ')
+  if (location_start_pos eq -1) then begin
+    __aurorax_message,'Unable to extract request ID from response headers'
+  endif else begin
+    request_id = strmid(headers,location_start_pos+url_add_length,36)
+  endelse
+
+  ; return
+  return,request_id
 end
