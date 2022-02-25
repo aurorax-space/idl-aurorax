@@ -42,6 +42,7 @@ Then, add the following to your startup file, or run the commands manually using
 .run aurorax_conjunctions
 .run aurorax_data_products
 .run aurorax_ephemeris
+.run aurorax_sources
 .run aurorax_util
 ```
 
