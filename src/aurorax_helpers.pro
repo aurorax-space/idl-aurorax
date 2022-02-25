@@ -74,6 +74,7 @@ function __aurorax_datetime_parser,input_str,INTERPRET_AS_START=start_kw,INTERPR
   input_str = input_str.replace('T','')
   input_str = input_str.replace('t','')
   input_str = input_str.replace(':','')
+  input_str = input_str.replace(' ','')
 
   ; based on length, add in the extra info
   if (strlen(input_str) eq 4) then begin
