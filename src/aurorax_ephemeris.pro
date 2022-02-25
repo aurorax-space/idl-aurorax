@@ -22,9 +22,6 @@
 ; SOFTWARE.
 ;-------------------------------------------------------------
 
-; definition for metadata filters
-
-;;;;;;;;
 
 function __aurorax_request_get_status,request_type,request_id
   ; set up request
@@ -107,13 +104,15 @@ function aurorax_ephemeris_search,start_dt,end_dt,programs=programs,platforms=pl
   if (isa(programs) eq 1) then data_sources_struct.programs = list(programs,/extract)
   if (isa(platforms) eq 1) then data_sources_struct.platforms = list(platforms,/extract)
   if (isa(instrument_types) eq 1) then data_sources_struct.instrument_types = list(instrument_types,/extract)
-  if (isa(metadata_filters) eq 1) then data_sources_struct.metadata_filters = metadata_filters
+  if (isa(metadata_filters) eq 1) then data_sources_struct.ephemeris_metadata_filters = hash(metadata_filters)
 
   ; create post struct and serialize into a string
   post_struct = {data_sources: data_sources_struct, start: start_iso_dt, end_dt: end_iso_dt}
   post_str = json_serialize(post_struct,/lowercase)
-  post_str = post_str.replace('end_dt','end')  ; because 'end' isn't a valid struct tag name
-  ;print,post_str
+  post_str = post_str.replace('LOGICAL_OPERATOR', 'logical_operator')  ; because of a bug in json_serialize where it does lowercase nested hashes
+  post_str = post_str.replace('EXPRESSIONS', 'expressions')            ; because of a bug in json_serialize where it does lowercase nested hashes
+  post_str = post_str.replace('end_dt','end')                          ; because 'end' isn't a valid struct tag name
+  print,post_str
 
   ; set up request
   req = OBJ_NEW('IDLnetUrl')
@@ -160,5 +159,6 @@ function aurorax_ephemeris_search,start_dt,end_dt,programs=programs,platforms=pl
   if (verbose eq 1) then __aurorax_message,'Data downloaded, search completed'
 
   ; return
+  if (verbose eq 1) then __aurorax_message,'Search completed, found ' + strtrim(status.search_result.result_count,2) + ' records'
   return,data
 end
