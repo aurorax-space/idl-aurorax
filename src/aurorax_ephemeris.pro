@@ -72,6 +72,10 @@
 ;
 ; KEYWORDS:
 ;       /QUIET           quiet output when searching, no print messages will be shown
+;       /DRYRUN          run in dry-run mode, which will exit before sending the search
+;                        request to AuroraX. The query will be printed though, so that
+;                        users can check to make sure it would have sent the request
+;                        that they wanted it to send.
 ;
 ; OUTPUT:
 ;       the found ephemeris records
@@ -97,17 +101,19 @@
 ;   - Initial implementation, Feb 2022, Darren Chaddock
 ;+
 ;-------------------------------------------------------------
-function aurorax_ephemeris_search,start_dt,end_dt,programs=programs,platforms=platforms,instrument_types=instrument_types,metadata_filters=metadata_filters,poll_interval=pi,QUIET=q
+function aurorax_ephemeris_search,start_dt,end_dt,programs=programs,platforms=platforms,instrument_types=instrument_types,metadata_filters=metadata_filters,poll_interval=pi,QUIET=q,DRYRUN=dr
   ; set verbosity
   verbose = 1
   if (isa(q) eq 1) then verbose = 0
 
-  ; set up some other vars we'll use
-  expected_url_length = 20
-
   ; set poll interval
   poll_interval = 1
   if (isa(pi) eq 1) then poll_interval = pi
+
+  ; set dry run flag
+  dry_run = 0
+  if (isa(dr) eq 1) then dry_run = 1
+  if (verbose eq 1 and dry_run eq 1) then __aurorax_message,'Executing in dry-run mode'
 
   ; get ISO datetime strings
   if (verbose eq 1) then __aurorax_message,'Parsing start and end timestamps'
@@ -129,6 +135,14 @@ function aurorax_ephemeris_search,start_dt,end_dt,programs=programs,platforms=pl
   post_str = post_str.replace('LOGICAL_OPERATOR', 'logical_operator')  ; because of a bug in json_serialize where it doesn't lowercase nested hashes
   post_str = post_str.replace('EXPRESSIONS', 'expressions')            ; because of a bug in json_serialize where it doesn't lowercase nested hashes
   post_str = post_str.replace('end_dt','end')                          ; because 'end' isn't a valid struct tag name
+
+  ; stop here if in dry-run mode
+  if (dry_run eq 1) then begin
+    __aurorax_message,'Dry-run mode, stopping here. Below is the query that would have been executed'
+    print,''
+    print,post_str
+    return,list()
+  endif
 
   ; set up request
   req = OBJ_NEW('IDLnetUrl')
