@@ -38,6 +38,7 @@ Then, add the following to your startup file, or run the commands manually using
 ```idl
 .run aurorax_models
 .run aurorax_helpers
+.run aurorax_requests
 .run aurorax_availability
 .run aurorax_conjunctions
 .run aurorax_data_products

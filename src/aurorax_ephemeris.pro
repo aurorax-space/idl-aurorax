@@ -22,63 +22,6 @@
 ; SOFTWARE.
 ;-------------------------------------------------------------
 
-function __aurorax_request_get_status,request_type,request_id
-  ; set up request
-  req = OBJ_NEW('IDLnetUrl')
-  req->SetProperty,URL_SCHEME = 'https'
-  req->SetProperty,URL_PORT = 443
-  req->SetProperty,URL_HOST = 'api.aurorax.space'
-  req->SetProperty,URL_PATH = 'api/v1/' + request_type + '/requests/' + request_id
-
-  ; make request
-  output = req->Get(/STRING_ARRAY)
-
-  ; serialize into struct
-  status = json_parse(output,/TOSTRUCT)
-
-  ; return
-  return,status
-end
-
-function __aurorax_request_wait_for_data,request_type,request_id,poll_interval,verbose
-  while (1) do begin
-    ; get status
-    status = __aurorax_request_get_status(request_type, request_id)
-
-    ; check status to see if request has completed
-    if (strpos(status.search_result.completed_timestamp,'!NULL') ne 0) then begin
-      ; data is available, bail out
-      break
-    endif
-
-    ; wait
-    if (verbose eq 1) then __aurorax_message,'Waiting for search to finish ...'
-    wait,poll_interval
-  endwhile
-
-  ; return completed status
-  return,status
-end
-
-function __aurorax_request_get_data,request_type,request_id
-  ; set up request
-  req = OBJ_NEW('IDLnetUrl')
-  req->SetProperty,URL_SCHEME = 'https'
-  req->SetProperty,URL_PORT = 443
-  req->SetProperty,URL_HOST = 'api.aurorax.space'
-  req->SetProperty,URL_PATH = 'api/v1/' + request_type + '/requests/' + request_id + '/data'
-
-  ; make request
-  output = req->Get(/STRING_ARRAY)
-
-  ; serialize into struct
-  data = json_parse(output,/TOSTRUCT)
-  data = data.result
-
-  ; return
-  return,data
-end
-
 ;-------------------------------------------------------------
 ;+
 ; NAME:
@@ -99,7 +42,7 @@ end
 ;       end_dt             end datetime, string (different formats allowed, see below)
 ;       programs           programs to filter for, list(string), optional
 ;       platforms          platforms to filter for, list(string), optional
-;       instrument_types   instrument type to filter for, string, optional
+;       instrument_types   instrument types to filter for, list(string), optional
 ;       metadata_filters   metadata filters to filter for, {aurorax_metadata_filter_obj}, optional
 ;       poll_interval      sleep time between polling events while waiting for data, integer,
 ;                          optional (in seconds; default is 1s)
@@ -183,8 +126,8 @@ function aurorax_ephemeris_search,start_dt,end_dt,programs=programs,platforms=pl
   ; create post struct and serialize into a string
   post_struct = {data_sources: data_sources_struct, start: start_iso_dt, end_dt: end_iso_dt}
   post_str = json_serialize(post_struct,/lowercase)
-  post_str = post_str.replace('LOGICAL_OPERATOR', 'logical_operator')  ; because of a bug in json_serialize where it does lowercase nested hashes
-  post_str = post_str.replace('EXPRESSIONS', 'expressions')            ; because of a bug in json_serialize where it does lowercase nested hashes
+  post_str = post_str.replace('LOGICAL_OPERATOR', 'logical_operator')  ; because of a bug in json_serialize where it doesn't lowercase nested hashes
+  post_str = post_str.replace('EXPRESSIONS', 'expressions')            ; because of a bug in json_serialize where it doesn't lowercase nested hashes
   post_str = post_str.replace('end_dt','end')                          ; because 'end' isn't a valid struct tag name
 
   ; set up request
