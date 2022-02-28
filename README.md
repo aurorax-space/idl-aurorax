@@ -36,15 +36,14 @@ IDL> ipm,/install,'https://data.aurorax.space/data/software/idl-aurorax/latest.z
 Then, add the following to your startup file, or run the commands manually using the IDL command prompt:
 
 ```idl
-.run aurorax_models
 .run aurorax_helpers
 .run aurorax_requests
+.run aurorax_metadata_filters
 .run aurorax_availability
 .run aurorax_conjunctions
 .run aurorax_data_products
 .run aurorax_ephemeris
 .run aurorax_sources
-.run aurorax_util
 ```
 
 For further information, you can view what packages are installed using `ipm,/list`. You can also view the package details using `ipm,/query,'idl-aurorax'`.

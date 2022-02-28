@@ -89,13 +89,9 @@
 ;       data = aurorax_data_product_search('2020-01-01T00:00','2020-01-01T23:59',programs=['trex'],platforms=['gillam'],instrument_types=['RGB ASI'])
 ;
 ;       ; example with metadata
-;       expression = {aurorax_metadata_expression_obj}
-;       expression.key = 'keogram_type'
-;       expression.operator = 'in'
-;       expression.values = list('daily')
-;       metadata_filters = {aurorax_metadata_filters_obj}
-;       metadata_filters.logical_operator = 'AND'
-;       metadata_filters.expressions = list(expression)
+;       expression = aurorax_create_metadata_filter_expression('keogram_type', list('daily'),/OPERATOR_IN)
+;       expressions = list(expression)
+;       metadata_filters = aurorax_create_metadata_filter(expressions,/OPERATOR_AND)
 ;       data = aurorax_data_product_search('2020-01-01T00:00','2020-01-01T23:59',programs=['trex'],metadata_filters=metadata_filters)
 ;
 ; REVISION HISTORY:
@@ -106,9 +102,6 @@ function aurorax_data_product_search,start_dt,end_dt,programs=programs,platforms
   ; set verbosity
   verbose = 1
   if (isa(q) eq 1) then verbose = 0
-
-  ; set up some other vars we'll use
-  expected_url_length = 20
 
   ; set poll interval
   poll_interval = 1
@@ -150,6 +143,7 @@ function aurorax_data_product_search,start_dt,end_dt,programs=programs,platforms
   endif
 
   ; set up request
+  tic
   req = OBJ_NEW('IDLnetUrl')
   req->SetProperty,URL_SCHEME = 'https'
   req->SetProperty,URL_PORT = 443
@@ -194,6 +188,7 @@ function aurorax_data_product_search,start_dt,end_dt,programs=programs,platforms
   if (verbose eq 1) then __aurorax_message,'Data downloaded, search completed'
 
   ; post-process data (ie. change 'start' to 'start_dt', and '_end' to 'end_dt')
+  if (verbose eq 1) then __aurorax_message,'Post-processing data into IDL struct'
   data_adjusted = list()
   for i=0,n_elements(data)-1 do begin
     new_record_struct = {start_dt: data[i].start, end_dt: data[i]._end, data_source: data[i].data_source, url: data[i].url, data_product_type: data[i].data_product_type, metadata: data[i].metadata}
@@ -201,7 +196,11 @@ function aurorax_data_product_search,start_dt,end_dt,programs=programs,platforms
   endfor
   delvar,data
 
+  ; get elapsed time
+  toc_ts = toc()
+  duration_str = __aurorax_time2string(toc_ts)
+
   ; return
-  if (verbose eq 1) then __aurorax_message,'Search completed, found ' + strtrim(status.search_result.result_count,2) + ' records'
+  if (verbose eq 1) then __aurorax_message,'Search completed, found ' + strtrim(status.search_result.result_count,2) + ' records in ' + duration_str
   return,data_adjusted
 end

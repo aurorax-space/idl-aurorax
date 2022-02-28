@@ -88,13 +88,9 @@
 ;       data = aurorax_ephemeris_search('2020-01-01T00:00','2020-01-01T23:59',programs=['swarm'],platforms=['swarma'],instrument_types=['footprint'])
 ;
 ;       ; example with metadata
-;       expression = {aurorax_metadata_expression_obj}
-;       expression.key = 'nbtrace_region'
-;       expression.operator = 'in'
-;       expression.values = list('north auroral oval', 'north mid-latitude')
-;       metadata_filters = {aurorax_metadata_filters_obj}
-;       metadata_filters.logical_operator = 'AND'
-;       metadata_filters.expressions = list(expression)
+;       expression = aurorax_create_metadata_filter_expression('nbtrace_region', list('north auroral oval', 'north mid-latitude'),/OPERATOR_IN)
+;       expressions = list(expression)
+;       metadata_filters = aurorax_create_metadata_filter(expressions,/OPERATOR_AND)
 ;       data = aurorax_ephemeris_search('2020-01-01T00:00','2020-01-01T23:59',programs=['swarm'],metadata_filters=metadata_filters)
 ;
 ; REVISION HISTORY:
@@ -145,6 +141,7 @@ function aurorax_ephemeris_search,start_dt,end_dt,programs=programs,platforms=pl
   endif
 
   ; set up request
+  tic
   req = OBJ_NEW('IDLnetUrl')
   req->SetProperty,URL_SCHEME = 'https'
   req->SetProperty,URL_PORT = 443
@@ -188,7 +185,11 @@ function aurorax_ephemeris_search,start_dt,end_dt,programs=programs,platforms=pl
   data = __aurorax_request_get_data('ephemeris',request_id)
   if (verbose eq 1) then __aurorax_message,'Data downloaded, search completed'
 
+  ; get elapsed time
+  toc_ts = toc()
+  duration_str = __aurorax_time2string(toc_ts)
+
   ; return
-  if (verbose eq 1) then __aurorax_message,'Search completed, found ' + strtrim(status.search_result.result_count,2) + ' records'
+  if (verbose eq 1) then __aurorax_message,'Search completed, found ' + strtrim(status.search_result.result_count,2) + ' records in ' + duration_str
   return,data
 end

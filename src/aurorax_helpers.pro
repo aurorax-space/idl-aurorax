@@ -136,7 +136,6 @@ function __aurorax_datetime_parser,input_str,INTERPRET_AS_START=start_kw,INTERPR
   return,iso_str
 end
 
-
 function __aurorax_extract_request_id_from_response_headers,headers,url_add_length
   ; init
   request_id = ''
@@ -151,4 +150,44 @@ function __aurorax_extract_request_id_from_response_headers,headers,url_add_leng
 
   ; return
   return,request_id
+end
+
+function __aurorax_time2string,time
+  ; seconds
+  tempTime = double(time)
+  if keyword_set(days) then tempTime *= 86400D
+  result = strtrim(string(tempTime mod 60, format='(f4.1, " seconds")'),2)
+
+  ; minutes
+  tempTime = floor(tempTime / 60)
+  if tempTime eq 0 then return, result
+  unit = (tempTime mod 60) eq 1 ? ' minute, ' : ' minutes, '
+  result = strtrim(string(tempTime mod 60, format='(i2)') + unit + result,2)
+
+  ; return
+  return, result
+end
+
+function aurorax_create_criteria_block,programs=programs,platforms=platforms,instrument_types=instrument_types,hemisphere=hemisphere,metadata_filters=metadata_filters,GROUND=ground_kw,SPACE=space_kw,EVENTS=events_kw
+  ; create the object
+  if (keyword_set(ground_kw) or keyword_set(events_kw)) then begin
+    obj = {programs: list(), platforms: list(), instrument_types: list(), ephemeris_metadata_filters: hash()}
+    if (isa(programs) eq 1) then obj.programs = list(programs,/extract)
+    if (isa(platforms) eq 1) then obj.platforms = list(platforms,/extract)
+    if (isa(instrument_types) eq 1) then obj.instrument_types = list(instrument_types,/extract)
+    if (isa(metadata_filters) eq 1) then obj.ephemeris_metadata_filters = hash(metadata_filters)
+  endif else if (keyword_set(space_kw)) then begin
+    obj = {programs: list(), platforms: list(), instrument_types: list(), hemisphere: list(), ephemeris_metadata_filters: hash()}
+    if (isa(programs) eq 1) then obj.programs = list(programs,/extract)
+    if (isa(platforms) eq 1) then obj.platforms = list(platforms,/extract)
+    if (isa(instrument_types) eq 1) then obj.instrument_types = list(instrument_types,/extract)
+    if (isa(hemisphere) eq 1) then obj.hemisphere = list(hemisphere,/extract)
+    if (isa(metadata_filters) eq 1) then obj.ephemeris_metadata_filters = hash(metadata_filters)
+  endif else begin
+    print,'Error: no keyword used, not sure what type of criteria block this should be. Please use one of /GROUND, /SPACE, or /EVENTS when calling this function'
+    return,!NULL
+  endelse
+
+  ; return
+  return,obj
 end
