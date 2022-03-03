@@ -182,7 +182,7 @@ end
 ;         start_dt = '2020/01/01T00:00'
 ;         start_dt = '2020-01-01 00:00'
 ;
-;       The following are all interpreted as '2020-12-31T23:59:59'
+;       The following are all interpreted as '2020-12-31T23:59:59':
 ;         end_dt = '2020'
 ;         end_dt = '202012'
 ;         end_dt = '20201231'
@@ -357,7 +357,14 @@ function aurorax_conjunction_search,start_dt,end_dt,distance,ground=ground,space
   if (verbose eq 1) then __aurorax_message,'Post-processing data into IDL struct'
   data_adjusted = list()
   for i=0,n_elements(data)-1 do begin
-    new_record_struct = {start_dt: data[i].start, end_dt: data[i]._end, min_distance: data[i].min_distance, max_distance: data[i].max_distance, closest_epoch: data[i].closest_epoch, farthest_epoch: data[i].farthest_epoch, data_sources: data[i].data_sources, events: data[i].events}
+    events_adjusted = list()
+    if (n_elements(data[i].events) gt 0) then begin
+      for j=0,n_elements(data[i].events)-1 do begin
+        new_event_struct = {e1_source: data[i].events[j].e1_source, e2_source: data[i].events[j].e2_source, start_dt: data[i].events[j].start, end_dt: data[i].events[j]._end, min_distance: data[i].events[j].min_distance, max_distance: data[i].events[j].max_distance}
+        events_adjusted.add,new_event_struct
+      endfor
+    endif
+    new_record_struct = {start_dt: data[i].start, end_dt: data[i]._end, min_distance: data[i].min_distance, max_distance: data[i].max_distance, closest_epoch: data[i].closest_epoch, farthest_epoch: data[i].farthest_epoch, data_sources: data[i].data_sources, events: events_adjusted}
     data_adjusted.add,new_record_struct
   endfor
   delvar,data
@@ -368,5 +375,5 @@ function aurorax_conjunction_search,start_dt,end_dt,distance,ground=ground,space
 
   ; return
   if (verbose eq 1) then __aurorax_message,'Search completed, found ' + strtrim(status.search_result.result_count,2) + ' conjunctions in ' + duration_str
-  return,data
+  return,data_adjusted
 end

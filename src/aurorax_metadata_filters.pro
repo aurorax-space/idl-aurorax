@@ -52,12 +52,13 @@
 ;       /OPERATOR_LE          operator for this expression will be '<='
 ;       /OPERATOR_BETWEEN     operator for this expression will be 'between'
 ;       /OPERATOR_IN          operator for this expression will be 'in'
+;       /OPERATOR_NOT_IN      operator for this expression will be 'not in'
 ;
 ; OUTPUT:
 ;       a metadata filter expression
 ;
 ; OUTPUT TYPE:
-;       HASH
+;       a hash
 ;
 ; EXAMPLES:
 ;       expression = aurorax_create_metadata_filter_expression('calgary_apa_ml_v1',list('classified as APA'),/OPERATOR_IN)
@@ -69,7 +70,7 @@
 ;   - Initial implementation, Feb 2022, Darren Chaddock
 ;+
 ;-------------------------------------------------------------
-function aurorax_create_metadata_filter_expression,key,values,OPERATOR_EQ=eq_kw,OPERATOR_NE=ne_kw,OPERATOR_LT=lt_kw,OPERATOR_GT=gt_kw,OPERATOR_LE=le_kw,OPERATOR_GE=ge_kw,OPERATOR_BETWEEN=between_kw,OPERATOR_IN=in_kw
+function aurorax_create_metadata_filter_expression,key,values,OPERATOR_EQ=eq_kw,OPERATOR_NE=ne_kw,OPERATOR_LT=lt_kw,OPERATOR_GT=gt_kw,OPERATOR_LE=le_kw,OPERATOR_GE=ge_kw,OPERATOR_BETWEEN=between_kw,OPERATOR_IN=in_kw,OPERATOR_NOT_IN=not_in_kw
   ; set operator
   operator = ''
   if keyword_set(eq_kw) then operator = '='
@@ -80,6 +81,7 @@ function aurorax_create_metadata_filter_expression,key,values,OPERATOR_EQ=eq_kw,
   if keyword_set(ge_kw) then operator = '>='
   if keyword_set(between_kw) then operator = 'between'
   if keyword_set(in_kw) then operator = 'in'
+  if keyword_set(not_in_kw) then operator = 'not in'
   if (operator eq '') then begin
     print,'Error: must supply one of the operator keywords, please add one and try again'
     return,hash()
@@ -128,7 +130,7 @@ end
 ;       the metadata filter
 ;
 ; OUTPUT TYPE:
-;       HASH
+;       a hash
 ;
 ; EXAMPLES:
 ;       expression1 = aurorax_create_metadata_filter_expression('calgary_apa_ml_v1', list('classified as APA'),/OPERATOR_IN)

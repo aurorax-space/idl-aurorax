@@ -1,6 +1,6 @@
 <a href="https://aurorax.space/"><img alt="AuroraX" src="logo.svg" height="60"></a>
 
-![Stable version](https://img.shields.io/badge/Latest%20stable%20release-v0.2.0-orange)
+![Stable version](https://img.shields.io/badge/Latest%20stable%20release-v0.3.0-orange)
 ![IDL version required](https://img.shields.io/badge/IDL-8.7.1%2B-blue)
 [![MIT license](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://github.com/aurorax-space/idl-aurorax/blob/main/LICENSE)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6098075.svg)](https://doi.org/10.5281/zenodo.6098075)
@@ -12,6 +12,8 @@ IDL-AuroraX officially supports IDL 8.7.1+ (limited testing on older versions).
 Some links to help:
 - [AuroraX main website](https://aurorax.space)
 - [IDL-AuroraX documentation](https://docs.aurorax.space/code/overview)
+- [Latest packaged release](https://data.aurorax.space/data/software/idl-aurorax/latest.zip)
+- [Browse previous releases](https://data.aurorax.space/data/software/idl-aurorax)
 
 ## Limitations
 
@@ -19,13 +21,13 @@ Please note, this IDL library only provides the ability to **retrieve** data fro
 
 ## Installation
 
-Installation can be done two different ways: 1) using the `ipm` command, or 2) manually adding the files to your IDL path.
+Installation can be done two different ways: 1) using the `ipm` command (recommended), or 2) manually adding the files to your IDL path.
 
 You can view all previous versions by browsing the AuroraX data tree [here](https://data.aurorax.space/data/software/idl-aurorax).
 
-### Using ipm
+### Using ipm (recommended)
 
-Since IDL 8.7.1, there exists an IDL package manager called [ipm](https://www.l3harrisgeospatial.com/docs/ipm.html#INSTALL). We can use this to install the idl-aurorax library with a single command.
+Since IDL 8.7.1, there exists an IDL package manager called [ipm](https://www.l3harrisgeospatial.com/docs/ipm.html#INSTALL). We can use this to install the idl-aurorax library with a single command. This is the recommended way of installing the IDL-AuroraX library.
 
 From the IDL command prompt, run the following:
 
@@ -33,17 +35,10 @@ From the IDL command prompt, run the following:
 IDL> ipm,/install,'https://data.aurorax.space/data/software/idl-aurorax/latest.zip'
 ```
 
-Then, add the following to your startup file, or run the commands manually using the IDL command prompt:
+Then, add the following to your startup file, or run the command manually using the IDL command prompt:
 
 ```idl
-.run aurorax_helpers
-.run aurorax_requests
-.run aurorax_metadata_filters
-.run aurorax_availability
-.run aurorax_conjunctions
-.run aurorax_data_products
-.run aurorax_ephemeris
-.run aurorax_sources
+.run aurorax_startup
 ```
 
 For further information, you can view what packages are installed using `ipm,/list`. You can also view the package details using `ipm,/query,'idl-aurorax'`.
@@ -54,6 +49,20 @@ Alternatively, you can install the idl-aurorax library manually by downloading t
 
 - [Latest packaged release](https://data.aurorax.space/data/software/idl-aurorax/latest.zip)
 - [Browse previous releases](https://data.aurorax.space/data/software/idl-aurorax)
+
+After it's in your path, add the following to your startup file (or run the command manually using the IDL command prompt).
+
+```idl
+.run aurorax_startup
+```
+
+### Bleeding edge
+
+If you want to install the most bleeding-edge version, use `ipm` and the Github repository URL:
+
+```idl
+IDL> ipm,/install,'https://github.com/aurorax-space/idl-aurorax'
+```
 
 ## Usage
 

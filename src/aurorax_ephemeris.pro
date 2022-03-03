@@ -43,7 +43,7 @@
 ;       programs           programs to filter for, list(string), optional
 ;       platforms          platforms to filter for, list(string), optional
 ;       instrument_types   instrument types to filter for, list(string), optional
-;       metadata_filters   metadata filters to filter for, {aurorax_metadata_filter_obj}, optional
+;       metadata_filters   metadata filters to filter for, hash, optional
 ;       poll_interval      sleep time between polling events while waiting for data, integer,
 ;                          optional (in seconds; default is 1s)
 ;
@@ -60,7 +60,7 @@
 ;         start_dt = '2020/01/01T00:00'
 ;         start_dt = '2020-01-01 00:00'
 ;
-;       The following are all interpreted as '2020-12-31T23:59:59'
+;       The following are all interpreted as '2020-12-31T23:59:59':
 ;         end_dt = '2020'
 ;         end_dt = '202012'
 ;         end_dt = '20201231'

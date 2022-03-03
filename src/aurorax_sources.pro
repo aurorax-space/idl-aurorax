@@ -45,7 +45,7 @@
 ;                         lunar, ground, event_list), string, optional
 ;
 ; KEYWORDS:
-;       /FORMAT_FULL_RECORD       data sources returned have all availabile information
+;       /FORMAT_FULL_RECORD       data sources returned have all available information
 ;                                 about them
 ;       /FORMAT_IDENTIFIER_ONLY   data sources returned have minimal information about
 ;                                 them, just the identifier
@@ -94,6 +94,60 @@ function aurorax_sources_list,program=program,platform=platform,instrument_type=
   req->SetProperty,URL_HOST = 'api.aurorax.space'
   req->SetProperty,URL_PATH = 'api/v1/data_sources'
   req->SetProperty,URL_QUERY = param_str
+
+  ; make request
+  output = req->Get(/STRING_ARRAY)
+
+  ; serialize into struct
+  data = json_parse(output,/TOSTRUCT)
+
+  ; cleanup
+  obj_destroy,req
+
+  ; return
+  return,data
+end
+
+;-------------------------------------------------------------
+;+
+; NAME:
+;       AURORAX_SOURCES_GET_STATS
+;
+; PURPOSE:
+;       Retrieve AuroraX data source stats
+;
+; EXPLANATION:
+;       Retrieve some additional information about a data source on the
+;       AuroraX platform, such as the earliest and latest ephemeris
+;       and data product records.
+;
+; CALLING SEQUENCE:
+;       aurorax_sources_get_stats()
+;
+; PARAMETERS:
+;       identifier        data source identifier, integer
+;
+; OUTPUT:
+;       stats about the data source
+;
+; OUTPUT TYPE:
+;       a struct
+;
+; EXAMPLES:
+;       source = aurorax_sources_list(program='swarm', platform='swarma')
+;       stats = aurorax_sources_get_stats(source[0].identifier)
+;
+; REVISION HISTORY:
+;   - Initial implementation, Feb 2022, Darren Chaddock
+;+
+;-------------------------------------------------------------
+function aurorax_sources_get_stats,identifier
+  ; set up request
+  req = OBJ_NEW('IDLnetUrl')
+  req->SetProperty,URL_SCHEME = 'https'
+  req->SetProperty,URL_PORT = 443
+  req->SetProperty,URL_HOST = 'api.aurorax.space'
+  req->SetProperty,URL_PATH = 'api/v1/data_sources/' + strtrim(identifier,2) + '/stats'
 
   ; make request
   output = req->Get(/STRING_ARRAY)

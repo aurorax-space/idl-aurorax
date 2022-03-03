@@ -168,6 +168,53 @@ function __aurorax_time2string,time
   return, result
 end
 
+;-------------------------------------------------------------
+;+
+; NAME:
+;       AURORAX_CREATE_CRITERIA_BLOCK
+;
+; PURPOSE:
+;       Create conjunction search criteria block
+;
+; EXPLANATION:
+;       The AuroraX conjunction search takes in sets of ground, space,
+;       and/or events "criteria blocks". These are objects describing
+;       the items to search for conjunction between. This function is
+;       meant to be an easy way to create a criteria block object
+;       for use in a subsequent conjunction search.
+;
+; CALLING SEQUENCE:
+;       aurorax_create_criteria_block
+;
+; PARAMETERS:
+;       programs           programs for this criteria block, list(string), optional
+;       platforms          platforms for this criteria block, list(string), optional
+;       instrument_types   instrument types for this criteria block, list(string), optional
+;       hemisphere         hemisphere values for this criteria block, list(string),
+;                          optional (valid values are 'northern' and/or 'southern')
+;       metadata_filters   metadata filters to filter for, hash, optional
+;
+; KEYWORDS:
+;       /GROUND            create a "ground" criteria block
+;       /SPACE             create a "space" criteria block
+;       /EVENTS            create a "events" criteria block
+;
+; OUTPUT:
+;       the criteria block
+;
+; OUTPUT TYPE:
+;       a struct
+;
+; EXAMPLES:
+;       expression = aurorax_create_metadata_filter_expression('calgary_apa_ml_v1',list('classified as APA'),/OPERATOR_IN)
+;       expression = aurorax_create_metadata_filter_expression('calgary_apa_ml_v1_confidence',95,/OPERATOR_GE)
+;       expression = aurorax_create_metadata_filter_expression('tii_on','true',/OPERATOR_IN)
+;       expression = aurorax_create_metadata_filter_expression('tii_quality_vixh','0,2',/OPERATOR_BETWEEN)
+;
+; REVISION HISTORY:
+;   - Initial implementation, Feb 2022, Darren Chaddock
+;+
+;-------------------------------------------------------------
 function aurorax_create_criteria_block,programs=programs,platforms=platforms,instrument_types=instrument_types,hemisphere=hemisphere,metadata_filters=metadata_filters,GROUND=ground_kw,SPACE=space_kw,EVENTS=events_kw
   ; create the object
   if (keyword_set(ground_kw) or keyword_set(events_kw)) then begin
