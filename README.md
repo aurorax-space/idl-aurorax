@@ -41,6 +41,8 @@ Then, add the following to your startup file, or run the command manually using 
 .run aurorax_startup
 ```
 
+Lastly, reset your IDL session by either clicking the Reset button in the IDL editor or by typing `.reset` into the IDL command prompt.
+
 For further information, you can view what packages are installed using `ipm,/list`. You can also view the package details using `ipm,/query,'idl-aurorax'`.
 
 ### Manually
@@ -56,6 +58,8 @@ After it's in your path, add the following to your startup file (or run the comm
 .run aurorax_startup
 ```
 
+Lastly, reset your IDL session by either clicking the Reset button in the IDL editor or by typing `.reset` into the IDL command prompt.
+
 ### Bleeding edge
 
 If you want to install the most bleeding-edge version, use `ipm` and the Github repository URL:
@@ -64,12 +68,13 @@ If you want to install the most bleeding-edge version, use `ipm` and the Github 
 IDL> ipm,/install,'https://github.com/aurorax-space/idl-aurorax'
 ```
 
-## Usage
+After it's installed, add the following to your startup file (or run the command manually using the IDL command prompt).
 
-For usage details, please visit the AuroraX documentation website, and the basic examples section.
+```idl
+.run aurorax_startup
+```
 
-- [IDL-AuroraX documentation](https://docs.aurorax.space/code/overview)
-- [Basic usage examples](https://docs.aurorax.space/code/basic_usage/overview)
+Lastly, reset your IDL session by either clicking the Reset button in the IDL editor or by typing `.reset` into the IDL command prompt.
 
 ## Updating
 
@@ -83,6 +88,13 @@ If you installed the code manually, you can download the latest Zip file and ove
 
 - [Latest packaged release](https://data.aurorax.space/data/software/idl-aurorax/latest.zip)
 - [Browse previous releases](https://data.aurorax.space/data/software/idl-aurorax)
+
+## Usage
+
+For usage details, please visit the AuroraX documentation website, and the basic examples section.
+
+- [IDL-AuroraX documentation](https://docs.aurorax.space/code/overview)
+- [Basic usage examples](https://docs.aurorax.space/code/basic_usage/overview)
 
 ## Development
 
