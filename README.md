@@ -37,7 +37,7 @@ Since IDL 8.7.1, there exists an IDL package manager called [ipm](https://www.l3
 
 2. Add the following to your startup file, or run the command manually using the IDL command prompt:
 
-    ```idl
+    ```
     [ open your startup.pro file and put the following in it ]
     .run aurorax_startup
     ```
@@ -54,7 +54,7 @@ Alternatively, you can install the idl-aurorax library manually by downloading t
 2. Extract the zip file into your IDL path (or add it as a directory to your IDL path)
 3. Add the following to your startup file (or run the command manually using the IDL command prompt).
 
-    ```idl
+    ```
     [ open your startup.pro file and put the following in it ]
     .run aurorax_startup
     ```
@@ -78,7 +78,7 @@ If you want to install the most bleeding-edge version, use `ipm` and the Github 
 
 2. Add the following to your startup file (or run the command manually using the IDL command prompt).
 
-    ```idl
+    ```
     [ open your startup.pro file and put the following in it ]
     .run aurorax_startup
     ```
@@ -115,7 +115,7 @@ When a new release is ready for deployment, there are a few tasks that need to b
 1. Increment the version number and change the date in `idlpackage.json`.
 2. Generate a new distributable Zip file ([more info](https://www.l3harrisgeospatial.com/docs/ipm.html#CREATE))
 
-    ```
+    ```idl
     IDL> ipm,/create,'path_to_code',name='idl-aurorax'
     ```
 
