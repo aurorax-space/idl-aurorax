@@ -210,9 +210,6 @@ end
 ;       expression = aurorax_create_metadata_filter_expression('calgary_apa_ml_v1_confidence',95,/OPERATOR_GE)
 ;       expression = aurorax_create_metadata_filter_expression('tii_on','true',/OPERATOR_IN)
 ;       expression = aurorax_create_metadata_filter_expression('tii_quality_vixh','0,2',/OPERATOR_BETWEEN)
-;
-; REVISION HISTORY:
-;   - Initial implementation, Feb 2022, Darren Chaddock
 ;+
 ;-------------------------------------------------------------
 function aurorax_create_criteria_block,programs=programs,platforms=platforms,instrument_types=instrument_types,hemisphere=hemisphere,metadata_filters=metadata_filters,GROUND=ground_kw,SPACE=space_kw,EVENTS=events_kw

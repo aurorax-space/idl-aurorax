@@ -65,9 +65,6 @@
 ;       expression = aurorax_create_metadata_filter_expression('calgary_apa_ml_v1_confidence',95,/OPERATOR_GE)
 ;       expression = aurorax_create_metadata_filter_expression('tii_on','true',/OPERATOR_IN)
 ;       expression = aurorax_create_metadata_filter_expression('tii_quality_vixh','0,2',/OPERATOR_BETWEEN)
-;
-; REVISION HISTORY:
-;   - Initial implementation, Feb 2022, Darren Chaddock
 ;+
 ;-------------------------------------------------------------
 function aurorax_create_metadata_filter_expression,key,values,OPERATOR_EQ=eq_kw,OPERATOR_NE=ne_kw,OPERATOR_LT=lt_kw,OPERATOR_GT=gt_kw,OPERATOR_LE=le_kw,OPERATOR_GE=ge_kw,OPERATOR_BETWEEN=between_kw,OPERATOR_IN=in_kw,OPERATOR_NOT_IN=not_in_kw
@@ -137,9 +134,6 @@ end
 ;       expression2 = aurorax_create_metadata_filter_expression('calgary_apa_ml_v1_confidence', 95,/OPERATOR_GE)
 ;       expressions = list(expression1, expression2)
 ;       metadata_filters = aurorax_create_metadata_filter(expressions,/OPERATOR_AND)
-;
-; REVISION HISTORY:
-;   - Initial implementation, Feb 2022, Darren Chaddock
 ;+
 ;-------------------------------------------------------------
 function aurorax_create_metadata_filter,expressions,OPERATOR_AND=and_kw,OPERATOR_OR=or_kw

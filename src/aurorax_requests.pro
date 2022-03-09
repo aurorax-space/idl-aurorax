@@ -74,7 +74,8 @@ function __aurorax_request_get_data,request_type,request_id
   ; serialize into struct
   data = json_parse(output,/TOSTRUCT)
   data = data.result
+  response = {request_type: request_type, request_id: request_id, data: data}
 
   ; return
-  return,data
+  return,response
 end

@@ -61,9 +61,6 @@
 ;       data = aurorax_sources_list(program='swarm',/FORMAT_FULL_RECORD)
 ;       data = aurorax_sources_list(platform='gillam')
 ;       data = aurorax_sources_list(program='trex', platform='fort smith')
-;
-; REVISION HISTORY:
-;   - Initial implementation, Feb 2022, Darren Chaddock
 ;+
 ;-------------------------------------------------------------
 function aurorax_sources_list,program=program,platform=platform,instrument_type=instrument_type,source_type=source_type,FORMAT_FULL_RECORD=format_full_record,FORMAT_IDENTIFIER_ONLY=format_identifier_only
@@ -136,9 +133,6 @@ end
 ; EXAMPLES:
 ;       source = aurorax_sources_list(program='swarm', platform='swarma')
 ;       stats = aurorax_sources_get_stats(source[0].identifier)
-;
-; REVISION HISTORY:
-;   - Initial implementation, Feb 2022, Darren Chaddock
 ;+
 ;-------------------------------------------------------------
 function aurorax_sources_get_stats,identifier

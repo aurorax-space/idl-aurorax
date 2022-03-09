@@ -6,3 +6,4 @@
 @aurorax_data_products
 @aurorax_ephemeris
 @aurorax_sources
+@aurorax_open_externally

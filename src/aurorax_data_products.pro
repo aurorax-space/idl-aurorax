@@ -82,20 +82,17 @@
 ;       the found data product records
 ;
 ; OUTPUT TYPE:
-;       a list of structs
+;       a search response struct
 ;
 ; EXAMPLES:
 ;       ; simple example
-;       data = aurorax_data_product_search('2020-01-01T00:00','2020-01-01T23:59',programs=['trex'],platforms=['gillam'],instrument_types=['RGB ASI'])
+;       response = aurorax_data_product_search('2020-01-01T00:00','2020-01-01T23:59',programs=['trex'],platforms=['gillam'],instrument_types=['RGB ASI'])
 ;
 ;       ; example with metadata
 ;       expression = aurorax_create_metadata_filter_expression('keogram_type', list('daily'),/OPERATOR_IN)
 ;       expressions = list(expression)
 ;       metadata_filters = aurorax_create_metadata_filter(expressions,/OPERATOR_AND)
-;       data = aurorax_data_product_search('2020-01-01T00:00','2020-01-01T23:59',programs=['trex'],metadata_filters=metadata_filters)
-;
-; REVISION HISTORY:
-;   - Initial implementation, Feb 2022, Darren Chaddock
+;       response = aurorax_data_product_search('2020-01-01T00:00','2020-01-01T23:59',programs=['trex'],metadata_filters=metadata_filters)
 ;+
 ;-------------------------------------------------------------
 function aurorax_data_product_search,start_dt,end_dt,programs=programs,platforms=platforms,instrument_types=instrument_types,data_product_types=data_product_types,metadata_filters=metadata_filters,poll_interval=pi,QUIET=q,DRYRUN=dr
@@ -184,17 +181,17 @@ function aurorax_data_product_search,start_dt,end_dt,programs=programs,platforms
   if (verbose eq 1) then __aurorax_message,'Downloading ' + __aurorax_humanize_bytes(status.search_result.file_size) + ' of data ...'
 
   ; get data
-  data = __aurorax_request_get_data('data_products',request_id)
+  response = __aurorax_request_get_data('data_products',request_id)
   if (verbose eq 1) then __aurorax_message,'Data downloaded, search completed'
 
   ; post-process data (ie. change 'start' to 'start_dt', and '_end' to 'end_dt')
   if (verbose eq 1) then __aurorax_message,'Post-processing data into IDL struct'
   data_adjusted = list()
-  for i=0,n_elements(data)-1 do begin
-    new_record_struct = {start_dt: data[i].start, end_dt: data[i]._end, data_source: data[i].data_source, url: data[i].url, data_product_type: data[i].data_product_type, metadata: data[i].metadata}
+  for i=0,n_elements(response.data)-1 do begin
+    new_record_struct = {start_dt: response.data[i].start, end_dt: response.data[i]._end, data_source: response.data[i].data_source, url: response.data[i].url, data_product_type: response.data[i].data_product_type, metadata: response.data[i].metadata}
     data_adjusted.add,new_record_struct
   endfor
-  delvar,data
+  response.data = data_adjusted
 
   ; get elapsed time
   toc_ts = toc()
@@ -202,5 +199,5 @@ function aurorax_data_product_search,start_dt,end_dt,programs=programs,platforms
 
   ; return
   if (verbose eq 1) then __aurorax_message,'Search completed, found ' + strtrim(status.search_result.result_count,2) + ' records in ' + duration_str
-  return,data_adjusted
+  return,response
 end

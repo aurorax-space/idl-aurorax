@@ -99,9 +99,6 @@ end
 ; EXAMPLES:
 ;       data = aurorax_ephemeris_availability('20200101','20200105',program='swarm')
 ;       data = aurorax_ephemeris_availability('2020-01-01','2020-03-15',program='themis',platform='themisc')
-;
-; REVISION HISTORY:
-;   - Initial implementation, Feb 2022, Darren Chaddock
 ;+
 ;-------------------------------------------------------------
 function aurorax_ephemeris_availability,start_date,end_date,program=program,platform=platform,instrument_type=instrument_type,source_type=source_type
@@ -143,9 +140,6 @@ end
 ; EXAMPLES:
 ;       data = aurorax_data_products_availability('20200101','20200105',program='auroramax')
 ;       data = aurorax_data_products_availability('2020-01-01','2020-03-15',program='trex',platform='gillam')
-;
-; REVISION HISTORY:
-;   - Initial implementation, Feb 2022, Darren Chaddock
 ;+
 ;-------------------------------------------------------------
 function aurorax_data_products_availability,start_date,end_date,program=program,platform=platform,instrument_type=instrument_type,source_type=source_type

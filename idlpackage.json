@@ -1,12 +1,12 @@
 {
     "Name": "idl-aurorax",
-    "Version": "0.3.0",
+    "Version": "0.4.0",
     "Author": "Darren Chaddock",
-    "Date": "2022-02-28",
+    "Date": "2022-03-08",
     "Dependencies": [
         {
             "Name": "IDL",
-            "Version": "^8.7.1"
+            "Version": "^8.7.2"
         }
     ]
 }

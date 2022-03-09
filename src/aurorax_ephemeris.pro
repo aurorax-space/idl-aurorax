@@ -81,20 +81,17 @@
 ;       the found ephemeris records
 ;
 ; OUTPUT TYPE:
-;       a list of structs
+;       a search response struct
 ;
 ; EXAMPLES:
 ;       ; simple example
-;       data = aurorax_ephemeris_search('2020-01-01T00:00','2020-01-01T23:59',programs=['swarm'],platforms=['swarma'],instrument_types=['footprint'])
+;       response = aurorax_ephemeris_search('2020-01-01T00:00','2020-01-01T23:59',programs=['swarm'],platforms=['swarma'],instrument_types=['footprint'])
 ;
 ;       ; example with metadata
 ;       expression = aurorax_create_metadata_filter_expression('nbtrace_region', list('north auroral oval', 'north mid-latitude'),/OPERATOR_IN)
 ;       expressions = list(expression)
 ;       metadata_filters = aurorax_create_metadata_filter(expressions,/OPERATOR_AND)
-;       data = aurorax_ephemeris_search('2020-01-01T00:00','2020-01-01T23:59',programs=['swarm'],metadata_filters=metadata_filters)
-;
-; REVISION HISTORY:
-;   - Initial implementation, Feb 2022, Darren Chaddock
+;       response = aurorax_ephemeris_search('2020-01-01T00:00','2020-01-01T23:59',programs=['swarm'],metadata_filters=metadata_filters)
 ;+
 ;-------------------------------------------------------------
 function aurorax_ephemeris_search,start_dt,end_dt,programs=programs,platforms=platforms,instrument_types=instrument_types,metadata_filters=metadata_filters,poll_interval=pi,QUIET=q,DRYRUN=dr

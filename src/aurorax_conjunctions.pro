@@ -206,7 +206,7 @@ end
 ;       the found conjunctions
 ;
 ; OUTPUT TYPE:
-;       a list of structs
+;       a search response struct
 ;
 ; EXAMPLES:
 ;       ; simple example
@@ -217,7 +217,7 @@ end
 ;       ground = list(ground1)
 ;       space1 = aurorax_create_criteria_block(programs=['swarm'],hemisphere=['northern'],/SPACE)
 ;       space = list(space1)
-;       data = aurorax_conjunction_search(start_dt,end_dt,distance,ground=ground,space=space,/nbtrace)
+;       response = aurorax_conjunction_search(start_dt,end_dt,distance,ground=ground,space=space,/nbtrace)
 ;
 ;       ; example with metadata
 ;       distance = 500
@@ -231,10 +231,7 @@ end
 ;       ground = list(ground1)
 ;       space1 = aurorax_create_criteria_block(programs=['themis'],hemisphere=['northern'],/SPACE)
 ;       space = list(space1)
-;       data = aurorax_conjunction_search(start_dt,end_dt,distance,ground=ground,space=space,/nbtrace)
-;
-; REVISION HISTORY:
-;   - Initial implementation, Feb 2022, Darren Chaddock
+;       response = aurorax_conjunction_search(start_dt,end_dt,distance,ground=ground,space=space,/nbtrace)
 ;+
 ;-------------------------------------------------------------
 function aurorax_conjunction_search,start_dt,end_dt,distance,ground=ground,space=space,events=events,poll_interval=pi,NBTRACE=ct_nbtrace,SBTRACE=ct_sbtrace,GEOGRAPHIC=ct_geo,QUIET=q,DRYRUN=dr
@@ -350,24 +347,24 @@ function aurorax_conjunction_search,start_dt,end_dt,distance,ground=ground,space
   if (verbose eq 1) then __aurorax_message,'Downloading ' + __aurorax_humanize_bytes(status.search_result.file_size) + ' of data ...'
 
   ; get data
-  data = __aurorax_request_get_data('conjunctions',request_id)
+  response = __aurorax_request_get_data('conjunctions',request_id)
   if (verbose eq 1) then __aurorax_message,'Data downloaded, search completed'
 
   ; post-process data (ie. change 'start' to 'start_dt', and '_end' to 'end_dt')
   if (verbose eq 1) then __aurorax_message,'Post-processing data into IDL struct'
   data_adjusted = list()
-  for i=0,n_elements(data)-1 do begin
+  for i=0,n_elements(response.data)-1 do begin
     events_adjusted = list()
-    if (n_elements(data[i].events) gt 0) then begin
-      for j=0,n_elements(data[i].events)-1 do begin
-        new_event_struct = {e1_source: data[i].events[j].e1_source, e2_source: data[i].events[j].e2_source, start_dt: data[i].events[j].start, end_dt: data[i].events[j]._end, min_distance: data[i].events[j].min_distance, max_distance: data[i].events[j].max_distance}
+    if (n_elements(response.data[i].events) gt 0) then begin
+      for j=0,n_elements(response.data[i].events)-1 do begin
+        new_event_struct = {e1_source: response.data[i].events[j].e1_source, e2_source: response.data[i].events[j].e2_source, start_dt: response.data[i].events[j].start, end_dt: response.data[i].events[j]._end, min_distance: response.data[i].events[j].min_distance, max_distance: response.data[i].events[j].max_distance}
         events_adjusted.add,new_event_struct
       endfor
     endif
-    new_record_struct = {start_dt: data[i].start, end_dt: data[i]._end, min_distance: data[i].min_distance, max_distance: data[i].max_distance, closest_epoch: data[i].closest_epoch, farthest_epoch: data[i].farthest_epoch, data_sources: data[i].data_sources, events: events_adjusted}
+    new_record_struct = {start_dt: response.data[i].start, end_dt: response.data[i]._end, min_distance: response.data[i].min_distance, max_distance: response.data[i].max_distance, closest_epoch: response.data[i].closest_epoch, farthest_epoch: response.data[i].farthest_epoch, data_sources: response.data[i].data_sources, events: events_adjusted}
     data_adjusted.add,new_record_struct
   endfor
-  delvar,data
+  response.data = data_adjusted
 
   ; get elapsed time
   toc_ts = toc()
@@ -375,5 +372,5 @@ function aurorax_conjunction_search,start_dt,end_dt,distance,ground=ground,space
 
   ; return
   if (verbose eq 1) then __aurorax_message,'Search completed, found ' + strtrim(status.search_result.result_count,2) + ' conjunctions in ' + duration_str
-  return,data_adjusted
+  return,response
 end
