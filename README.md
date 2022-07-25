@@ -94,7 +94,7 @@ IDL> ipm,/update,'idl-aurorax'
 IDL> .reset
 ```
 
-If you installed the code manually, you can download the latest Zip file and overwite the existing files. Then, add and new `.run` commands to your startup file as defined in the "Installation" section above.
+If you installed the code manually, you can download the latest Zip file and overwite the existing files. Then, add any new `.run` commands to your startup file as defined in the "Installation" section above.
 
 - [Latest packaged release](https://data.aurorax.space/data/software/idl-aurorax/latest.zip)
 - [Browse previous releases](https://data.aurorax.space/data/software/idl-aurorax)
