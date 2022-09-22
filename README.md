@@ -1,6 +1,6 @@
 <a href="https://aurorax.space/"><img alt="AuroraX" src="logo.svg" height="60"></a>
 
-![Stable version](https://img.shields.io/badge/Latest%20stable%20release-v0.5.0-orange)
+![Stable version](https://img.shields.io/badge/Latest%20stable%20release-v0.6.0-orange)
 ![IDL version required](https://img.shields.io/badge/IDL-8.7.2%2B-blue)
 [![MIT license](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://github.com/aurorax-space/idl-aurorax/blob/main/LICENSE)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6098075.svg)](https://doi.org/10.5281/zenodo.6098075)
@@ -112,7 +112,7 @@ For usage details, please visit the AuroraX documentation website, and the basic
 
 When a new release is ready for deployment, there are a few tasks that need to be done.
 
-1. Increment the version number and change the date in `idlpackage.json`.
+1. Increment the version number and change the date in `idlpackage.json`, `aurorax_helpers.pro`, and `README.md`.
 2. Generate a new distributable Zip file ([more info](https://www.l3harrisgeospatial.com/docs/ipm.html#CREATE))
 
     ```idl
