@@ -312,7 +312,7 @@ function aurorax_conjunction_search,start_dt,end_dt,distance,ground=ground,space
   req->SetProperty,URL_PORT = 443
   req->SetProperty,URL_HOST = 'api.aurorax.space'
   req->SetProperty,URL_PATH = 'api/v1/conjunctions/search'
-  req->SetProperty,HEADERS = 'Content-Type: application/json'
+  req->SetProperty,HEADERS = ['Content-Type: application/json', 'User-Agent: idl-aurorax/' + __aurorax_version()]
 
   ; make request
   if (verbose eq 1) then __aurorax_message,'Sending search request ...'

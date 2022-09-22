@@ -51,6 +51,7 @@ function __aurorax_retrieve_availability,start_date,end_date,program,platform,in
   req->SetProperty,URL_HOST = 'api.aurorax.space'
   req->SetProperty,URL_PATH = url_path
   req->SetProperty,URL_QUERY = param_str
+  req->SetProperty,HEADERS = 'User-Agent: idl-aurorax/' + __aurorax_version()
 
   ; make request
   output = req->Get(/STRING_ARRAY)

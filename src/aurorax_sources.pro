@@ -91,6 +91,7 @@ function aurorax_sources_list,program=program,platform=platform,instrument_type=
   req->SetProperty,URL_HOST = 'api.aurorax.space'
   req->SetProperty,URL_PATH = 'api/v1/data_sources'
   req->SetProperty,URL_QUERY = param_str
+  req->SetProperty,HEADERS = 'User-Agent: idl-aurorax/' + __aurorax_version()  
 
   ; make request
   output = req->Get(/STRING_ARRAY)
@@ -142,6 +143,7 @@ function aurorax_sources_get_stats,identifier
   req->SetProperty,URL_PORT = 443
   req->SetProperty,URL_HOST = 'api.aurorax.space'
   req->SetProperty,URL_PATH = 'api/v1/data_sources/' + strtrim(identifier,2) + '/stats'
+  req->SetProperty,HEADERS = 'User-Agent: idl-aurorax/' + __aurorax_version()
 
   ; make request
   output = req->Get(/STRING_ARRAY)

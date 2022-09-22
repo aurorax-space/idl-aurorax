@@ -136,6 +136,7 @@ pro aurorax_save_swarmaurora_custom_import_file,request_id,filename=filename
   req->SetProperty,URL_HOST = 'swarm-aurora.com'
   req->SetProperty,URL_PATH = 'conjunctionFinder/generate_custom_import_json'
   req->SetProperty,URL_QUERY = 'aurorax_request_id=' + request_id
+  req->SetProperty,HEADERS = 'User-Agent: idl-aurorax/' + __aurorax_version()
 
   ; make request
   output = req->Get(/STRING_ARRAY)

@@ -22,6 +22,10 @@
 ; SOFTWARE.
 ;-------------------------------------------------------------
 
+function __aurorax_version
+  return,"0.6.0"
+end
+
 pro __aurorax_message,msg
   ; set datetime string
   dt_str = systime()
