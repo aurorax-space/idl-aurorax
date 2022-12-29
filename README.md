@@ -42,7 +42,7 @@ Since IDL 8.7.1, there exists an IDL package manager called [ipm](https://www.l3
     .run aurorax_startup
     ```
 
-3. Reset your IDL session by either clicking the Reset button in the IDL editor or by typing `.reset` into the IDL command prompt.
+3. Reset your IDL session by either clicking the Reset button in the IDL editor or by typing `.reset` into the IDL command prompt. If you compiled the code manually in step 2 (instead of adding to your startup file), skip this step.
 
 For further information, you can view what packages are installed using `ipm,/list`. You can also view the package details using `ipm,/query,'idl-aurorax'`.
 
