@@ -91,13 +91,22 @@ function aurorax_sources_list,program=program,platform=platform,instrument_type=
   req->SetProperty,URL_HOST = 'api.aurorax.space'
   req->SetProperty,URL_PATH = 'api/v1/data_sources'
   req->SetProperty,URL_QUERY = param_str
-  req->SetProperty,HEADERS = 'User-Agent: idl-aurorax/' + __aurorax_version()  
+  req->SetProperty,HEADERS = 'User-Agent: idl-aurorax/' + __aurorax_version()
 
   ; make request
   output = req->Get(/STRING_ARRAY)
 
   ; serialize into struct
   data = json_parse(output,/TOSTRUCT)
+
+  ; remove under-the-hood adhoc data sources
+  idxs_to_remove = list()
+  for i=0,n_elements(data)-1 do begin
+    if (data[i].identifier lt 0) then begin
+      idxs_to_remove.add,i
+    endif
+  endfor
+  remove,idxs_to_remove.toArray(),data
 
   ; cleanup
   obj_destroy,req
