@@ -33,6 +33,10 @@ function __aurorax_request_get_status,request_type,request_id
 
   ; make request
   output = req->Get(/STRING_ARRAY)
+  
+  ; temporary -- bugfix in API needed to resolve this
+  ;   this is just a hack
+  output = repstr(output, '"request_id": null, ', '')
 
   ; serialize into struct
   status = json_parse(output,/TOSTRUCT)
