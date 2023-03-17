@@ -23,7 +23,7 @@
 ;-------------------------------------------------------------
 
 function __aurorax_version
-  return,"0.7.1"
+  return,"0.7.2"
 end
 
 pro __aurorax_message,msg
