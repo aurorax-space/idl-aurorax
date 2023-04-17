@@ -34,16 +34,6 @@ function __aurorax_request_get_status,request_type,request_id
   ; make request
   output = req->Get(/STRING_ARRAY)
 
-  ; temporary -- bugfix in API needed to resolve this
-  ;   this is just a hack
-  bad_str = '"request_id": null, '
-  null_request_id_idx = strpos(output, bad_str)
-  if (null_request_id_idx ge 0) then begin
-    output_chunk1 = strmid(output, 0, null_request_id_idx)
-    output_chunk2 = strmid(output, null_request_id_idx+strlen(bad_str))
-    output = strjoin([output_chunk1, output_chunk2])
-  endif
-
   ; serialize into struct
   status = json_parse(output,/TOSTRUCT)
 

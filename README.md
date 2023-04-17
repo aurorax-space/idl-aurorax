@@ -1,6 +1,6 @@
 <a href="https://aurorax.space/"><img alt="AuroraX" src="logo.svg" height="60"></a>
 
-![Stable version](https://img.shields.io/badge/Latest%20stable%20release-v0.7.2-orange)
+![Stable version](https://img.shields.io/badge/Latest%20stable%20release-v0.7.3-orange)
 ![IDL version required](https://img.shields.io/badge/IDL-8.7.2%2B-blue)
 [![MIT license](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://github.com/aurorax-space/idl-aurorax/blob/main/LICENSE)
 [![DOI](https://img.shields.io/badge/DOI-10.3389/fspas.2022.1009450-blue)](https://www.frontiersin.org/articles/10.3389/fspas.2022.1009450/full)
