@@ -1,8 +1,8 @@
 {
     "Name": "idl-aurorax",
-    "Version": "0.7.4",
+    "Version": "0.8.0",
     "Author": "Darren Chaddock",
-    "Date": "2024-05-06",
+    "Date": "2024-05-16",
     "Dependencies": [
         {
             "Name": "IDL",
