@@ -2,7 +2,7 @@ function aurorax_list_datasets,name=name
   ; set params
   param_str = ''
   if (isa(name) eq 1) then begin
-    param_str += '&name=' + name
+    param_str += '?name=' + name
   endif
 
   ; set up request
