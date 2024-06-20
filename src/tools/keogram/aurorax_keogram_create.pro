@@ -1,9 +1,13 @@
 
 
-function aurorax_keogram_create, images
+function aurorax_keogram_create, image_data
     
-    if not isa(images, /array) then stop, "(aurorax_create_keogram) Error: 'images' must be an array"
+    if not isa(image_data, /array) then stop, "(aurorax_create_keogram) Error: 'image_data' must be an array"
     
+    ; Extract data array and timestamps
+    images = image_data.data
+    time_stamp = image_data.timestamp
+
     ; Get the number of channels of image data
     images_shape = size(images, /dimensions)
     if n_elements(images_shape) eq 2 then begin
@@ -34,6 +38,6 @@ function aurorax_keogram_create, images
     endelse
     
     ; Return keogram array
-    return, {data:keo_arr, ccd_y:ccd_y, slice_idx:keo_idx}
+    return, {data:keo_arr, ccd_y:ccd_y, slice_idx:keo_idx, timestamp:time_stamp}
         
 end

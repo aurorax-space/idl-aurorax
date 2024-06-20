@@ -1,7 +1,12 @@
 
-function aurorax_keogram_add_axis, keogram_struct, skymap, altitude_km, geo=geo, mag=mag, elev=elev
+function aurorax_keogram_add_axis, keogram_struct, skymap, altitude_km=altitude_km, geo=geo, mag=mag, elev=elev
+    
+    if keyword_set(geo) and not keyword_set(altitude_km) then begin
+        stop, "(aurorax_keogram_add_axis) Error: Using '/geo' or '/mag' requires passing in 'altitude_km'."
+    endif
     
     ; Determine number of channels and height of keogram
+    time_stamp = keogram_struct.timestamp
     keo_arr = keogram_struct.data
     if n_elements(size(keo_arr, /dimensions)) eq 3 then begin
         n_channels = (size(keo_arr, /dimensions))[0]
@@ -23,9 +28,18 @@ function aurorax_keogram_add_axis, keogram_struct, skymap, altitude_km, geo=geo,
     ; Obtain keogram index in CCD coords
     slice_idx = keogram_struct.slice_idx
     
+    ; grab necessary data from skymap
+    altitudes = skymap.full_map_altitude
+    lats = skymap.full_map_latitude
+    lons = skymap.full_map_longitude
+    lons[where(lons gt 180)] -= 360
+    elevation = skymap.full_elevation
+    
+    ; grab ccd axis
+    ccd_y = keogram_struct.ccd_y
+    
     ; Create elevation axis
     elev_y = []
-    elevation = skymap.full_elevation
     foreach row_idx, keogram_struct.ccd_y do begin
         el = elevation[slice_idx, row_idx]
         elev_y = [elev_y, el]
@@ -68,27 +82,32 @@ function aurorax_keogram_add_axis, keogram_struct, skymap, altitude_km, geo=geo,
     
     keywords = [keyword_set(geo), keyword_set(mag), keyword_set(elev)]
     
+;    ; Reverse all axes
+;    if keyword_set(geo) then geo_y = reverse(geo_y)
+;    if keyword_set(mag) then mag_y = reverse(mag_y)
+;    if keyword_set(elev) then elev_y = reverse(elev_y)
+    
     if array_equal(keywords, [0,0,1]) then begin
         ; Return keogram array with desired axes added
-        return, {data:keo_arr, ccd_y:ccd_y, slice_idx:keo_idx, elev_y:elev_y}
+        return, {data:keo_arr, timestamp:time_stamp, ccd_y:ccd_y, slice_idx:slice_idx, elev_y:elev_y}
     endif else if array_equal(keywords, [0,1,0]) then begin
         ; Return keogram array with desired axes added
-        return, {data:keo_arr, ccd_y:ccd_y, slice_idx:keo_idx, mag_y:mag_y}
+        return, {data:keo_arr, timestamp:time_stamp, ccd_y:ccd_y, slice_idx:slice_idx, mag_y:mag_y}
     endif else if array_equal(keywords, [0,1,1]) then begin
         ; Return keogram array with desired axes added
-        return, {data:keo_arr, ccd_y:ccd_y, slice_idx:keo_idx, mag_y:mag_y, elev_y:elev_y}
+        return, {data:keo_arr, timestamp:time_stamp, ccd_y:ccd_y, slice_idx:slice_idx, mag_y:mag_y, elev_y:elev_y}
     endif else if array_equal(keywords, [1,0,0]) then begin
         ; Return keogram array with desired axes added
-        return, {data:keo_arr, ccd_y:ccd_y, slice_idx:keo_idx, geo_y:geo_y}
+        return, {data:keo_arr, timestamp:time_stamp, ccd_y:ccd_y, slice_idx:slice_idx, geo_y:geo_y}
     endif else if array_equal(keywords, [1,0,1]) then begin
         ; Return keogram array with desired axes added
-        return, {data:keo_arr, ccd_y:ccd_y, slice_idx:keo_idx, geo_y:geo_y, elev_y:elev_y}
+        return, {data:keo_arr, timestamp:time_stamp, ccd_y:ccd_y, slice_idx:slice_idx, geo_y:geo_y, elev_y:elev_y}
     endif else if array_equal(keywords, [1,1,0]) then begin
         ; Return keogram array with desired axes added
-        return, {data:keo_arr, ccd_y:ccd_y, slice_idx:keo_idx, geo_y:geo_y, mag_y:mag_y}
+        return, {data:keo_arr, timestamp:time_stamp, ccd_y:ccd_y, slice_idx:slice_idx, geo_y:geo_y, mag_y:mag_y}
     endif else if array_equal(keywords, [1,1,1]) then begin
         ; Return keogram array with desired axes added
-        return, {data:keo_arr, ccd_y:ccd_y, slice_idx:keo_idx, geo_y:geo_y, mag_y:mag_y, elev_y:elev_y}
+        return, {data:keo_arr, timestamp:time_stamp, ccd_y:ccd_y, slice_idx:slice_idx, geo_y:geo_y, mag_y:mag_y, elev_y:elev_y}
     endif 
     
 end
