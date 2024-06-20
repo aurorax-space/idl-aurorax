@@ -1,9 +1,8 @@
 <a href="https://aurorax.space/"><img alt="AuroraX" src="logo.svg" height="60"></a>
 
-![Stable version](https://img.shields.io/badge/Latest%20stable%20release-v0.8.0-orange)
+![Stable version](https://img.shields.io/badge/Latest%20stable%20release-v1.0.0-orange)
 ![IDL version required](https://img.shields.io/badge/IDL-8.7.2%2B-blue)
-[![MIT license](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://github.com/aurorax-space/idl-aurorax/blob/main/LICENSE)
-[![DOI](https://img.shields.io/badge/DOI-10.3389/fspas.2022.1009450-blue)](https://www.frontiersin.org/articles/10.3389/fspas.2022.1009450/full)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6098075.svg)](https://doi.org/10.5281/zenodo.6098075)
 
 IDL-AuroraX is an IDL library for interacting with [AuroraX](https://aurorax.space), a project working to be the world's first and foremost data platform for auroral science. The primary objective of AuroraX is to enable mining and exploration of existing and future auroral data, enabling key science and enhancing the benefits of the world's investment in auroral instrumentation. This will be accomplished with the development of key systems/standards for uniform metadata generation and search, image content analysis, interfaces to leading international tools, and a community involvement that includes more than 80% of the world's data providers.
 
@@ -15,9 +14,12 @@ Some links to help:
 - [Latest packaged release](https://data.aurorax.space/data/software/idl-aurorax/latest.zip)
 - [Browse previous releases](https://data.aurorax.space/data/software/idl-aurorax)
 
-## Limitations
+## Usage
 
-Please note, this IDL library only provides the ability to **retrieve** data from the AuroraX platform. It does not have functions for uploading or editing data on AuroraX. Please use the Python library, [PyAuroraX](https://github.com/aurorax-space/pyaurorax) for this functionality.
+For usage details, please visit the AuroraX documentation website, and the basic examples section.
+
+- [IDL-AuroraX documentation](https://docs.aurorax.space/code/overview)
+- [Basic usage examples](https://docs.aurorax.space/code/basic_usage/overview)
 
 ## Installation
 
@@ -99,25 +101,6 @@ If you installed the code manually, you can download the latest Zip file and ove
 - [Latest packaged release](https://data.aurorax.space/data/software/idl-aurorax/latest.zip)
 - [Browse previous releases](https://data.aurorax.space/data/software/idl-aurorax)
 
-## Usage
+## Limitations
 
-For usage details, please visit the AuroraX documentation website, and the basic examples section.
-
-- [IDL-AuroraX documentation](https://docs.aurorax.space/code/overview)
-- [Basic usage examples](https://docs.aurorax.space/code/basic_usage/overview)
-
-## Development
-
-### Preparing a new distributable package
-
-When a new release is ready for deployment, there are a few tasks that need to be done.
-
-1. Increment the version number and change the date in `idlpackage.json`, `aurorax_helpers.pro`, and `README.md`.
-2. Generate a new distributable Zip file ([more info](https://www.l3harrisgeospatial.com/docs/ipm.html#CREATE))
-
-    ```idl
-    IDL> ipm,/create,'path_to_code',name='idl-aurorax'
-    ```
-
-3. Upload the generated Zip file to https://data.aurorax.space, and update the symlink for latest.zip
-4. Create a new release in Github repository
+Please note, this IDL library only provides the ability to **retrieve** data. It does not have functions for uploading or editing data in the AuroraX search engine. Please use the Python library, [PyAuroraX](https://github.com/aurorax-space/pyaurorax) for this functionality.
