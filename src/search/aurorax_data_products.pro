@@ -35,11 +35,11 @@
 ;       parameters used to filter for specific matching data.
 ;
 ; CALLING SEQUENCE:
-;       aurorax_data_product_search(start_dt, end_dt)
+;       aurorax_data_product_search(start_ts, end_ts)
 ;
 ; PARAMETERS:
-;       start_dt             start datetime, string (different formats allowed, see below)
-;       end_dt               end datetime, string (different formats allowed, see below)
+;       start_ts             start datetime, string (different formats allowed, see below)
+;       end_ts               end datetime, string (different formats allowed, see below)
 ;       programs             programs to filter for, list(string), optional
 ;       platforms            platforms to filter for, list(string), optional
 ;       instrument_types     instrument types to filter for, list(string), optional
@@ -48,28 +48,28 @@
 ;       poll_interval        sleep time between polling events while waiting for data, integer,
 ;                            optional (in seconds; default is 1s)
 ;
-;       The 'start_dt' and 'end_dt' parameters are to be timestamps in a variety of formats. The
+;       The 'start_ts' and 'end_ts' parameters are to be timestamps in a variety of formats. The
 ;       following are examples of what is allowed:
 ;
 ;       The following are all interpreted as '2020-01-01T00:00:00':
-;         start_dt = '2020'
-;         start_dt = '202001'
-;         start_dt = '20200101'
-;         start_dt = '2020010100'
-;         start_dt = '202001010000'
-;         start_dt = '2020-01-01'
-;         start_dt = '2020/01/01T00:00'
-;         start_dt = '2020-01-01 00:00'
+;         start_ts = '2020'
+;         start_ts = '202001'
+;         start_ts = '20200101'
+;         start_ts = '2020010100'
+;         start_ts = '202001010000'
+;         start_ts = '2020-01-01'
+;         start_ts = '2020/01/01T00:00'
+;         start_ts = '2020-01-01 00:00'
 ;
 ;       The following are all interpreted as '2020-12-31T23:59:59':
-;         end_dt = '2020'
-;         end_dt = '202012'
-;         end_dt = '20201231'
-;         end_dt = '2020123123'
-;         end_dt = '202012312359'
-;         end_dt = '2020-12-31'
-;         end_dt = '2020/12/31T23'
-;         end_dt = '2020-12-31 23'
+;         end_ts = '2020'
+;         end_ts = '202012'
+;         end_ts = '20201231'
+;         end_ts = '2020123123'
+;         end_ts = '202012312359'
+;         end_ts = '2020-12-31'
+;         end_ts = '2020/12/31T23'
+;         end_ts = '2020-12-31 23'
 ;
 ; KEYWORDS:
 ;       /QUIET           quiet output when searching, no print messages will be shown
@@ -95,7 +95,7 @@
 ;       response = aurorax_data_product_search('2020-01-01T00:00','2020-01-01T23:59',programs=['trex'],metadata_filters=metadata_filters)
 ;+
 ;-------------------------------------------------------------
-function aurorax_data_product_search,start_dt,end_dt,programs=programs,platforms=platforms,instrument_types=instrument_types,data_product_types=data_product_types,metadata_filters=metadata_filters,poll_interval=pi,QUIET=q,DRYRUN=dr
+function aurorax_data_product_search,start_ts,end_ts,programs=programs,platforms=platforms,instrument_types=instrument_types,data_product_types=data_product_types,metadata_filters=metadata_filters,poll_interval=pi,QUIET=q,DRYRUN=dr
   ; set verbosity
   verbose = 1
   if (isa(q) eq 1) then verbose = 0
@@ -111,8 +111,8 @@ function aurorax_data_product_search,start_dt,end_dt,programs=programs,platforms
 
   ; get ISO datetime strings
   if (verbose eq 1) then __aurorax_message,'Parsing start and end timestamps'
-  start_iso_dt = __aurorax_datetime_parser(start_dt,/interpret_as_start)
-  end_iso_dt = __aurorax_datetime_parser(end_dt,/interpret_as_end)
+  start_iso_dt = __aurorax_datetime_parser(start_ts,/interpret_as_start)
+  end_iso_dt = __aurorax_datetime_parser(end_ts,/interpret_as_end)
   if (start_iso_dt eq '' or end_iso_dt eq '') then return,list()
 
   ; create data sources struct
@@ -124,12 +124,12 @@ function aurorax_data_product_search,start_dt,end_dt,programs=programs,platforms
   if (isa(metadata_filters) eq 1) then data_sources_struct.data_product_metadata_filters = hash(metadata_filters)
 
   ; create post struct and serialize into a string
-  post_struct = {data_sources: data_sources_struct, start: start_iso_dt, end_dt: end_iso_dt, data_product_type_filters: list()}
+  post_struct = {data_sources: data_sources_struct, start: start_iso_dt, end_ts: end_iso_dt, data_product_type_filters: list()}
   if (isa(data_product_types) eq 1) then data_sources_struct.data_product_type_filters = list(data_product_types,/extract)
   post_str = json_serialize(post_struct,/lowercase)
   post_str = post_str.replace('LOGICAL_OPERATOR', 'logical_operator')  ; because of a bug in json_serialize where it doesn't lowercase nested hashes
   post_str = post_str.replace('EXPRESSIONS', 'expressions')            ; because of a bug in json_serialize where it doesn't lowercase nested hashes
-  post_str = post_str.replace('end_dt','end')                          ; because 'end' isn't a valid struct tag name
+  post_str = post_str.replace('end_ts','end')                          ; because 'end' isn't a valid struct tag name
 
   ; stop here if in dry-run mode
   if (dry_run eq 1) then begin
@@ -184,11 +184,11 @@ function aurorax_data_product_search,start_dt,end_dt,programs=programs,platforms
   response = __aurorax_request_get_data('data_products',request_id)
   if (verbose eq 1) then __aurorax_message,'Data downloaded, search completed'
 
-  ; post-process data (ie. change 'start' to 'start_dt', and '_end' to 'end_dt')
+  ; post-process data (ie. change 'start' to 'start_ts', and '_end' to 'end_ts')
   if (verbose eq 1) then __aurorax_message,'Post-processing data into IDL struct'
   data_adjusted = list()
   for i=0,n_elements(response.data)-1 do begin
-    new_record_struct = {start_dt: response.data[i].start, end_dt: response.data[i]._end, data_source: response.data[i].data_source, url: response.data[i].url, data_product_type: response.data[i].data_product_type, metadata: response.data[i].metadata}
+    new_record_struct = {start_ts: response.data[i].start, end_ts: response.data[i]._end, data_source: response.data[i].data_source, url: response.data[i].url, data_product_type: response.data[i].data_product_type, metadata: response.data[i].metadata}
     data_adjusted.add,new_record_struct
   endfor
   response.data = data_adjusted

@@ -51,7 +51,7 @@
 ; EXAMPLES:
 ;       ...
 ;       ...
-;       response = aurorax_conjunction_search(start_dt,end_dt,distance,ground=ground,space=space)
+;       response = aurorax_conjunction_search(start_ts,end_ts,distance,ground=ground,space=space)
 ;       aurorax_open_conjunctions_in_swarmaurora,response.request_id
 ;+
 ;-------------------------------------------------------------
@@ -119,7 +119,7 @@ end
 ; EXAMPLES:
 ;       ...
 ;       ...
-;       response = aurorax_conjunction_search(start_dt,end_dt,distance,ground=ground,space=space)
+;       response = aurorax_conjunction_search(start_ts,end_ts,distance,ground=ground,space=space)
 ;       aurorax_save_swarmaurora_custom_import_file,response.request_id
 ;+
 ;-------------------------------------------------------------
@@ -184,7 +184,7 @@ end
 ; EXAMPLES:
 ;       ...
 ;       ...
-;       response = aurorax_conjunction_search(start_dt,end_dt,distance,ground=ground,space=space)
+;       response = aurorax_conjunction_search(start_ts,end_ts,distance,ground=ground,space=space)
 ;       aurorax_open_conjunctions_in_aurorax,response.request_id
 ;+
 ;-------------------------------------------------------------

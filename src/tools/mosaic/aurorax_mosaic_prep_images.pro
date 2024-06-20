@@ -15,19 +15,19 @@ function aurorax_mosaic_prep_images, image_list
     ;   1) finding the over-arching start and end times of data across all sites
     ;   2) determine the cadence using the timestamps
     ;   3) determine the number of expected frames using the cadence, start and end
-    start_dt = __get_julday(image_list[0].timestamp[0])
-    end_dt = __get_julday(image_list[0].timestamp[-1])
+    start_ts = __get_julday(image_list[0].timestamp[0])
+    end_ts = __get_julday(image_list[0].timestamp[-1])
     foreach site_data, image_list do begin
-        this_start_dt = __get_julday(site_data.timestamp[0])
-        this_end_dt = __get_julday(site_data.timestamp[-1])
-        if (this_start_dt lt start_dt) then start_dt = this_start_dt
-        if (this_end_dt gt end_dt) then end_dt = this_end_dt
+        this_start_ts = __get_julday(site_data.timestamp[0])
+        this_end_ts = __get_julday(site_data.timestamp[-1])
+        if (this_start_ts lt start_ts) then start_ts = this_start_ts
+        if (this_end_ts gt end_ts) then end_ts = this_end_ts
     endforeach
     
     ; Determine cadance, and generate all expected timestamps
     cadence = __determine_cadence(image_list[0].timestamp)
-    expected_juldays = timegen(start=start_dt, final=end_dt, step_size=cadence, units='S')
-    if (end_dt - start_dt) gt 3 then stop, "(aurorax_mosaic_prep_images) Error: Excessive date range detected - Check that all data is from the same time range"
+    expected_juldays = timegen(start=start_ts, final=end_ts, step_size=cadence, units='S')
+    if (end_ts - start_ts) gt 3 then stop, "(aurorax_mosaic_prep_images) Error: Excessive date range detected - Check that all data is from the same time range"
     expected_timestamps = string(expected_juldays, format = '(C(CYI, "-", CMOI2.2, "-", CDI2.2, " ", CHI2.2, ":", CMI2.2, ":", CSI2.2))')
     expected_num_frames = n_elements(expected_timestamps)
     

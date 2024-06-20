@@ -7,3 +7,8 @@
 @aurorax_ephemeris
 @aurorax_sources
 @aurorax_open_externally
+
+@aurorax_list_datasets
+@aurorax_list_observatories
+@aurorax_get_urls
+@aurorax_download_data
