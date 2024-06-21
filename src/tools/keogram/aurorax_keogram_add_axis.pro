@@ -76,26 +76,20 @@ function aurorax_keogram_add_axis, keogram_struct, skymap, altitude_km=altitude_
     endelse
     
     if keyword_set(mag) then begin
-        ; Magnetic conversion goes here
-        mag_y = geo_y ; TEMP ***************** JOSH FIX THIS
+        print, "Warning: Magnetic coordinates are not currently supported for this routine."
     endif
     
     keywords = [keyword_set(geo), keyword_set(mag), keyword_set(elev)]
-    
-;    ; Reverse all axes
-;    if keyword_set(geo) then geo_y = reverse(geo_y)
-;    if keyword_set(mag) then mag_y = reverse(mag_y)
-;    if keyword_set(elev) then elev_y = reverse(elev_y)
     
     if array_equal(keywords, [0,0,1]) then begin
         ; Return keogram array with desired axes added
         return, {data:keo_arr, timestamp:time_stamp, ccd_y:ccd_y, slice_idx:slice_idx, elev_y:elev_y}
     endif else if array_equal(keywords, [0,1,0]) then begin
         ; Return keogram array with desired axes added
-        return, {data:keo_arr, timestamp:time_stamp, ccd_y:ccd_y, slice_idx:slice_idx, mag_y:mag_y}
+        return, {data:keo_arr, timestamp:time_stamp, ccd_y:ccd_y, slice_idx:slice_idx}
     endif else if array_equal(keywords, [0,1,1]) then begin
         ; Return keogram array with desired axes added
-        return, {data:keo_arr, timestamp:time_stamp, ccd_y:ccd_y, slice_idx:slice_idx, mag_y:mag_y, elev_y:elev_y}
+        return, {data:keo_arr, timestamp:time_stamp, ccd_y:ccd_y, slice_idx:slice_idx, elev_y:elev_y}
     endif else if array_equal(keywords, [1,0,0]) then begin
         ; Return keogram array with desired axes added
         return, {data:keo_arr, timestamp:time_stamp, ccd_y:ccd_y, slice_idx:slice_idx, geo_y:geo_y}
@@ -104,10 +98,10 @@ function aurorax_keogram_add_axis, keogram_struct, skymap, altitude_km=altitude_
         return, {data:keo_arr, timestamp:time_stamp, ccd_y:ccd_y, slice_idx:slice_idx, geo_y:geo_y, elev_y:elev_y}
     endif else if array_equal(keywords, [1,1,0]) then begin
         ; Return keogram array with desired axes added
-        return, {data:keo_arr, timestamp:time_stamp, ccd_y:ccd_y, slice_idx:slice_idx, geo_y:geo_y, mag_y:mag_y}
+        return, {data:keo_arr, timestamp:time_stamp, ccd_y:ccd_y, slice_idx:slice_idx, geo_y:geo_y}
     endif else if array_equal(keywords, [1,1,1]) then begin
         ; Return keogram array with desired axes added
-        return, {data:keo_arr, timestamp:time_stamp, ccd_y:ccd_y, slice_idx:slice_idx, geo_y:geo_y, mag_y:mag_y, elev_y:elev_y}
+        return, {data:keo_arr, timestamp:time_stamp, ccd_y:ccd_y, slice_idx:slice_idx, geo_y:geo_y, elev_y:elev_y}
     endif 
     
 end

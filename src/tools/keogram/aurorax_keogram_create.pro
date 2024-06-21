@@ -1,26 +1,22 @@
 
 
-function aurorax_keogram_create, image_data
+function aurorax_keogram_create, images, time_stamp
     
-    if not isa(image_data, /array) then stop, "(aurorax_create_keogram) Error: 'image_data' must be an array"
-    
-    ; Extract data array and timestamps
-    images = image_data.data
-    time_stamp = image_data.timestamp
+    if not isa(images, /array) then stop, "(aurorax_keogram_create) Error: 'images' must be an array"  
 
     ; Get the number of channels of image data
     images_shape = size(images, /dimensions)
     if n_elements(images_shape) eq 2 then begin
-        stop, "(aurorax_create_keogram) Error: 'images' must contain multiple frames."
+        stop, "(aurorax_keogram_create) Error: 'images' must contain multiple frames."
     endif else if n_elements(images_shape) eq 3 then begin
-        if images_shape[0] eq 3 then stop, "(aurorax_create_keogram) Error: 'images' must contain multiple frames."
+        if images_shape[0] eq 3 then stop, "(aurorax_keogram_create) Error: 'images' must contain multiple frames."
         n_channels = 1
     endif else if n_elements(images_shape) eq 4 then begin
         n_channels = images_shape[0]
-    endif else stop, "(aurorax_create_keogram) Error: Unable to determine number of channels based on the supplied images. " + $ 
-                     "Make sure you are supplying a [rows,cols,images] or [rows,cols,channels,images] sized array."
+    endif else stop, "(aurorax_keogram_create) Error: Unable to determine number of channels based on the supplied images. " + $ 
+                     "Make sure you are supplying a [cols,rows,images] or [channels,cols,rows,images] sized array."
     
-    ; Extract the transpose and reshape for proper output shape
+    ; Extract the keogram slice, transpose and reshape for proper output shape
     if n_channels eq 1 then begin
         keo_idx = images_shape[0] / 2
         keo_arr = transpose(reform(images[keo_idx,*,*]))

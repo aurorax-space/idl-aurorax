@@ -80,7 +80,7 @@ function aurorax_bounding_box_extract_metric, images, mode, xy_bounds, metric=me
                 preview_img = bytscl(flat_images[*,0], top=230)
                 preview_img[bounded_idx] = 255
                 preview_img = reform(preview_img, (size(images, /dimensions))[0], (size(images, /dimensions))[1])
-                im = image(preview_img, rgb_table=0, title="Preview of Bounded Area")
+                im = image(preview_img, rgb_table=0, title="Preview of Bounded Area", position=[5,5], /device)
             endif
             
             ; Obtain bounded data and then take metric over all images
@@ -101,7 +101,7 @@ function aurorax_bounding_box_extract_metric, images, mode, xy_bounds, metric=me
                 preview_img[0,bounded_idx] = 255
                 preview_img[1:*,bounded_idx] = 0
                 preview_img = reform(preview_img, 3, (size(images, /dimensions))[1], (size(images, /dimensions))[2])
-                im = image(preview_img, title="Preview of Bounded Area")
+                im = image(preview_img, title="Preview of Bounded Area", position=[5,5], /device)
             endif
             
             ; Obtain bounded data and then take metric over all images
@@ -180,7 +180,7 @@ function aurorax_bounding_box_extract_metric, images, mode, xy_bounds, metric=me
                 ; plot the first image, with bounded idx masked
                 preview_img = bytscl(images[*,*,0], top=230)
                 preview_img[x_0:x_1,y_0:y_1] = 255
-                im = image(preview_img, rgb_table=0, title="Preview of Bounded Area")
+                im = image(preview_img, rgb_table=0, title="Preview of Bounded Area", position=[5,5], /device)
             endif
 
             ; Obtain bounded data and then take metric over all images
@@ -198,7 +198,7 @@ function aurorax_bounding_box_extract_metric, images, mode, xy_bounds, metric=me
                 preview_img = bytscl(images[*,*,*,0], top=230)
                 preview_img[0,x_0:x_1,y_0:y_1] = 255
                 preview_img[1:*,x_0:x_1,y_0:y_1] = 0
-                im = image(preview_img, title="Preview of Bounded Area")
+                im = image(preview_img, title="Preview of Bounded Area", position=[5,5], /device)
             endif
 
             ; Obtain bounded data and then take metric over all images
@@ -262,7 +262,7 @@ function aurorax_bounding_box_extract_metric, images, mode, xy_bounds, metric=me
                 preview_img = bytscl(flat_images[*,0], top=230)
                 preview_img[bounded_idx] = 255
                 preview_img = reform(preview_img, (size(images, /dimensions))[0], (size(images, /dimensions))[1])
-                im = image(preview_img, rgb_table=0, title="Preview of Bounded Area")
+                im = image(preview_img, rgb_table=0, title="Preview of Bounded Area", position=[5,5], /device)
             endif
 
             ; Obtain bounded data and then take metric over all images
@@ -283,7 +283,7 @@ function aurorax_bounding_box_extract_metric, images, mode, xy_bounds, metric=me
                 preview_img[0,bounded_idx] = 255
                 preview_img[1:*,bounded_idx] = 0
                 preview_img = reform(preview_img, 3, (size(images, /dimensions))[1], (size(images, /dimensions))[2])
-                im = image(preview_img, title="Preview of Bounded Area")
+                im = image(preview_img, title="Preview of Bounded Area", position=[5,5], /device)
             endif
 
             ; Obtain bounded data and then take metric over all images
@@ -412,7 +412,7 @@ function aurorax_bounding_box_extract_metric, images, mode, xy_bounds, metric=me
                 preview_img = bytscl(flat_images[*,0], top=230)
                 preview_img[bounded_idx] = 255
                 preview_img = reform(preview_img, (size(images, /dimensions))[0], (size(images, /dimensions))[1])
-                im = image(preview_img, rgb_table=0, title="Preview of Bounded Area")
+                im = image(preview_img, rgb_table=0, title="Preview of Bounded Area", position=[5,5], /device)
             endif
 
             ; Obtain bounded data and then take metric over all images
@@ -433,7 +433,7 @@ function aurorax_bounding_box_extract_metric, images, mode, xy_bounds, metric=me
                 preview_img[0,bounded_idx] = 255
                 preview_img[1:*,bounded_idx] = 0
                 preview_img = reform(preview_img, 3, (size(images, /dimensions))[1], (size(images, /dimensions))[2])
-                im = image(preview_img, title="Preview of Bounded Area")
+                im = image(preview_img, title="Preview of Bounded Area", position=[5,5], /device)
             endif
 
             ; Obtain bounded data and then take metric over all images

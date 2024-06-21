@@ -1,17 +1,17 @@
 
 
-pro create_keogram_trex_rgb
+pro aurorax_example_create_keogram_trex_rgb
     
     ; First, obtain 1 hour of data
     f = file_search("\\bender.phys.ucalgary.ca\data\trex\rgb\stream0\2023\02\24\yknf*\ut06\20230224_06*_yknf*_full.h5")
     trex_imager_readfile, f, img, meta
-    image_data = {data:img, timestamp:meta.EXPOSURE_START_STRING, metadata:meta}
+    time_stamp = meta.EXPOSURE_START_STRING
     
     ; Load in corresponding skymap
     restore, "\\bender.phys.ucalgary.ca\data\trex\rgb\skymaps\yknf\yknf_20230114\rgb_skymap_yknf_20230114-+_v01.sav"
     
     ; Create keogram object
-    keo = aurorax_keogram_create(image_data)
+    keo = aurorax_keogram_create(img, time_stamp)
     
     ; Extract keogram data array. - This can be further manipulated or plotted however you'd like
     keo_arr = keo.data

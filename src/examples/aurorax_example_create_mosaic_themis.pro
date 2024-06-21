@@ -1,6 +1,6 @@
 
 
-pro create_mosaic_themis
+pro aurorax_example_create_mosaic_themis
 
     ; First get image data
 
