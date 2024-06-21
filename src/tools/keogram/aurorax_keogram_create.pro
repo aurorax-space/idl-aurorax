@@ -1,8 +1,8 @@
 
 
-function aurorax_keogram_create,images,time_stamp
+function aurorax_keogram_create, images, time_stamp
     
-    if not isa(images, /array) then stop, "(aurorax_create_keogram) Error: 'image_data' must be an array"
+    if not isa(images, /array) then stop, "(aurorax_keogram_create) Error: 'images' must be an array"  
     
     ; Get the number of channels of image data
     images_shape = size(images, /dimensions)
