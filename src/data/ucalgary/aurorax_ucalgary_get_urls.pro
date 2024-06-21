@@ -1,4 +1,4 @@
-function aurorax_get_urls,dataset_name,start_ts,end_ts,site_uid=site_uid,device_uid=device_uid
+function aurorax_ucalgary_get_urls,dataset_name,start_ts,end_ts,site_uid=site_uid,device_uid=device_uid
   ; set required params
   param_str = '?name=' + dataset_name
   param_str += '&start=' + start_ts

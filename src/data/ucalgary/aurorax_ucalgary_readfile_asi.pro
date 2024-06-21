@@ -568,7 +568,7 @@ function __aurorax_asi_pgm_readfile,filename,LUN=lun,VERBOSE=verbose,COMMENTS=co
   return,-1L
 end
 
-pro aurorax_asi_readfile,$
+pro aurorax_ucalgary_readfile_asi,$
   filename,$
   images,$
   metadata,$
@@ -677,7 +677,7 @@ pro aurorax_asi_readfile,$
 
   ; sort filenames
   if (n_elements(filenames) gt 1) then filenames = filenames[sort(filenames)]
-  if (verbose gt 0) then print,'[aurorax_read] Reading ' + strcompress(fix(n_elements(filenames)),/remove_all) + ' files'
+  ;if (verbose gt 0) then print,'[aurorax_read] Reading ' + strcompress(fix(n_elements(filenames)),/remove_all) + ' files'
 
   ; set values for pre-allocating memory (significantly increases speed)
   n_chunk = 20
@@ -822,18 +822,18 @@ pro aurorax_asi_readfile,$
     images = images[*,*,*,0:n_frames-1]
     metadata = metadata[0:n_frames-1]
   endif
-  
+
   ; show read timing information if verbose keyword is set
-  if (show_datarate gt 0) then begin
-    dtime = (systime(1) - time0)
-    i = 0
-    while (n_bytes gt 1024L) do begin
-      n_bytes = n_bytes / 1024.0
-      i = i + 1
-    endwhile
-    prefix = (['','K','M','G','T'])[i]
-    infoline = string(n_bytes,prefix,dtime,8*n_bytes/dtime,prefix,format='("Read ",F6.1,X,A,"B in ",I," seconds: ",F7.1,X,A,"b/second")')
-    print,'[aurorax_read] ' + strcompress(infoline)
-  endif
+  ;  if (show_datarate gt 0) then begin
+  ;    dtime = (systime(1) - time0)
+  ;    i = 0
+  ;    while (n_bytes gt 1024L) do begin
+  ;      n_bytes = n_bytes / 1024.0
+  ;      i = i + 1
+  ;    endwhile
+  ;    prefix = (['','K','M','G','T'])[i]
+  ;    infoline = string(n_bytes,prefix,dtime,8*n_bytes/dtime,prefix,format='("Read ",F6.1,X,A,"B in ",I," seconds: ",F7.1,X,A,"b/second")')
+  ;    print,'[aurorax_read] ' + strcompress(infoline)
+  ;  endif
   skip: return
 end

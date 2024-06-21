@@ -34,7 +34,7 @@ function __extract_content_length,req
   return,content_length
 end
 
-function aurorax_download_data,dataset_name,start_ts,end_ts,site_uid=site_uid,device_uid=device_uid,download_path=download_path,overwrite=overwrite,quiet=quiet
+function aurorax_ucalgary_download,dataset_name,start_ts,end_ts,site_uid=site_uid,device_uid=device_uid,download_path=download_path,overwrite=overwrite,quiet=quiet
   ; init
   time0 = systime(1)
   total_bytes = 0
@@ -52,12 +52,12 @@ function aurorax_download_data,dataset_name,start_ts,end_ts,site_uid=site_uid,de
   output_root_path = download_path + path_sep() + dataset_name
 
   ; get urls
-  urls = aurorax_get_urls(dataset_name,start_ts,end_ts,site_uid=site_uid,device_uid=device_uid)
+  urls = aurorax_ucalgary_get_urls(dataset_name,start_ts,end_ts,site_uid=site_uid,device_uid=device_uid)
 
   ; download each file
   if (n_elements(urls.urls) eq 0) then begin
     if (quiet_flag eq 0) then print,'[aurorax_download] No files found to download'
-    return,{filenames: list(), dataset: urls.dataset, output_root_path: output_root_path, total_bytes: 0}
+    return,{filenames: list(), count: 0, dataset: urls.dataset, output_root_path: output_root_path, total_bytes: 0}
   endif else begin
     downloaded_files = list()
     for i=0,n_elements(urls.urls)-1 do begin
@@ -77,16 +77,16 @@ function aurorax_download_data,dataset_name,start_ts,end_ts,site_uid=site_uid,de
       ; make destination dir
       file_mkdir,file_dirname(output_filename)
 
-      ;      ; if the url object throws an error it will be caught here
-      ;      catch,error_status
-      ;      if (error_status ne 0) then begin
-      ;        catch,/cancel
-      ;        req->GetProperty,response_code=rspCode
-      ;        if (quiet_flag eq 0) then print,'[aurorax_download] URL download failed with error code ' + strtrim(string(rspCode),2) + ': ' + url
-      ;        file_delete,output_filename  ; don't want an empty 1kb file to stick around
-      ;        obj_destroy,req
-      ;        continue
-      ;      endif
+      ; if the url object throws an error it will be caught here
+      catch,error_status
+      if (error_status ne 0) then begin
+        catch,/cancel
+        req->GetProperty,response_code=rspCode
+        if (quiet_flag eq 0) then print,'[aurorax_download] URL download failed with error code ' + strtrim(string(rspCode),2) + ': ' + url
+        file_delete,output_filename  ; don't want an empty 1kb file to stick around
+        obj_destroy,req
+        continue
+      endif
 
       ; retrieve file
       req = OBJ_NEW('IDLnetUrl')
@@ -119,11 +119,9 @@ function aurorax_download_data,dataset_name,start_ts,end_ts,site_uid=site_uid,de
       i = i + 1
     endwhile
     prefix = (['','K','M','G','T'])[i]
-    ;info_line = string(working_total_bytes,prefix,dtime,8*working_total_bytes/dtime,prefix,format='("Downloaded ",F6.1,X,A,"B in ",I," seconds: ",F7.1,X,A,"b/second")')
-    ;print,'[aurorax_download] ' + info_line
     print,'[aurorax_download] Finished, downloaded ' + strcompress(fix(working_total_bytes),/remove_all) + ' ' + prefix + 'B in ' + strcompress(string(dtime,format='(d20.2)'),/remove_all) + " seconds"
   endif
 
   ; return
-  return,{filenames: downloaded_files, dataset: urls.dataset, output_root_path: output_root_path, total_bytes: total_bytes}
+  return,{filenames: downloaded_files, count: n_elements(downloaded_files), dataset: urls.dataset, output_root_path: output_root_path, total_bytes: total_bytes}
 end
