@@ -794,6 +794,18 @@ pro aurorax_ucalgary_readfile_asi,$
           mdata = metadata[n_frames-1]
         endelse
 
+        ; replace site and device uids in the metadata using the filename
+        ;
+        ; NOTE: this is in response to some data that was found to have
+        ; invalid metadata, mismatching with the filename site and device.
+        ; It needed to be fixed to allow the mosaic routine to function,
+        ; so instead of fixing all the data, we put this logic in. And then
+        ; we fix the data.
+        site_uid_from_fname = ((file_basename(filenames[i])).split('_'))[2]
+        imager_uid_from_fname = ((file_basename(filenames[i])).split('_'))[3]
+        mdata.site_uid = site_uid_from_fname
+        mdata.imager_uid = imager_uid_from_fname
+
         ; finalize return variables
         metadata[n_frames] = mdata
         images[0,0,n_frames] = image

@@ -26,3 +26,6 @@
 @aurorax_mosaic_create
 @aurorax_mosaic_prep_images
 @aurorax_mosaic_prep_skymap
+
+@aurorax_atm_forward
+@aurorax_atm_inverse
