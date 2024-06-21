@@ -11,4 +11,5 @@ pro aurorax_example_read_data
 
   ; read the data quietly
   data = aurorax_ucalgary_read(d.dataset,f[0],/quiet)
+ 
 end

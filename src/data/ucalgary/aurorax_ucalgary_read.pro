@@ -1,3 +1,76 @@
+function __reorient_asi_images,dataset_name,data
+  ; NOTE:
+  ; flip horizonally --> reverse(data[*,*,0],1) -- subscript index = 1
+  ; flip vertically  --> reverse(data[*,*,0],2) -- subscript index = 2
+
+  if (dataset_name eq 'THEMIS_ASI_RAW') then begin
+    ; themis - flip vertically
+    data = reverse(data,2)
+  endif
+  if (dataset_name eq 'REGO_RAW') then begin
+    ; rego - flip vertically and horizontally
+    data = reverse(data,1)
+    data = reverse(data,2)
+  endif
+  if (dataset_name eq 'TREX_BLUE_RAW') then begin
+    ; trex blue - flip vertically
+    data = reverse(data,2)
+  endif
+  if (dataset_name eq 'TREX_NIR_RAW') then begin
+    ; trex nir - flip vertically
+    data = reverse(data,2)
+  endif
+  if (dataset_name eq 'TREX_RGB_RAW_NOMINAL' or dataset_name eq 'TREX_RGB_RAW_BURST') then begin
+    ; trex rgb - flip vertically
+    data = reverse(data,3)
+  endif
+
+  ; return
+  return,data
+end
+
+function __reorient_skymaps,dataset_name,skymap
+  ; NOTE:
+  ; flip horizonally --> reverse(data[*,*,0],1) -- subscript index = 1
+  ; flip vertically  --> reverse(data[*,*,0],2) -- subscript index = 2
+
+  ; flip several things vertically
+  skymap.full_elevation = reverse(skymap.full_elevation,2)
+  skymap.full_azimuth = reverse(skymap.full_azimuth,2)
+  skymap.full_map_latitude = reverse(skymap.full_map_latitude,2)
+  skymap.full_map_longitude = reverse(skymap.full_map_longitude,2)
+
+  if (dataset_name eq 'REGO_SKYMAP_IDLSAV') then begin
+    ; flip horizontally too, but just for REGO (since we do this to the raw data too)
+    skymap.full_elevation = reverse(skymap.full_elevation,1)
+    skymap.full_azimuth = reverse(skymap.full_azimuth,1)
+    skymap.full_map_latitude = reverse(skymap.full_map_latitude,1)
+    skymap.full_map_longitude = reverse(skymap.full_map_longitude,1)
+  endif
+
+  ; return
+  return,skymap
+end
+
+function __reorient_calibration,dataset_name,cal
+  ; NOTE:
+  ; flip horizonally --> reverse(data[*,*,0],1) -- subscript index = 1
+  ; flip vertically  --> reverse(data[*,*,0],2) -- subscript index = 2
+
+  if (dataset_name eq 'REGO_CALIBRATION_FLATFIELD_IDLSAV') then begin
+    ; flip vertically and horizontally
+    cal.flat_field_multiplier = reverse(cal.flat_field_multiplier,1)
+    cal.flat_field_multiplier = reverse(cal.flat_field_multiplier,2)
+  endif
+  if (dataset_name eq 'TREX_NIR_CALIBRATION_FLATFIELD_IDLSAV') then begin
+    ; flip vertically
+    cal.flat_field_multiplier = reverse(cal.flat_field_multiplier,2)
+  endif
+
+  ; return
+  return,cal
+end
+
 function aurorax_ucalgary_read,dataset,file_list,first_record=first_record,no_metadata=no_metadata,quiet=quiet
   ; init
   timestamp_list = list()
@@ -58,6 +131,7 @@ function aurorax_ucalgary_read,dataset,file_list,first_record=first_record,no_me
 
     ; set the data
     data = img
+    data = __reorient_asi_images(dataset.name, data)
 
     ; set the timestamps
     for i=0,n_elements(meta)-1 do begin
@@ -69,9 +143,15 @@ function aurorax_ucalgary_read,dataset,file_list,first_record=first_record,no_me
   endif else if (read_function eq 'skymap') then begin
     ; read using skymap readfile
     data = aurorax_ucalgary_readfile_skymap(file_list,quiet_flag=quiet_flag)
+    for i=0,n_elements(data)-1 do begin
+      data[i] = __reorient_skymaps(dataset.name,data[0])
+    endfor
   endif else if (read_function eq 'calibration') then begin
     ; read using calibration readfile
     data = aurorax_ucalgary_readfile_calibration(file_list,quiet_flag=quiet_flag)
+    for i=0,n_elements(data)-1 do begin
+      data[i] = __reorient_calibration(dataset.name,data[0])
+    endfor
   endif
 
   ; put data into a struct
