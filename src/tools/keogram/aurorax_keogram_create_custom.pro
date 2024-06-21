@@ -1,12 +1,5 @@
-
-
-
-
-
-
+; function that checks if point is within polygon
 function __point_is_in_polygon, point, vertices
-    ; function that checks if point is within polygon
-    
     x = point[0]
     y = point[1]
     
@@ -39,25 +32,37 @@ function __point_is_in_polygon, point, vertices
 END
    
    
-   
+; Function to obtain all indices of an array/image, within the
+; polygon defined by input list of ordered vertices.
 function __indices_in_polygon, vertices, image_shape
-    ; Function to obtain all indices of an array/image, within the 
-    ; polygon defined by input list of ordered vertices.
+    x_verts = []
+    y_verts = []
+    for i=0, n_elements(vertices)-1 do begin
+        x_verts = [x_verts, (vertices[i])[0]]
+        y_verts = [y_verts, (vertices[i])[1]]
+    endfor
     
     x_idx_inside = []
     y_idx_inside = []
     
     ; Iterate through every point in image
-;    for i=0, images_shape[0]-1 do begin
-;        for j=0, images_shape[1]-1 do begin
-;            point = [i,j]
-;            
-;            if __point_is_in_polygon(point, vertices) do begin
-;                x_idx_inside = [x_idx_inside, i]
-;                y_idx_inside = [y_idx_inside, j]
-;            endif
-;        endfor
-;    endfor
+    i_idx = indgen(image_shape[0])
+    i_indices = []
+    for j=0, image_shape[1]-1 do begin
+        i_indices = [i_indices, i_idx]
+    endfor
+    j_idx = indgen(image_shape[1])
+    j_indices = []
+    for j=0, image_shape[0]-1 do begin
+        j_indices = [j_indices, j_idx]
+    endfor
+
+    obj = obj_new('IDLanROI', x_verts, y_verts)
+    flat_idx = where(obj.containspoints(i_indices, j_indices))
+    x_idx_inside = i_indices[flat_idx]
+    y_idx_inside = j_indices[flat_idx]
+    
+    return, list(x_idx_inside, y_idx_inside)
 end
     
 function __convert_lonlat_to_ccd, lon_locs, lat_locs, skymap, altitude_km, time_stamp=time_stamp, mag=mag
@@ -175,9 +180,8 @@ function __haversine_distances, target_lat, target_lon, lat_array, lon_array
 end
 
 
-
 function aurorax_keogram_create_custom, images, time_stamp, coordinate_system, x_locs, y_locs, width=width, show_preview=show_preview, skymap=skymap, altitude_km=altitude_km, metric=metric
-    
+        
     ; check that coord system is valid
     coord_options = ['ccd', 'geo', 'mag']
     if where(coordinate_system eq coord_options, /null) eq !null then begin
@@ -185,7 +189,6 @@ function aurorax_keogram_create_custom, images, time_stamp, coordinate_system, x
     endif
     
     if not isa(images, /array) then stop, "(aurorax_keogram_create_custom) Error: 'images' must be an array"
-
 
     ; Get the number of channels of image data
     images_shape = size(images, /dimensions)
@@ -211,7 +214,7 @@ function aurorax_keogram_create_custom, images, time_stamp, coordinate_system, x
     
     ; Extract preview image if desired
     if keyword_set(show_preview) then begin
-        if n_channels eq 1 then preview_img = images[*,*,0] else preview_img = images[*,*,*,0]
+        if n_channels eq 1 then preview_img = bytscl(images[*,*,0], top=230) else preview_img = images[*,*,*,0]
     endif
     
     ; Convert lat/lons to CCD coordinates
@@ -221,7 +224,7 @@ function aurorax_keogram_create_custom, images, time_stamp, coordinate_system, x
     endif else if coordinate_system eq "mag" then begin
         print, "(aurorax_keogram_create_custom) Warning: Magnetic coordinates are not currently supported for this routine."
         return, !null
-        result = __convert_lonlat_to_ccd(x_locs, y_locs, skymap, altitude_km, time_stamp=time_stamp, /mag)
+        result = __convert_lonlat_to_ccd(x_locs, y_locs, skymap, altitude_km, timestamp=timestamp, /mag)
         x_locs = result[0] & y_locs = result[1]
     endif
     
@@ -259,6 +262,13 @@ function aurorax_keogram_create_custom, images, time_stamp, coordinate_system, x
     x_locs = parsed_x_locs
     y_locs = parsed_y_locs
     
+    ; Initialize keogram with a height of n_points-1 and a width of however many frames we have
+    if n_channels eq 1 then begin
+        keo_arr = intarr((size(images,/dimensions))[-1], n_elements(x_locs)-1)
+    endif else begin
+        keo_arr = intarr(n_channels, (size(images,/dimensions))[-1], n_elements(x_locs)-1)
+    endelse
+    
     ; Iterate through points in pairs of two
     for i=0, n_elements(x_locs)-2 do begin
         
@@ -273,7 +283,7 @@ function aurorax_keogram_create_custom, images, time_stamp, coordinate_system, x
         dy = y_1 - y_0
         length = sqrt(dx^2 + dy^2)
         if length eq 0 then begin
-            stop, "Successive points may not be the same. Detected zero length between points of index ["+$
+            stop, "(aurorax_keogram_create_custom) Error: Successive points may not be the same. Detected zero length between points of index ["+$
                   strcompress(string(i),/remove_all)+"] and ["+strcompress(string(i+1),/remove_all)+"]."
         endif
         dx /= length
@@ -299,18 +309,74 @@ function aurorax_keogram_create_custom, images, time_stamp, coordinate_system, x
         vertices = list(vertex1, vertex2, vertex3, vertex4)
         
         ; Obtain the indexes into the image of this polygon
-        help, vertices
+        idx_list = __indices_in_polygon(vertices, [x_max, y_max])
+        x_idx_inside = idx_list[0]
+        y_idx_inside = idx_list[1]
+        
+        ; Make sure data exists for polygon
+        if x_idx_inside eq [] or y_idx_inside eq [] then begin
+            print, "(aurorax_keogram_create_custom) Error: Could not form keogram path... Try increasing 'width' or decreasing number of points in input coordinates."
+            return, !null
+        endif
+        
+        ; default to median for metric
+        metrics = ["mean", "median", "sum"]
+        if not keyword_set(metric) then metric = "median"
+        if where(metric eq metrics, /null) eq !null then begin
+            stop, "(aurorax_bounding_box_extract_metric) Error: Metric '"+string(metric)+"' not recognized. Accepted metrics are: "+strjoin(modes, ",")+"."
+        endif
+        
+        if n_channels eq 1 then begin
+            ; Extract metric for every frame from this polygons bounds
+            if metric eq "median" then begin
+                result = reform(median(images[x_idx_inside,y_idx_inside,*], dimension=1))
+            endif else if metric eq "mean" then begin
+                result = reform(mean(images[x_idx_inside,y_idx_inside,*], dimension=1))
+            endif else if metric eq "sum" then begin
+                result = reform(total(images[x_idx_inside,y_idx_inside,*], dimension=1))
+            endif
+            
+            ; Insert this slice into keogram array
+            keo_arr[*,i] = result
+            
+            ; Update preview image with keogram slice idx masking if desired
+            if keyword_set(show_preview) then begin
+                preview_img[x_idx_inside,y_idx_inside] = 255
+            endif
+        endif else if n_channels eq 3 then begin
+            ; Extract metric for every frame from this polygons bounds
+            if metric eq "median" then begin
+                result = reform(median(median(images[*,x_idx_inside,y_idx_inside,*], dimension=2), dimension=2))
+            endif else if metric eq "mean" then begin
+                result = reform(mean(mean(images[*,x_idx_inside,y_idx_inside,*], dimension=2), dimension=2))
+            endif else if metric eq "sum" then begin
+                result = reform(total(total(images[*,x_idx_inside,y_idx_inside,*], 2),2))
+            endif
+            
+            ; Insert this slice into keogram array
+            keo_arr[*,*,i] = result
+
+            ; Update preview image with keogram slice idx masking if desired
+            if keyword_set(show_preview) then begin
+                preview_img[0,x_idx_inside,y_idx_inside] = 255
+                preview_img[1:*,x_idx_inside,y_idx_inside] = 255
+            endif
+        endif else begin
+            print, "(aurorax_keogram_create_custom) Error: Urecognized image shape of "+strcompress(string(image_shape),/remove_all)+"."
+            return, !null
+        endelse
+        
     endfor
-     
+    
+    
+    if keyword_set(show_preview) then begin
+        if n_channels eq 1 then begin
+            im = image(preview_img, title="Preview of Keogram Slice", rgb_table=0, position=[5,5], /device)
+        endif else begin
+            im = image(preview_img, title="Preview of Keogram Slice", position=[5,5], /device)
+        endelse
+    endif
+    
+    ; Return keogram array
+    return, {data:keo_arr, timestamp:time_stamp, ccd_y:"custom"}
 end
-
-
-
-
-
-
-
-
-
-
-

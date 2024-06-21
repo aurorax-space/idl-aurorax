@@ -2,36 +2,39 @@
 
 pro aurorax_example_create_mosaic_themis
 
-    ; First get image data
 
-    ; start by obtaining a list of all image data objects
-    data_list_110km = list()
-
-    foreach site, ["atha", "fsmi", "gill", "inuv", "talo"] do begin
-        f = file_search("\\bender.phys.ucalgary.ca\data\themis\imager\stream0\2023\02\24\"+site+"*\ut06\20230224_0640_"+site+"*_full.pgm.gz")
-        trex_imager_readfile, f, img, meta
-        image_data = {data:img, timestamp:meta.EXPOSURE_START_STRING, metadata:meta}
-        data_list_110km.add, image_data ; add to list
-    endforeach
-
-    prepped_data_110km = aurorax_mosaic_prep_images(data_list_110km)
-
-    ; next get lists of all skymaps in same order
-    skymap_list_110km = list()
-    restore, "\\bender.phys.ucalgary.ca\data\themis\imager\skymaps\atha\atha_20230115\themis_skymap_atha_20230115-+_v02.sav"
-    skymap_list_110km.add, skymap
-    restore, "\\bender.phys.ucalgary.ca\data\themis\imager\skymaps\fsmi\fsmi_20230321\themis_skymap_fsmi_20230321-+_v02.sav"
-    skymap_list_110km.add, skymap
-    restore, "\\bender.phys.ucalgary.ca\data\themis\imager\skymaps\gill\gill_20230220\themis_skymap_gill_20230220-+_v02.sav"
-    skymap_list_110km.add, skymap
-    restore, "\\bender.phys.ucalgary.ca\data\themis\imager\skymaps\inuv\inuv_20230312\themis_skymap_inuv_20230312-+_v02.sav"
-    skymap_list_110km.add, skymap
-    restore, "\\bender.phys.ucalgary.ca\data\themis\imager\skymaps\talo\talo_20230214\themis_skymap_talo_20230214-+_v02.sav"
-    skymap_list_110km.add, skymap
-
-    prepped_skymap_110km = aurorax_mosaic_prep_skymap(skymap_list_110km, 117)
+    ; Create lists to hold all image data and skymap structures
+    data_list = list()
+    skymap_list = list()
     
-    ; Set up window for direct graphics plotting, with empty map
+    ; Date of Interest
+    date_time = '2021-11-04T09:30:00'
+
+    ; Date to search back to for skymaps
+    earliest_date_time = '2017-02-24T06:15:00'
+    
+    foreach site, ["atha", "fsmi", "fsim", "pina", "talo", "tpas"] do begin
+        ; download and read data for this site, then add to respective list
+        d = aurorax_ucalgary_download('THEMIS_ASI_RAW', date_time, date_time, site_uid=site)
+        image_data = aurorax_ucalgary_read(d.dataset, d.filenames)
+        data_list.add, image_data
+        
+        ; download all skymaps in range, read them in, then append *most recent* to respective list
+        d = aurorax_ucalgary_download('THEMIS_ASI_SKYMAP_IDLSAV', earliest_date_time, date_time, site_uid=site)
+        skymap_data = aurorax_ucalgary_read(d.dataset, d.filenames)
+        skymap_list.add, skymap_data.data[-1]
+    endforeach
+    
+    ; set altitude in km
+    altitude = 115 
+    
+    ; Prep the images and skymaps for plotting
+    prepped_data = aurorax_mosaic_prep_images(data_list)
+    prepped_skymap = aurorax_mosaic_prep_skymap(skymap_list, altitude)
+    
+    ; Now, we need to create a direct graphics map that the data can be plotted
+    ; onto. Using, the map_set procedure (see IDL docs for info), create the map
+    ; however you'd like. Below is an example
     land_color = 2963225
     water_color = 0
     border_color = 16777215 & border_thick = 1
@@ -50,14 +53,22 @@ pro aurorax_example_create_mosaic_themis
     map_continents, /countries, color=border_color, thick=border_thick
     map_continents, color=border_color, thick=border_thick
     
-    ; set scaling bounds
-    scale = hash("fsmi", [2000, 10000],$
-                 "inuv", [2000, 5500],$
-                 "atha", [2000, 6000],$
-                 "gill", [2000, 10000],$
-                 "talo", [2000, 6000])    
+    ; Define scaling bounds for image data if desiresd
+    scale = hash("atha", [2500, 10000],$
+                 "fsmi", [2500, 10000],$
+                 "fsim", [2500, 12500],$
+                 "pina", [2500, 10000],$
+                 "talo", [2000, 10000],$
+                 "tpas", [2500, 10000])  
 
-    !null = aurorax_mosaic_create(prepped_data_110km, prepped_skymap_110km, 0, intensity_scales=scale, colortable=0)
+    ; Plot the first frame 
+    image_idx = 0 
+    
+    ; Use grey colormap for themis
+    ct = 0
+
+    ; Call the mosaic creation function to plot the mosaic in the current window
+    aurorax_mosaic_plot, prepped_data, prepped_skymap, image_idx, intensity_scales=scale, colortable=ct
 
 end
 

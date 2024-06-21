@@ -1,59 +1,74 @@
 
 
-pro create_mosaic_multi_network
+pro aurorax_example_create_mosaic_multi_network
     
-    ; First get image data
-
-    ; start by obtaining lists of all image data objects, seperated by altitude
+    ; Initialize two lists for holding image data, to seperate image data
+    ; from different altitudes
     data_list_110km = list()
     data_list_230km = list()
-
+    
+    ; Do the same for skymaps
+    skymap_list_110km = list()
+    skymap_list_230km = list()
+    
+    ; Date of Interest
+    date_time = '2023-02-24T06:15:00'
+    
+    ; Date to search back to for skymaps
+    earliest_date_time = '2019-02-24T06:15:00'
+    
+    ; Grab some TREx RGB data
     foreach site, ['yknf', 'gill', 'rabb', 'luck'] do begin
-        f = file_search("\\bender.phys.ucalgary.ca\data\trex\rgb\stream0\2023\02\24\"+site+"*\ut06\20230224_0615_"+site+"*_full.h5")
-        trex_imager_readfile, f, img, meta
-        image_data = {data:img, timestamp:meta.EXPOSURE_START_STRING, metadata:meta}
-        data_list_110km.add, image_data ; add to list
+        ; download and read data for this site, then add to respective list,
+        d = aurorax_ucalgary_download('TREX_RGB_RAW_NOMINAL', date_time, date_time, site_uid=site)
+        image_data = aurorax_ucalgary_read(d.dataset, d.filenames)
+        data_list_110km.add, image_data 
+        
+        ; download all skymaps in range, read them in, then append most recent to respective list
+        d = aurorax_ucalgary_download('TREX_RGB_SKYMAP_IDLSAV', earliest_date_time, date_time, site_uid=site)
+        skymap_data = aurorax_ucalgary_read(d.dataset, d.filenames)
+        skymap_list_110km.add, skymap_data.data[-1]
     endforeach
+    
+    ; Next grab some THEMIS data
     foreach site, ['fsmi', 'atha'] do begin
-        f = file_search("\\bender.phys.ucalgary.ca\data\themis\imager\stream0\2023\02\24\"+site+"*\ut06\20230224_0615_"+site+"*_full.pgm.gz")
-        trex_imager_readfile, f, img, meta
-        image_data = {data:img, timestamp:meta.EXPOSURE_START_STRING, metadata:meta}
+        ; download and read data for this site, then add to respective list
+        d = aurorax_ucalgary_download('THEMIS_ASI_RAW', date_time, date_time, site_uid=site)
+        image_data = aurorax_ucalgary_read(d.dataset, d.filenames)
         data_list_110km.add, image_data
+        
+        ; download all skymaps in range, read them in, then append *most recent* to respective list
+        d = aurorax_ucalgary_download('THEMIS_ASI_SKYMAP_IDLSAV', earliest_date_time, date_time, site_uid=site)
+        skymap_data = aurorax_ucalgary_read(d.dataset, d.filenames)
+        skymap_list_110km.add, skymap_data.data[-1]
     endforeach
-
+    
+    ; Finally grab some REGO data and repeat the process *making sure to add to the other list this time*
     foreach site, ['rank'] do begin
-        f = file_search("\\bender.phys.ucalgary.ca\data\go\rego\stream0\2023\02\24\"+site+"*\ut06\20230224_0615_"+site+"*_6300.pgm.gz")
-        trex_imager_readfile, f, img, meta
-        image_data = {data:img, timestamp:meta.EXPOSURE_START_STRING, metadata:meta}
+        ; download and read data for this site, then add to respective list
+        d = aurorax_ucalgary_download('REGO_RAW', date_time, date_time, site_uid=site)
+        image_data = aurorax_ucalgary_read(d.dataset, d.filenames)
         data_list_230km.add, image_data
+        
+        ; download all skymaps in range, read them in, then append *most recent* to respective list
+        d = aurorax_ucalgary_download('REGO_SKYMAP_IDLSAV', earliest_date_time, date_time, site_uid=site)
+        skymap_data = aurorax_ucalgary_read(d.dataset, d.filenames)
+        skymap_list_230km.add, skymap_data.data[-1] ; <---- Add to list for 230 km data
     endforeach
-
+    
+    ; Prepare both sets of image data, and combine into a single array
     prepped_data_110km = aurorax_mosaic_prep_images(data_list_110km)
     prepped_data_230km = aurorax_mosaic_prep_images(data_list_230km)
     prepped_data = [prepped_data_230km, prepped_data_110km]
-
-    ; next get lists of all skymaps in same order
-    skymap_list_110km = list()
-    skymap_list_230km = list()
-    restore, "\\bender.phys.ucalgary.ca\data\trex\rgb\skymaps\yknf\yknf_20230114\rgb_skymap_yknf_20230114-+_v01.sav"
-    skymap_list_110km.add, skymap
-    restore, "\\bender.phys.ucalgary.ca\data\trex\rgb\skymaps\gill\gill_20221102\rgb_skymap_gill_20221102-+_v01.sav"
-    skymap_list_110km.add, skymap
-    restore, "\\bender.phys.ucalgary.ca\data\trex\rgb\skymaps\rabb\rabb_20220301\rgb_skymap_rabb_20220301-+_v01.sav"
-    skymap_list_110km.add, skymap
-    restore, "\\bender.phys.ucalgary.ca\data\trex\rgb\skymaps\luck\luck_20220406\rgb_skymap_luck_20220406-+_v01.sav"
-    skymap_list_110km.add, skymap
-    restore, "\\bender.phys.ucalgary.ca\data\themis\imager\skymaps\fsmi\fsmi_20220309\themis_skymap_fsmi_20220309-+_v02.sav"
-    skymap_list_110km.add, skymap
-    restore, "\\bender.phys.ucalgary.ca\data\themis\imager\skymaps\atha\atha_20230115\themis_skymap_atha_20230115-+_v02.sav"
-    skymap_list_110km.add, skymap
-    restore, "\\bender.phys.ucalgary.ca\data\go\rego\skymap\rank\rank_20221214\rego_skymap_rank_20221214-+_v01.sav"
-    skymap_list_230km.add, skymap
-
-    prepped_skymap_110km = aurorax_mosaic_prep_skymap(skymap_list_110km, 115)
-    prepped_skymap_230km = aurorax_mosaic_prep_skymap(skymap_list_230km, 230)
+    
+    ; Prepare both sets of skymaps, and combine into a single array
+    prepped_skymap_110km = aurorax_mosaic_prep_skymap(skymap_list_110km, 110) ; <-- Make sure to specify
+    prepped_skymap_230km = aurorax_mosaic_prep_skymap(skymap_list_230km, 230) ;     the correct altitude!
     prepped_skymap = [prepped_skymap_230km, prepped_skymap_110km]
-
+    
+    ; Now, we need to create a direct graphics map that the data can be plotted
+    ; onto. Using, the map_set procedure (see IDL docs for info), create the map
+    ; however you'd like. Below is an example
     land_color = 2963225
     water_color = 0
     border_color = 16777215 & border_thick = 1
@@ -62,7 +77,6 @@ pro create_mosaic_multi_network
     map_bounds = [40,220,80,290]
     ilon = 255 & ilat = 56
 
-    ; Define plotting window and plot empty map
     window, 0, xsize=800, ysize=600, xpos=2400
     map_win_loc = [0., 0., 1., 1.]
     device, decomposed=1
@@ -73,15 +87,23 @@ pro create_mosaic_multi_network
     map_continents, /countries, color=border_color, thick=border_thick
     map_continents, color=border_color, thick=border_thick
 
-    scale = hash("yknf", [10, 105],$      ; RGB sites
-        "gill", [10, 105],$
-        "rabb", [10, 105],$
-        "luck", [10, 105],$
-        "atha", [3500, 14000],$  ; THEMIS sites
-        "fsmi", [3500, 14000],$
-        "rank", [250, 1500])     ; REGO site
-
-    !null = aurorax_mosaic_create(prepped_data, prepped_skymap, 0, min_elevation=[10,5], intensity_scales=scale, colortable=[3,0])
+    ; Define scaling bounds for image data if desiresd
+    scale = hash("yknf", [10, 105],$      
+                 "gill", [10, 105],$    ; RGB sites
+                 "rabb", [10, 105],$
+                 "luck", [10, 105],$
+                 "atha", [3500, 14000],$  ; THEMIS sites
+                 "fsmi", [3500, 14000],$
+                 "rank", [250, 1500])     ; REGO site
+    
+    ; Plot the first frame
+    image_idx = 0
+    
+    ; Use grey colormap for themis and red colormap for REGO
+    colortable=[3,0]
+             
+    ; Call the mosaic creation function to plot the mosaic in the current window
+    aurorax_mosaic_plot, prepped_data, prepped_skymap, image_idx, min_elevation=[10,5], intensity_scales=scale, colortable=colortable
     
 end
 

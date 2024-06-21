@@ -3,21 +3,25 @@
 
 pro aurorax_example_extract_luminosity_from_bounding_box
     
-    ; First, obtain 1 hour of data
-    print, "Reading Files..."
-    f = file_search("\\bender.phys.ucalgary.ca\data\trex\rgb\stream0\2021\11\04\gill*\ut03\20211104_03*_gill*_full.h5")
-    trex_imager_readfile, f, img, meta
+    ; Download an hour of TREx RGB data
+    d = aurorax_ucalgary_download('TREX_RGB_RAW_NOMINAL', '2021-11-04T03:00:00', '2021-11-04T03:59:59', site_uid='gill')
 
-    image_data = {data:img, timestamp:meta.EXPOSURE_START_STRING, metadata:meta}
-    print, "Finished Reading."
+    ; Read the image data
+    image_data = aurorax_ucalgary_read(d.dataset, d.filenames)
     
-    ; Load in corresponding skymap
-    restore, "\\bender.phys.ucalgary.ca\data\trex\rgb\skymaps\gill\gill_20210726\rgb_skymap_gill_20210726-+_v01.sav"
+    ; Download all skymaps in 3 years leading up to date of interest
+    d = aurorax_ucalgary_download('TREX_RGB_SKYMAP_IDLSAV', '2018-11-04T03:00:00', '2021-11-04T03:59:59', site_uid='gill')
+    
+    ; Read in all of the skymaps that were found
+    skymap_data = aurorax_ucalgary_read(d.dataset, d.filenames)
     
     ; Get images and timestamp arrays from the image data object
     images = image_data.data
     timestamps = image_data.timestamp
     
+    ; Grab the *last* skymap out of the skymap data struct as this is most recent to date of interest
+    skymap = skymap_data.data[-1]
+
     ; Extract some data within bounds of azimuth, CCD, elevation, and geo lats
     azim_bounds = [134, 143]
     luminosity_in_azim = aurorax_bounding_box_extract_metric(images, "azim", azim_bounds, skymap=skymap, /show_preview)

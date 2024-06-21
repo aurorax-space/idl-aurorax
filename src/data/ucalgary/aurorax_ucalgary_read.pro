@@ -160,13 +160,13 @@ function aurorax_ucalgary_read,dataset,file_list,first_record=first_record,no_me
     ; read using skymap readfile
     data = aurorax_ucalgary_readfile_skymap(file_list,quiet_flag=quiet_flag)
     for i=0,n_elements(data)-1 do begin
-      data[i] = __reorient_skymaps(dataset.name,data[0])
+      data[i] = __reorient_skymaps(dataset.name,data[i])
     endfor
   endif else if (read_function eq 'calibration') then begin
     ; read using calibration readfile
     data = aurorax_ucalgary_readfile_calibration(file_list,quiet_flag=quiet_flag)
     for i=0,n_elements(data)-1 do begin
-      data[i] = __reorient_calibration(dataset.name,data[0])
+      data[i] = __reorient_calibration(dataset.name,data[i])
     endfor
   endif
 

@@ -7,7 +7,7 @@ function __get_decomposed_color, rgb_triple
 end
 
 
-function aurorax_mosaic_create, prepped_data, prepped_skymaps, frame_idx, min_elevation=min_elevation, intensity_scales=intensity_scales, colortable=colortable, elevation_increment=elevation_increment
+pro aurorax_mosaic_plot, prepped_data, prepped_skymaps, frame_idx, min_elevation=min_elevation, intensity_scales=intensity_scales, colortable=colortable, elevation_increment=elevation_increment
 
   __DEFAULT_SCALE_MIN = 0
   __DEFAULT_SCALE_MAX = 20000
@@ -84,7 +84,7 @@ function aurorax_mosaic_create, prepped_data, prepped_skymaps, frame_idx, min_el
   ; Check that ALL site uids match between images and skymaps. This is crucial for order
   for mosaic_data_idx=0, n_elements(prepped_data)-1 do begin
     if not array_equal((prepped_data[mosaic_data_idx])["site_uid"], (prepped_skymaps[mosaic_data_idx])["site_uid"]) then begin
-      stop, "(aurorax_mosaic_create) Error: Mismatched site_uid array between prepped_data["+string(mosaic_data_idx, format='(I1.1)') + $
+        stop, "(aurorax_mosaic_create) Error: Mismatched site_uid array between prepped_data["+string(mosaic_data_idx, format='(I1.1)') + $
         "] and prepped_skymap["+string(mosaic_data_idx, format='(I1.1)')+"]. Make sure that all image data and skymap data is " + $
         "ordered the same before using as inputs."
     endif
@@ -266,7 +266,6 @@ function aurorax_mosaic_create, prepped_data, prepped_skymaps, frame_idx, min_el
   endfor
 
   device, get_decomposed=original_decomp
-
 
 end
 
