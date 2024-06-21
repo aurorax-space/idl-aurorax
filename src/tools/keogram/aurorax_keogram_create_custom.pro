@@ -2,133 +2,6 @@
 
 
 
-function aurorax_keogram_create_custom, images, time_stamp, coordinate_system, x_locs, y_locs, width=width, show_preview=show_preview, skymap=skymap, altitude_km=altitude_km, metric=metric
-    
-    ; check that coord system is valid
-    coord_options = ['ccd', 'geo', 'mag']
-    if where(coordinate_system eq coord_options, /null) eq !null then begin
-        stop, "(aurorax_keogram_create_custom) Error: Accepted coordinate systems are 'ccd', 'geo', or 'mag'."
-    endif
-    
-    if not isa(images, /array) then stop, "(aurorax_keogram_create_custom) Error: 'images' must be an array"
-
-
-    ; Get the number of channels of image data
-    images_shape = size(images, /dimensions)
-    if n_elements(images_shape) eq 2 then begin
-        stop, "(aurorax_keogram_create_custom) Error: 'images' must contain multiple frames."
-    endif else if n_elements(images_shape) eq 3 then begin
-        if images_shape[0] eq 3 then stop, "(aurorax_keogram_create_custom) Error: 'images' must contain multiple frames."
-        n_channels = 1
-    endif else if n_elements(images_shape) eq 4 then begin
-        n_channels = images_shape[0]
-    endif else stop, "(aurorax_keogram_create_custom) Error: Unable to determine number of channels based on the supplied images. " + $
-                     "Make sure you are supplying a [cols,rows,images] or [channels,cols,rows,images] sized array."
-        
-    ; Set default width
-    if not isa(width) then width = 3
-    
-    ; Check that all necessary parameters are supplied
-    if coordinate_system eq "geo" or coordinate_system eq "mag" then begin
-        if not keyword_set(skymap) or not keyword_set(altitude_km) then begin
-            stop, "When working in lat/lon coordinates, a skymap and altitude must be supplied."
-        endif
-    endif
-    
-    ; Extract preview image if desired
-    if keyword_set(show_preview) then begin
-        if n_channels eq 1 then preview_img = images[*,*,0] else preview_img = images[*,*,*,0]
-    endif
-    
-    ; Convert lat/lons to CCD coordinates
-    if coordinate_system eq "geo" then begin
-        result = __convert_lonlat_to_ccd(x_locs, y_locs, skymap, altitude_km)
-        x_locs = result[0] & y_locs = result[1]
-    endif else if coordinate_system eq "mag" then begin
-        print, "(aurorax_keogram_create_custom) Warning: Magnetic coordinates are not currently supported for this routine."
-        return, !null
-        result = __convert_lonlat_to_ccd(x_locs, y_locs, skymap, altitude_km, timestamp=timestamp, /mag)
-        x_locs = result[0] & y_locs = result[1]
-    endif
-    
-    ; At this point, we work exclusively in CCD coordinates, everything has been converted
-
-    ; Get max image indices
-    if n_channels eq 1 then begin
-        x_max = (size(images, /dimensions))[0]
-        y_max = (size(images, /dimensions))[1]
-    endif else if n_channels eq 3 then begin
-        x_max = (size(images, /dimensions))[1]
-        y_max = (size(images, /dimensions))[2]
-    endif
-    
-    ; Remove any points that are not within the image CCD bounds
-    parsed_x_locs = []
-    parsed_y_locs = []
-    for i=0, n_elements(x_locs)-1 do begin
-        x = x_locs[i]
-        y = y_locs[i]
-        
-        ; omit points outside of image bounds
-        if x lt 0 or x gt x_max then continue
-        if y lt 0 or y gt y_max then continue
-        
-        parsed_x_locs = [parsed_x_locs, x]
-        parsed_y_locs = [parsed_y_locs, y]
-    endfor
-    
-    ; Print message that some points have been removed if so
-    if n_elements(parsed_x_locs) lt n_elements(x_locs) then begin
-        print, "(aurorax_keogram_create_custom) Warning: Some input coordinates fall outside of the valid range for input image/skymap, and have been automatically removed."
-    endif
-    
-    x_locs = parsed_x_locs
-    y_locs = parsed_y_locs
-    
-    ; Iterate through points in pairs of two
-    for i=0, n_elements(x_locs)-2 do begin
-        
-        ; Points of concern for this iteration
-        x_0 = x_locs[i]
-        x_1 = x_locs[i+1]
-        y_0 = y_locs[i]
-        y_1 = y_locs[i+1]
-
-        ; Compute the unit vector between the two points
-        dx = x_1 - x_0
-        dy = y_1 - y_0
-        length = sqrt(dx^2 + dy^2)
-        if length eq 0 then begin
-            stop, "Successive points may not be the same. Detected zero length between points of index ["+$
-                  strcompress(string(i),/remove_all)+"] and ["+strcompress(string(i+1),/remove_all)+"]."
-        endif
-        dx /= length
-        dy /= length
-        
-        ; Compute orthogonal unit vector
-        perp_dx = -dy
-        perp_dy = dx
-
-        ; Calculate (+/-) offsets for each perpendicular direction
-        offset1_x = perp_dx * width / 2.
-        offset1_y = perp_dy * width / 2.
-        offset2_x = -perp_dx * width / 2.
-        offset2_y = -perp_dy * width / 2.
-
-        ; Calculate vertices in correct order for this polygon
-        vertex1 = [fix(x_0 + offset1_x), fix(y_0 + offset1_y)]
-        vertex2 = [fix(x_1 + offset1_x), fix(y_1 + offset1_y)]
-        vertex3 = [fix(x_1 + offset2_x), fix(y_1 + offset2_y)]
-        vertex4 = [fix(x_0 + offset2_x), fix(y_0 + offset2_y)]
-        
-        ; Append vertices in the correct order to form a closed polygon
-        vertices = list(vertex1, vertex2, vertex3, vertex4)
-        
-        ; Obtain the indexes into the image of this polygon
-        help, vertices
-    endfor
-     
-end
 
 
 function __point_is_in_polygon, point, vertices
@@ -303,7 +176,133 @@ end
 
 
 
+function aurorax_keogram_create_custom, images, time_stamp, coordinate_system, x_locs, y_locs, width=width, show_preview=show_preview, skymap=skymap, altitude_km=altitude_km, metric=metric
+    
+    ; check that coord system is valid
+    coord_options = ['ccd', 'geo', 'mag']
+    if where(coordinate_system eq coord_options, /null) eq !null then begin
+        stop, "(aurorax_keogram_create_custom) Error: Accepted coordinate systems are 'ccd', 'geo', or 'mag'."
+    endif
+    
+    if not isa(images, /array) then stop, "(aurorax_keogram_create_custom) Error: 'images' must be an array"
 
+
+    ; Get the number of channels of image data
+    images_shape = size(images, /dimensions)
+    if n_elements(images_shape) eq 2 then begin
+        stop, "(aurorax_keogram_create_custom) Error: 'images' must contain multiple frames."
+    endif else if n_elements(images_shape) eq 3 then begin
+        if images_shape[0] eq 3 then stop, "(aurorax_keogram_create_custom) Error: 'images' must contain multiple frames."
+        n_channels = 1
+    endif else if n_elements(images_shape) eq 4 then begin
+        n_channels = images_shape[0]
+    endif else stop, "(aurorax_keogram_create_custom) Error: Unable to determine number of channels based on the supplied images. " + $
+                     "Make sure you are supplying a [cols,rows,images] or [channels,cols,rows,images] sized array."
+        
+    ; Set default width
+    if not isa(width) then width = 3
+    
+    ; Check that all necessary parameters are supplied
+    if coordinate_system eq "geo" or coordinate_system eq "mag" then begin
+        if not keyword_set(skymap) or not keyword_set(altitude_km) then begin
+            stop, "When working in lat/lon coordinates, a skymap and altitude must be supplied."
+        endif
+    endif
+    
+    ; Extract preview image if desired
+    if keyword_set(show_preview) then begin
+        if n_channels eq 1 then preview_img = images[*,*,0] else preview_img = images[*,*,*,0]
+    endif
+    
+    ; Convert lat/lons to CCD coordinates
+    if coordinate_system eq "geo" then begin
+        result = __convert_lonlat_to_ccd(x_locs, y_locs, skymap, altitude_km)
+        x_locs = result[0] & y_locs = result[1]
+    endif else if coordinate_system eq "mag" then begin
+        print, "(aurorax_keogram_create_custom) Warning: Magnetic coordinates are not currently supported for this routine."
+        return, !null
+        result = __convert_lonlat_to_ccd(x_locs, y_locs, skymap, altitude_km, time_stamp=time_stamp, /mag)
+        x_locs = result[0] & y_locs = result[1]
+    endif
+    
+    ; At this point, we work exclusively in CCD coordinates, everything has been converted
+
+    ; Get max image indices
+    if n_channels eq 1 then begin
+        x_max = (size(images, /dimensions))[0]
+        y_max = (size(images, /dimensions))[1]
+    endif else if n_channels eq 3 then begin
+        x_max = (size(images, /dimensions))[1]
+        y_max = (size(images, /dimensions))[2]
+    endif
+    
+    ; Remove any points that are not within the image CCD bounds
+    parsed_x_locs = []
+    parsed_y_locs = []
+    for i=0, n_elements(x_locs)-1 do begin
+        x = x_locs[i]
+        y = y_locs[i]
+        
+        ; omit points outside of image bounds
+        if x lt 0 or x gt x_max then continue
+        if y lt 0 or y gt y_max then continue
+        
+        parsed_x_locs = [parsed_x_locs, x]
+        parsed_y_locs = [parsed_y_locs, y]
+    endfor
+    
+    ; Print message that some points have been removed if so
+    if n_elements(parsed_x_locs) lt n_elements(x_locs) then begin
+        print, "(aurorax_keogram_create_custom) Warning: Some input coordinates fall outside of the valid range for input image/skymap, and have been automatically removed."
+    endif
+    
+    x_locs = parsed_x_locs
+    y_locs = parsed_y_locs
+    
+    ; Iterate through points in pairs of two
+    for i=0, n_elements(x_locs)-2 do begin
+        
+        ; Points of concern for this iteration
+        x_0 = x_locs[i]
+        x_1 = x_locs[i+1]
+        y_0 = y_locs[i]
+        y_1 = y_locs[i+1]
+
+        ; Compute the unit vector between the two points
+        dx = x_1 - x_0
+        dy = y_1 - y_0
+        length = sqrt(dx^2 + dy^2)
+        if length eq 0 then begin
+            stop, "Successive points may not be the same. Detected zero length between points of index ["+$
+                  strcompress(string(i),/remove_all)+"] and ["+strcompress(string(i+1),/remove_all)+"]."
+        endif
+        dx /= length
+        dy /= length
+        
+        ; Compute orthogonal unit vector
+        perp_dx = -dy
+        perp_dy = dx
+
+        ; Calculate (+/-) offsets for each perpendicular direction
+        offset1_x = perp_dx * width / 2.
+        offset1_y = perp_dy * width / 2.
+        offset2_x = -perp_dx * width / 2.
+        offset2_y = -perp_dy * width / 2.
+
+        ; Calculate vertices in correct order for this polygon
+        vertex1 = [fix(x_0 + offset1_x), fix(y_0 + offset1_y)]
+        vertex2 = [fix(x_1 + offset1_x), fix(y_1 + offset1_y)]
+        vertex3 = [fix(x_1 + offset2_x), fix(y_1 + offset2_y)]
+        vertex4 = [fix(x_0 + offset2_x), fix(y_0 + offset2_y)]
+        
+        ; Append vertices in the correct order to form a closed polygon
+        vertices = list(vertex1, vertex2, vertex3, vertex4)
+        
+        ; Obtain the indexes into the image of this polygon
+        help, vertices
+    endfor
+     
+end
 
 
 
