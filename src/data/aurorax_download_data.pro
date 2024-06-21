@@ -70,6 +70,7 @@ function aurorax_download_data,dataset_name,start_ts,end_ts,site_uid=site_uid,de
       ; check if the file exists already
       if (overwrite_flag eq 0 and file_test(output_filename) eq 1) then begin
         if (quiet_flag eq 0) then print,'[aurorax_download] File already exists, not redownloading (' + output_filename + ')
+        downloaded_files.Add,output_filename
         continue
       endif
 

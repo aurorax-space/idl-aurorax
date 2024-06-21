@@ -12,3 +12,5 @@
 @aurorax_list_observatories
 @aurorax_get_urls
 @aurorax_download_data
+@aurorax_asi_readfile
+@aurorax_read_data
