@@ -50,7 +50,7 @@ pro create_mosaic_multi_network
     restore, "\\bender.phys.ucalgary.ca\data\go\rego\skymap\rank\rank_20221214\rego_skymap_rank_20221214-+_v01.sav"
     skymap_list_230km.add, skymap
 
-    prepped_skymap_110km = aurorax_mosaic_prep_skymap(skymap_list_110km, 110)
+    prepped_skymap_110km = aurorax_mosaic_prep_skymap(skymap_list_110km, 115)
     prepped_skymap_230km = aurorax_mosaic_prep_skymap(skymap_list_230km, 230)
     prepped_skymap = [prepped_skymap_230km, prepped_skymap_110km]
 

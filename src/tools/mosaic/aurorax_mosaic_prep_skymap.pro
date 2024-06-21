@@ -79,11 +79,13 @@ function aurorax_mosaic_prep_skymap, skymap_list, altitude_km
                     lon2 = interpol(lons[i+1, j, *], interp_alts, altitude_km)
                     lon3 = interpol(lons[i+1, j+1, *], interp_alts, altitude_km)
                     lon4 = interpol(lons[i, j+1, *], interp_alts, altitude_km)
+                    help, lons[i, j+1, *]
+                    help, interp_alts
                     pix_lons = [lon1, lon2, lon3, lon4, lon1]
 
                     ; Skip any nans, as we only fill pixels with 4 finite corners
                     if where(~finite(pix_lons), /null) ne !null then continue
-
+                    stop
                     ; repeat above for latitudes
                     lat1 = interpol(lats[i, j, *], interp_alts, altitude_km)
                     lat2 = interpol(lats[i+1, j, *], interp_alts, altitude_km)
