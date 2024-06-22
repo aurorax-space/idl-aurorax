@@ -15,6 +15,7 @@
 ;-------------------------------------------------------------
 
 @aurorax_search_helpers
+@aurorax_calibrate_helpers
 @aurorax_requests
 @aurorax_metadata_filters
 @aurorax_availability
@@ -35,6 +36,8 @@
 @aurorax_ucalgary_is_read_supported
 
 @aurorax_bounding_box_extract_metric
+@aurorax_calibrate_rego
+@aurorax_calibrate_trex_nir
 @aurorax_keogram_add_axis
 @aurorax_keogram_create_custom
 @aurorax_keogram_create
