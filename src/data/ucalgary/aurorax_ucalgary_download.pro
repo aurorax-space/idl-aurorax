@@ -56,7 +56,7 @@ end
 ;       AURORAX_UCALGARY_DOWNLOAD
 ;
 ; PURPOSE:
-;       Download UCalgary data from their Open Data Platform.
+;       Download data from the UCalgary Open Data Platform
 ;
 ; EXPLANATION:
 ;       Download data from the UCalgary Open Data Platform, for the given
