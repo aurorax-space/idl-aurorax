@@ -30,8 +30,8 @@
 ;       aurorax_ephemeris_search(start_ts, end_ts)
 ;
 ; PARAMETERS:
-;       start_ts           start datetime, string (different formats allowed, see below)
-;       end_ts             end datetime, string (different formats allowed, see below)
+;       start_ts           start timestamp, string (different formats allowed, see below)
+;       end_ts             end timestamp, string (different formats allowed, see below)
 ;       programs           programs to filter for, list(string), optional
 ;       platforms          platforms to filter for, list(string), optional
 ;       instrument_types   instrument types to filter for, list(string), optional

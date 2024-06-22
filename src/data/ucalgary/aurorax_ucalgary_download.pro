@@ -50,6 +50,42 @@ function __extract_content_length,req
   return,content_length
 end
 
+;-------------------------------------------------------------
+;+
+; NAME:
+;       AURORAX_UCALGARY_DOWNLOAD
+;
+; PURPOSE:
+;       Download UCalgary data from their Open Data Platform.
+;       
+; EXPLANATION:
+;       Download data from the UCalgary Open Data Platform, for the given
+;       dataset, timeframe, and optional site/device.
+;
+; CALLING SEQUENCE:
+;       aurorax_ucalgary_download(dataset_name, start_ts, end_ts)
+;
+; PARAMETERS:
+;       dataset_name             name of the dataset to download data for
+;       start_ts                 start timestamp, format as ISO time string (YYYY-MM-DDTHH:MM:SS)
+;       end_ts                   end timestamp, format as ISO time string (YYYY-MM-DDTHH:MM:SS)
+;       site_uid                 unique 4-letter site UID to filter on (e.g., atha, gill, fsmi), optional
+;       device_uid               unique device UID to filter on (e.g., themis08, rgb-09), optional
+;       download_path            path to save data to, default is your home directory; optional
+;       overwrite                download the files regardless of them existing locally already, optional
+;       quiet                    no print messages, data download will be silent; optional
+;
+; OUTPUT
+;       the found datasets
+;
+; OUTPUT TYPE:
+;       a list of structs
+;
+; EXAMPLES:
+;       datasets = aurorax_list_datasets()
+;       datasets = aurorax_list_datasets(name='THEMIS_ASI')
+;+
+;-------------------------------------------------------------
 function aurorax_ucalgary_download,dataset_name,start_ts,end_ts,site_uid=site_uid,device_uid=device_uid,download_path=download_path,overwrite=overwrite,quiet=quiet
   ; init
   time0 = systime(1)

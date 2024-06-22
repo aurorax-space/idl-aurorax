@@ -14,7 +14,7 @@
 ; limitations under the License.
 ;-------------------------------------------------------------
 
-@aurorax_helpers
+@aurorax_search_helpers
 @aurorax_requests
 @aurorax_metadata_filters
 @aurorax_availability
