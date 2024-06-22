@@ -20,34 +20,30 @@
 ;       AURORAX_LIST_DATASETS
 ;
 ; PURPOSE:
-;       Retrieve list of available datasets to download data for.
+;       Retrieve list of available datasets for which you can
+;       download data.
 ;
 ; EXPLANATION:
-;       Retrieve datasets and their information  information for ephemeris records
-;       in the AuroraX platform. Optional parameters are used to filter
-;       unwanted data sources out.
+;       Retrieve information about available datasets, including provider,
+;       short+long descriptions, and DOI details. Optional parameters are
+;       used to filter for certain matching datasets.
 ;
 ; CALLING SEQUENCE:
-;       aurorax_ephemeris_availability(start_date, end_date)
+;       aurorax_list_datasets()
 ;
 ; PARAMETERS:
-;       start_date        start year to use, string (YYYY, YYYYMM, or YYYYMMDD)
-;       end_date          end year to use, string (YYYY, YYYYMM, or YYYYMMDD)
-;       program           program to filter on, string, optional
-;       platform          platform to filter on, string, optional
-;       instrument_type   instrument type to filter on, string, optional
-;       source_type       source type to filter on (valid values are: leo, heo,
-;                         lunar, ground, event_list), string, optional
+;       name         dataset name for filter on, case-sensitive and partial
+;                    matches are allowed. Optional.
 ;
 ; OUTPUT
-;       retrieved data availability information
+;       the found datasets
 ;
 ; OUTPUT TYPE:
 ;       a list of structs
 ;
 ; EXAMPLES:
-;       data = aurorax_ephemeris_availability('20200101','20200105',program='swarm')
-;       data = aurorax_ephemeris_availability('2020-01-01','2020-03-15',program='themis',platform='themisc')
+;       datasets = aurorax_list_datasets()
+;       datasets = aurorax_list_datasets(name='THEMIS_ASI')
 ;+
 ;-------------------------------------------------------------
 function aurorax_list_datasets,name=name
