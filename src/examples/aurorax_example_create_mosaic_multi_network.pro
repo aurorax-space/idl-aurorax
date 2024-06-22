@@ -69,22 +69,22 @@ pro aurorax_example_create_mosaic_multi_network
     ; Now, we need to create a direct graphics map that the data can be plotted
     ; onto. Using, the map_set procedure (see IDL docs for info), create the map
     ; however you'd like. Below is an example
-    land_color = 2963225
-    water_color = 0
-    border_color = 16777215 & border_thick = 1
-    window_bg_color = 16777215
+    land_color = aurorax_get_decomposed_color([186, 186, 186])
+    water_color = aurorax_get_decomposed_color([64, 89, 120])
+    border_color = aurorax_get_decomposed_color([0, 0, 0])
+    border_thick = 2
+    window_bg_color = aurorax_get_decomposed_color([0, 0, 0])
 
     map_bounds = [40,220,80,290]
     ilon = 255 & ilat = 56
 
-    window, 0, xsize=800, ysize=600, xpos=2400
+    window, 0, xsize=800, ysize=600, xpos=0
     map_win_loc = [0., 0., 1., 1.]
     device, decomposed=1
     polyfill, [0.,0.,1.,1.], [0.,1.,1.,0.], color=window_bg_color, /normal
     polyfill, [map_win_loc[0],map_win_loc[2],map_win_loc[2],map_win_loc[0]], [map_win_loc[1],map_win_loc[1],map_win_loc[3],map_win_loc[3]], color=water_color, /normal
     map_set, ilat, ilon, 0, sat_p=[20,0,0], /satellite, limit=map_bounds, position=map_win_loc, /noerase, /noborder ; <---- (Change Projection)
     map_continents, /fill, /countries, color=land_color
-    map_continents, /countries, color=border_color, thick=border_thick
     map_continents, color=border_color, thick=border_thick
 
     ; Define scaling bounds for image data if desiresd
@@ -101,9 +101,21 @@ pro aurorax_example_create_mosaic_multi_network
     
     ; Use grey colormap for themis and red colormap for REGO
     colortable=[3,0]
-             
+        
+    ; Plot some gridlines
+    gridline_color = aurorax_get_decomposed_color([0, 0, 0])
+    clats = [30,40,50,60,70,80]
+    clons = [200,220,240,260,280,300,320,340]
+    aurorax_mosaic_oplot, constant_lats=clats , constant_lons=clons, color=gridline_color, linestyle=2, thick=2
+
     ; Call the mosaic creation function to plot the mosaic in the current window
     aurorax_mosaic_plot, prepped_data, prepped_skymap, image_idx, min_elevation=[10,5], intensity_scales=scale, colortable=colortable
     
+    ; Plot some text on top
+    xyouts, 0.01, 0.9, "THEMIS ASI", /normal, font=1, charsize=5
+    xyouts, 0.01, 0.825, "TREx RGB", /normal, font=1, charsize=5
+    xyouts, 0.01, 0.75, "REGO", /normal, font=1, charsize=5
+    xyouts, 0.01, 0.085, strmid(image_data.timestamp[0],0,10), /normal, font=1, charsize=5
+    xyouts, 0.01, 0.01, strmid(image_data.timestamp[0],11,8)+" UTC", /normal, font=1, charsize=5
 end
 

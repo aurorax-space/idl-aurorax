@@ -1,12 +1,3 @@
-function __get_decomposed_color, rgb_triple
-
-  dims = size(rgb_triple, /dimensions)
-  if dims ne [3] and dims ne [1,3] then stop, "Please enter color as a 3-element array, [R, G, B]."
-  return, rgb_triple[0] + (rgb_triple[1] * 2L^8L) + (rgb_triple[2] * 2L^16L)
-
-end
-
-
 pro aurorax_mosaic_plot, prepped_data, prepped_skymaps, frame_idx, min_elevation=min_elevation, intensity_scales=intensity_scales, colortable=colortable, elevation_increment=elevation_increment
 
   __DEFAULT_SCALE_MIN = 0
@@ -255,7 +246,7 @@ pro aurorax_mosaic_plot, prepped_data, prepped_skymaps, frame_idx, min_elevation
           ; multi-channel plotting using decomposed color
           device, decomposed=1
           for k=0, n_elements(el_idx)-1 do begin
-            polyfill, el_lvl_fill_lons[*,k], el_lvl_fill_lats[*,k], color=__get_decomposed_color(el_lvl_cmap_vals[*,k])
+            polyfill, el_lvl_fill_lons[*,k], el_lvl_fill_lats[*,k], color=aurorax_get_decomposed_color(el_lvl_cmap_vals[*,k])
           endfor
         endelse
 
