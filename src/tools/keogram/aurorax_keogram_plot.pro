@@ -1,10 +1,24 @@
-
+;-------------------------------------------------------------
+; Copyright 2024 University of Calgary
+;
+; Licensed under the Apache License, Version 2.0 (the "License");
+; you may not use this file except in compliance with the License.
+; You may obtain a copy of the License at
+;
+;    http://www.apache.org/licenses/LICENSE-2.0
+;
+; Unless required by applicable law or agreed to in writing, software
+; distributed under the License is distributed on an "AS IS" BASIS,
+; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+; See the License for the specific language governing permissions and
+; limitations under the License.
+;-------------------------------------------------------------
 
 pro aurorax_keogram_plot, keogram_struct, object=object, geo=geo, mag=mag, elev=elev, dimensions=dimensions, location=location, title=title, x_tick_interval=x_tick_interval, y_tick_interval=y_tick_interval, aspect_ratio=aspect_ratio
 
   axis_keywords = [keyword_set(geo), keyword_set(mag), keyword_set(elev)]
   if total(axis_keywords) gt 1 then stop, "(aurorax_keogram_plot) Error: Only one of '/geo', '/mag', '/elev' may be set"
-      
+
   ; Make sure desired axis exists
   if keyword_set(geo) and where("GEO_Y" eq tag_names(keogram_struct), /null) eq !null then begin
     stop, "(aurorax_keogram_plot) Error: Keyword '/geo' was set, but input keogram has no geographic axis. Use aurorax_keogram_add_axis()."
@@ -29,16 +43,16 @@ pro aurorax_keogram_plot, keogram_struct, object=object, geo=geo, mag=mag, elev=
 
   ; Extract keogram data
   keo_arr = bytscl(keogram_struct.data)
-  
+
   ; Get number of channels
   if n_elements(size(keo_arr, /dimensions)) eq 3 then begin
     n_channels = (size(keo_arr, /dimensions))[0]
   endif else begin
     n_channels = 1
   endelse
-  
+
   if keyword_set(aspect_ratio) then aspect = aspect_ratio else aspect = 1
-  
+
   ; Get dimensions of keogram
   if n_channels eq 1 then begin
     keo_width = (size(keo_arr, /dimensions))[0]
@@ -58,7 +72,7 @@ pro aurorax_keogram_plot, keogram_struct, object=object, geo=geo, mag=mag, elev=
 
   keo_image = image(keo_arr, /current, axis_style=4, aspect_ratio=aspect)
   if keyword_set(title) and isa(title, /string) then keo_image.title = title
-  
+
   ; Create the x axis (time)
   timestamp_axis = []
   for i=0, n_elements(keogram_struct.timestamp)-1, x_tick_interval do begin
@@ -73,7 +87,7 @@ pro aurorax_keogram_plot, keogram_struct, object=object, geo=geo, mag=mag, elev=
 
   ; For custom keogram, don't plot a y-axis because we can't create a well defined y-axis
   if isa(y, /string, /scalar) then goto, custom_keogram_jump
-  
+
   ; Create desired y-axis
   coord_axis = []
   for i=0, n_elements(y)-1, y_tick_interval do begin
@@ -93,9 +107,9 @@ pro aurorax_keogram_plot, keogram_struct, object=object, geo=geo, mag=mag, elev=
   y_axis.tickinterval = y_tick_interval
   y_axis.tickname = coord_axis
   y_axis.title = y_title
-  
+
   custom_keogram_jump:
-  
+
 end
 
 

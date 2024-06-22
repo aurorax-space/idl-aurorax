@@ -1,3 +1,18 @@
+;-------------------------------------------------------------
+; Copyright 2024 University of Calgary
+;
+; Licensed under the Apache License, Version 2.0 (the "License");
+; you may not use this file except in compliance with the License.
+; You may obtain a copy of the License at
+;
+;    http://www.apache.org/licenses/LICENSE-2.0
+;
+; Unless required by applicable law or agreed to in writing, software
+; distributed under the License is distributed on an "AS IS" BASIS,
+; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+; See the License for the specific language governing permissions and
+; limitations under the License.
+;-------------------------------------------------------------
 
 function aurorax_keogram_add_axis, keogram_struct, skymap, altitude_km=altitude_km, geo=geo, mag=mag, elev=elev
 
@@ -20,7 +35,7 @@ function aurorax_keogram_add_axis, keogram_struct, skymap, altitude_km=altitude_
   if not keyword_set(geo) and not keyword_set(mag) and not keyword_set(geo) then begin
     stop, "(aurorax_keogram_add_axis) Error: At least one of '/geo', '/mag', '/elev', must be set to add axes.'
   endif
-  
+
   ; Check that skymap size matches keogram
   if keogram_struct.axis eq 0 then begin
     if (size(skymap.full_azimuth, /dimensions))[1] ne keo_height then begin
@@ -31,7 +46,7 @@ function aurorax_keogram_add_axis, keogram_struct, skymap, altitude_km=altitude_
       stop, "(aurorax_keogram_add_axis) Error: Skymap size does not match size of
     endif
   endelse
-  
+
   ; Obtain keogram index in CCD coords
   slice_idx = keogram_struct.slice_idx
 

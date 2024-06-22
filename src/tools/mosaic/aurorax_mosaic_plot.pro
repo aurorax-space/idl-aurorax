@@ -1,3 +1,19 @@
+;-------------------------------------------------------------
+; Copyright 2024 University of Calgary
+;
+; Licensed under the Apache License, Version 2.0 (the "License");
+; you may not use this file except in compliance with the License.
+; You may obtain a copy of the License at
+;
+;    http://www.apache.org/licenses/LICENSE-2.0
+;
+; Unless required by applicable law or agreed to in writing, software
+; distributed under the License is distributed on an "AS IS" BASIS,
+; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+; See the License for the specific language governing permissions and
+; limitations under the License.
+;-------------------------------------------------------------
+
 pro aurorax_mosaic_plot, prepped_data, prepped_skymaps, frame_idx, min_elevation=min_elevation, intensity_scales=intensity_scales, colortable=colortable, elevation_increment=elevation_increment
 
   __DEFAULT_SCALE_MIN = 0
@@ -75,7 +91,7 @@ pro aurorax_mosaic_plot, prepped_data, prepped_skymaps, frame_idx, min_elevation
   ; Check that ALL site uids match between images and skymaps. This is crucial for order
   for mosaic_data_idx=0, n_elements(prepped_data)-1 do begin
     if not array_equal((prepped_data[mosaic_data_idx])["site_uid"], (prepped_skymaps[mosaic_data_idx])["site_uid"]) then begin
-        stop, "(aurorax_mosaic_create) Error: Mismatched site_uid array between prepped_data["+string(mosaic_data_idx, format='(I1.1)') + $
+      stop, "(aurorax_mosaic_create) Error: Mismatched site_uid array between prepped_data["+string(mosaic_data_idx, format='(I1.1)') + $
         "] and prepped_skymap["+string(mosaic_data_idx, format='(I1.1)')+"]. Make sure that all image data and skymap data is " + $
         "ordered the same before using as inputs."
     endif

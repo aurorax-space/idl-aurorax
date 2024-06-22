@@ -1,15 +1,29 @@
-
+;-------------------------------------------------------------
+; Copyright 2024 University of Calgary
+;
+; Licensed under the Apache License, Version 2.0 (the "License");
+; you may not use this file except in compliance with the License.
+; You may obtain a copy of the License at
+;
+;    http://www.apache.org/licenses/LICENSE-2.0
+;
+; Unless required by applicable law or agreed to in writing, software
+; distributed under the License is distributed on an "AS IS" BASIS,
+; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+; See the License for the specific language governing permissions and
+; limitations under the License.
+;-------------------------------------------------------------
 
 function aurorax_keogram_create, images, time_stamp, axis=axis
 
   if not isa(images, /array) then stop, "(aurorax_keogram_create) Error: 'images' must be an array"
-  
+
   ; Determine which dimension to slice keogram from
   if not keyword_set(axis) then axis = 0
   if axis ne 0 and axis ne 1 then begin
     print, "(aurorax_keogram_create) Error: Allowed axis values are 0 or 1.
   endif
-  
+
   ; Get the number of channels of image data
   images_shape = size(images, /dimensions)
   if n_elements(images_shape) eq 2 then begin
@@ -49,7 +63,7 @@ function aurorax_keogram_create, images, time_stamp, axis=axis
   endif else begin
     ccd_y = indgen((size(keo_arr, /dimensions))[2])
   endelse
-  
+
   ; Return keogram array
   return, {data:keo_arr, ccd_y:ccd_y, slice_idx:keo_idx, timestamp:time_stamp, axis:axis}
 

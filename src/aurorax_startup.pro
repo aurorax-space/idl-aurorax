@@ -39,9 +39,12 @@
 @aurorax_keogram_create_custom
 @aurorax_keogram_create
 @aurorax_keogram_plot
-@aurorax_mosaic_create
+@aurorax_mosaic_plot
+@aurorax_mosaic_oplot
 @aurorax_mosaic_prep_images
 @aurorax_mosaic_prep_skymap
+@aurorax_get_decomposed_color
+@aurorax_movie
 
 ;@aurorax_atm_forward
 ;@aurorax_atm_inverse
