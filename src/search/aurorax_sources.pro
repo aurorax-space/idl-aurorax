@@ -20,11 +20,12 @@
 ;       AURORAX_SOURCES_LIST
 ;
 ; PURPOSE:
-;       Retrieve AuroraX data sources
+;       Retrieve AuroraX Search Engine data sources
 ;
 ; EXPLANATION:
-;       Retrieve a list of data sources from the AuroraX platform, with optional
-;       parameters used to filter unwanted data sources out.
+;       Retrieve a list of data sources available in the AuroraX Search
+;       Engine, with optional parameters used to filter for certain data
+;       sources.
 ;
 ; CALLING SEQUENCE:
 ;       aurorax_sources_list()

@@ -20,11 +20,12 @@
 ;       AURORAX_DATA_PRODUCT_SEARCH
 ;
 ; PURPOSE:
-;       Retrieve AuroraX data product records
+;       Retrieve AuroraX Search Engine data product records
 ;
 ; EXPLANATION:
-;       Retrieve data product records from the AuroraX platform, with optional
-;       parameters used to filter for specific matching data.
+;       Retrieve data product records from the AuroraX Search Engine,
+;       with optional parameters used to filter for specific matching
+;       data.
 ;
 ; CALLING SEQUENCE:
 ;       aurorax_data_product_search(start_ts, end_ts)

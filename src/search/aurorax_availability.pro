@@ -65,11 +65,12 @@ end
 ;
 ; PURPOSE:
 ;       Retrieve data availability information for ephemeris records
+;       in the AuroraX Search Engine.
 ;
 ; EXPLANATION:
 ;       Retrieve data availability information for ephemeris records
-;       in the AuroraX platform. Optional parameters are used to filter
-;       unwanted data sources out.
+;       in the AuroraX Search Engine. Optional parameters are used to
+;       filter unwanted data sources out.
 ;
 ; CALLING SEQUENCE:
 ;       aurorax_ephemeris_availability(start_date, end_date)

@@ -20,13 +20,14 @@
 ;       AURORAX_CREATE_METADATA_FILTER_EXPRESSION
 ;
 ; PURPOSE:
-;       Create metadata filter expression for searches
+;       Create metadata filter expression for AuroraX Search Engine
+;       queries.
 ;
 ; EXPLANATION:
-;       The AuroraX ephemeris, data products, and conjunction searches can take
-;       metadata filters to help refine your search. This function provides
-;       an easy way to create metadata filter expressions which will be added
-;       to a metadata_filter object later on.
+;       The AuroraX Search Engine ephemeris, data products, and conjunction
+;       searches can take metadata filters to help refine your search. This
+;       function provides an easy way to create metadata filter expressions
+;       which will be added to a metadata_filter object later on.
 ;
 ; CALLING SEQUENCE:
 ;       aurorax_create_metadata_filter_expression(key,values)

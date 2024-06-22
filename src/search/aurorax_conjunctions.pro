@@ -110,9 +110,6 @@ end
 ;
 ; EXAMPLES:
 ;       distances = aurorax_create_advanced_distances_hash(500, ground_count=1, space_count=2)
-;
-; REVISION HISTORY:
-;   - Initial implementation, Feb 2022, Darren Chaddock
 ;+
 ;-------------------------------------------------------------
 function aurorax_create_advanced_distances_hash,distance,ground_count=ground_count,space_count=space_count,events_count=events_count

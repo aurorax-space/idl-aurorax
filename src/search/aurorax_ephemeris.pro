@@ -20,11 +20,11 @@
 ;       AURORAX_EPHEMERIS_SEARCH
 ;
 ; PURPOSE:
-;       Retrieve AuroraX ephemeris records
+;       Retrieve AuroraX Search Engine ephemeris records
 ;
 ; EXPLANATION:
-;       Retrieve ephemeris records from the AuroraX platform, with optional
-;       parameters used to filter for specific matching data.
+;       Retrieve ephemeris records from the AuroraX Search Engine, with 
+;       optional parameters used to filter for specific matching data.
 ;
 ; CALLING SEQUENCE:
 ;       aurorax_ephemeris_search(start_ts, end_ts)
