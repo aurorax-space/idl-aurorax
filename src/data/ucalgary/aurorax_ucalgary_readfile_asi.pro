@@ -584,7 +584,7 @@ function __aurorax_asi_pgm_readfile,filename,LUN=lun,VERBOSE=verbose,COMMENTS=co
   return,-1L
 end
 
-pro aurorax_ucalgary_readfile_asi,$
+pro __aurorax_ucalgary_readfile_asi,$
   filename,$
   images,$
   metadata,$

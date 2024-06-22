@@ -87,6 +87,42 @@ function __reorient_calibration,dataset_name,cal
   return,cal
 end
 
+;-------------------------------------------------------------
+;+
+; NAME:
+;       AURORAX_UCALGARY_READ
+;
+; PURPOSE:
+;       Read data downloaded from the UCalgary Open Data Platform
+;
+; EXPLANATION:
+;       Read data files that were dowloaded from the UCalgary Open
+;       Data Platform.
+;
+; CALLING SEQUENCE:
+;       aurorax_ucalgary_read(dataset, file_list)
+;
+; PARAMETERS:
+;       dataset            struct for the dataset that is being read in (retrieved from aurorax_list_dataset() function)
+;       file_list          list of files on the local computer to read in (can also be a single filename string)
+;
+; KEYWORDS:
+;       /FIRST_RECORD      only read the first record/frame/image in each file
+;       /NO_METADATA       exclude reading of metadata
+;       /QUIET             read data silently, no print messages will be shown
+;
+; OUTPUT
+;       the loaded data
+;
+; OUTPUT TYPE:
+;       a struct
+;
+; EXAMPLES:
+;       download_obj = aurorax_ucalgary_download('THEMIS_ASI_RAW','2022-01-01T06:00:00','2022-01-01T06:59:59',site_uid='gill')
+;       data = aurorax_ucalgary_read(d.dataset,f)
+;       help,data
+;+
+;-------------------------------------------------------------
 function aurorax_ucalgary_read,dataset,file_list,first_record=first_record,no_metadata=no_metadata,quiet=quiet
   ; init
   timestamp_list = list()
@@ -140,9 +176,9 @@ function aurorax_ucalgary_read,dataset,file_list,first_record=first_record,no_me
   if (read_function eq 'asi_images') then begin
     ; read using ASI readfile
     if (quiet_flag eq 0) then begin
-      aurorax_ucalgary_readfile_asi,file_list,img,meta,count=n_frames,first_frame=first_record,no_metadata=no_metadata,/verbose,/show_datarate
+      __aurorax_ucalgary_readfile_asi,file_list,img,meta,count=n_frames,first_frame=first_record,no_metadata=no_metadata,/verbose,/show_datarate
     endif else begin
-      aurorax_ucalgary_readfile_asi,file_list,img,meta,count=n_frames,first_frame=first_record,no_metadata=no_metadata
+      __aurorax_ucalgary_readfile_asi,file_list,img,meta,count=n_frames,first_frame=first_record,no_metadata=no_metadata
     endelse
 
     ; set the data
@@ -158,13 +194,13 @@ function aurorax_ucalgary_read,dataset,file_list,first_record=first_record,no_me
     metadata_list = meta
   endif else if (read_function eq 'skymap') then begin
     ; read using skymap readfile
-    data = aurorax_ucalgary_readfile_skymap(file_list,quiet_flag=quiet_flag)
+    data = __aurorax_ucalgary_readfile_skymap(file_list,quiet_flag=quiet_flag)
     for i=0,n_elements(data)-1 do begin
       data[i] = __reorient_skymaps(dataset.name,data[i])
     endfor
   endif else if (read_function eq 'calibration') then begin
     ; read using calibration readfile
-    data = aurorax_ucalgary_readfile_calibration(file_list,quiet_flag=quiet_flag)
+    data = __aurorax_ucalgary_readfile_calibration(file_list,quiet_flag=quiet_flag)
     for i=0,n_elements(data)-1 do begin
       data[i] = __reorient_calibration(dataset.name,data[i])
     endfor
