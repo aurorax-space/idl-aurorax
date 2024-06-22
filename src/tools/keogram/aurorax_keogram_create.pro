@@ -1,9 +1,15 @@
 
 
-function aurorax_keogram_create, images, time_stamp
+function aurorax_keogram_create, images, time_stamp, axis=axis
 
   if not isa(images, /array) then stop, "(aurorax_keogram_create) Error: 'images' must be an array"
-
+  
+  ; Determine which dimension to slice keogram from
+  if not keyword_set(axis) then axis = 0
+  if axis ne 0 and axis ne 1 then begin
+    print, "(aurorax_keogram_create) Error: Allowed axis values are 0 or 1.
+  endif
+  
   ; Get the number of channels of image data
   images_shape = size(images, /dimensions)
   if n_elements(images_shape) eq 2 then begin
@@ -18,12 +24,23 @@ function aurorax_keogram_create, images, time_stamp
 
   ; Extract the keogram slice, transpose and reshape for proper output shape
   if n_channels eq 1 then begin
-    keo_idx = images_shape[0] / 2
-    keo_arr = transpose(reform(images[keo_idx,*,*]))
+    if axis eq 0 then begin
+      keo_idx = images_shape[0] / 2
+      keo_arr = transpose(reform(images[keo_idx,*,*]))
+    endif else begin
+      keo_idx = images_shape[1] / 2
+      keo_arr = transpose(reform(images[*,keo_idx,*]))
+    endelse
   endif else begin
-    keo_idx = images_shape[1] / 2
-    keo_arr = reform(images[*,keo_idx,*,*])
-    keo_arr = bytscl(transpose(keo_arr, [0,2,1]), min=0, max=255)
+    if axis eq 0 then begin
+      keo_idx = images_shape[1] / 2
+      keo_arr = reform(images[*,keo_idx,*,*])
+      keo_arr = bytscl(transpose(keo_arr, [0,2,1]), min=0, max=255)
+    endif else begin
+      keo_idx = images_shape[2] / 2
+      keo_arr = reform(images[*,*,keo_idx,*])
+      keo_arr = bytscl(transpose(keo_arr, [0,2,1]), min=0, max=255)
+    endelse
   endelse
 
   ; Create CCD Y axis
@@ -32,8 +49,8 @@ function aurorax_keogram_create, images, time_stamp
   endif else begin
     ccd_y = indgen((size(keo_arr, /dimensions))[2])
   endelse
-
+  
   ; Return keogram array
-  return, {data:keo_arr, ccd_y:ccd_y, slice_idx:keo_idx, timestamp:time_stamp}
+  return, {data:keo_arr, ccd_y:ccd_y, slice_idx:keo_idx, timestamp:time_stamp, axis:axis}
 
 end

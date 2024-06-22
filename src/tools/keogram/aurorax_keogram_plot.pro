@@ -72,7 +72,7 @@ pro aurorax_keogram_plot, keogram_struct, object=object, geo=geo, mag=mag, elev=
   x_axis.text_orientation = 0
 
   ; For custom keogram, don't plot a y-axis because we can't create a well defined y-axis
-  if isa(y, /string, /scalar) and y eq "custom" then goto, custom_keogram_jump
+  if isa(y, /string, /scalar) then goto, custom_keogram_jump
   
   ; Create desired y-axis
   coord_axis = []
@@ -84,7 +84,11 @@ pro aurorax_keogram_plot, keogram_struct, object=object, geo=geo, mag=mag, elev=
     endelse
 
   endfor
-  y_title = (["Geographic Latitude", "Magnetic Latitude", "Elevation", "CCD Y"])[where(axis_keywords)]
+  if keogram_struct.axis eq 0 then begin
+    y_title = (["Geographic Latitude", "Magnetic Latitude", "Elevation", "CCD Y"])[where(axis_keywords)]
+  endif else begin
+    y_title = (["Geographic Longitude", "Magnetic Longitude", "Elevation", "CCD Y"])[where(axis_keywords)]
+  endelse
   y_axis = axis('Y', location=0)
   y_axis.tickinterval = y_tick_interval
   y_axis.tickname = coord_axis

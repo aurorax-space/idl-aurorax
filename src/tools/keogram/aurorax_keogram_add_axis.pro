@@ -20,11 +20,18 @@ function aurorax_keogram_add_axis, keogram_struct, skymap, altitude_km=altitude_
   if not keyword_set(geo) and not keyword_set(mag) and not keyword_set(geo) then begin
     stop, "(aurorax_keogram_add_axis) Error: At least one of '/geo', '/mag', '/elev', must be set to add axes.'
   endif
+  
   ; Check that skymap size matches keogram
-  if (size(skymap.full_azimuth, /dimensions))[1] ne keo_height then begin
-    stop, "(aurorax_keogram_add_axis) Error: Skymap size does not match size of
-  endif
-
+  if keogram_struct.axis eq 0 then begin
+    if (size(skymap.full_azimuth, /dimensions))[1] ne keo_height then begin
+      stop, "(aurorax_keogram_add_axis) Error: Skymap size does not match size of
+    endif
+  endif else begin
+    if (size(skymap.full_azimuth, /dimensions))[0] ne keo_height then begin
+      stop, "(aurorax_keogram_add_axis) Error: Skymap size does not match size of
+    endif
+  endelse
+  
   ; Obtain keogram index in CCD coords
   slice_idx = keogram_struct.slice_idx
 
@@ -41,7 +48,11 @@ function aurorax_keogram_add_axis, keogram_struct, skymap, altitude_km=altitude_
   ; Create elevation axis
   elev_y = []
   foreach row_idx, keogram_struct.ccd_y do begin
-    el = elevation[slice_idx, row_idx]
+    if keogram_struct.axis eq 0 then begin
+      el = elevation[slice_idx, row_idx]
+    endif else begin
+      el = elevation[row_idx, slice_idx]
+    endelse
     elev_y = [elev_y, el]
   endforeach
 
@@ -55,8 +66,13 @@ function aurorax_keogram_add_axis, keogram_struct, skymap, altitude_km=altitude_
     ; Grab all latitudes
     geo_y = []
     foreach row_idx, keogram_struct.ccd_y do begin
-      lat = lats[slice_idx, row_idx, alt_idx]
-      geo_y = [geo_y, lat]
+      if keogram_struct.axis eq 0 then begin
+        lat = lats[slice_idx, row_idx, alt_idx]
+        geo_y = [geo_y, lat]
+      endif else begin
+        lon = lons[row_idx, slice_idx, alt_idx]
+        geo_y = [geo_y, lon]
+      endelse
     endforeach
   endif else begin
     ; interpolation is required
@@ -70,8 +86,13 @@ function aurorax_keogram_add_axis, keogram_struct, skymap, altitude_km=altitude_
     ; Interpolate all latitudes
     geo_y = []
     foreach row_idx, keogram_struct.ccd_y do begin
-      lat = interpol(lats[slice_idx, row_idx, *], interp_alts, altitude_km)
-      geo_y = [geo_y, lat]
+      if keogram_struct.axis eq 0 then begin
+        lat = interpol(lats[slice_idx, row_idx, *], interp_alts, altitude_km)
+        geo_y = [geo_y, lat]
+      endif else begin
+        lon = interpol(lons[row_idx, slice_idx, *], interp_alts, altitude_km)
+        geo_y = [geo_y, lon]
+      endelse
     endforeach
   endelse
 
@@ -83,25 +104,25 @@ function aurorax_keogram_add_axis, keogram_struct, skymap, altitude_km=altitude_
 
   if array_equal(keywords, [0,0,1]) then begin
     ; Return keogram array with desired axes added
-    return, {data:keo_arr, timestamp:time_stamp, ccd_y:ccd_y, slice_idx:slice_idx, elev_y:elev_y}
+    return, {data:keo_arr, timestamp:time_stamp, ccd_y:ccd_y, slice_idx:slice_idx, axis:keogram_struct.axis, elev_y:elev_y}
   endif else if array_equal(keywords, [0,1,0]) then begin
     ; Return keogram array with desired axes added
-    return, {data:keo_arr, timestamp:time_stamp, ccd_y:ccd_y, slice_idx:slice_idx}
+    return, {data:keo_arr, timestamp:time_stamp, ccd_y:ccd_y, slice_idx:slice_idx, axis:keogram_struct.axis}
   endif else if array_equal(keywords, [0,1,1]) then begin
     ; Return keogram array with desired axes added
-    return, {data:keo_arr, timestamp:time_stamp, ccd_y:ccd_y, slice_idx:slice_idx, elev_y:elev_y}
+    return, {data:keo_arr, timestamp:time_stamp, ccd_y:ccd_y, slice_idx:slice_idx, axis:keogram_struct.axis, elev_y:elev_y}
   endif else if array_equal(keywords, [1,0,0]) then begin
     ; Return keogram array with desired axes added
-    return, {data:keo_arr, timestamp:time_stamp, ccd_y:ccd_y, slice_idx:slice_idx, geo_y:geo_y}
+    return, {data:keo_arr, timestamp:time_stamp, ccd_y:ccd_y, slice_idx:slice_idx, axis:keogram_struct.axis, geo_y:geo_y}
   endif else if array_equal(keywords, [1,0,1]) then begin
     ; Return keogram array with desired axes added
-    return, {data:keo_arr, timestamp:time_stamp, ccd_y:ccd_y, slice_idx:slice_idx, geo_y:geo_y, elev_y:elev_y}
+    return, {data:keo_arr, timestamp:time_stamp, ccd_y:ccd_y, slice_idx:slice_idx, axis:keogram_struct.axis, geo_y:geo_y, elev_y:elev_y}
   endif else if array_equal(keywords, [1,1,0]) then begin
     ; Return keogram array with desired axes added
-    return, {data:keo_arr, timestamp:time_stamp, ccd_y:ccd_y, slice_idx:slice_idx, geo_y:geo_y}
+    return, {data:keo_arr, timestamp:time_stamp, ccd_y:ccd_y, slice_idx:slice_idx, axis:keogram_struct.axis, geo_y:geo_y}
   endif else if array_equal(keywords, [1,1,1]) then begin
     ; Return keogram array with desired axes added
-    return, {data:keo_arr, timestamp:time_stamp, ccd_y:ccd_y, slice_idx:slice_idx, geo_y:geo_y, elev_y:elev_y}
+    return, {data:keo_arr, timestamp:time_stamp, ccd_y:ccd_y, slice_idx:slice_idx, axis:keogram_struct.axis, geo_y:geo_y, elev_y:elev_y}
   endif
 
 end
