@@ -60,7 +60,10 @@ function __determine_cadence, timestamp_arr
     endif
   endforeach
 
-  if cadence eq !null then stop, "(aurorax_mosaic_prep_images) Error: Could not determine cadence of image data."
+  if cadence eq !null then begin
+    print, "[aurorax_mosaic_prep_images] Error: Could not determine cadence of image data."
+    return, !null
+  endif
 
   return, cadence
 
@@ -103,12 +106,45 @@ function __get_julday, time_stamp
   endelse
 end
 
-
-
+;-------------------------------------------------------------
+;+
+; NAME:
+;       AURORAX_MOSAIC_PREP_IMAGES
+;
+; PURPOSE:
+;       Prepare image data to create a mosaic
+;
+; EXPLANATION:
+;       Takes image data and formats it in a way such that it
+;       can be fed into the aurorax_mosaic_plot routine
+;
+; CALLING SEQUENCE:
+;       aurorax_mosaic_prep_images(list(img_data1, image_data2))
+;
+; PARAMETERS:
+;       image_data        a list of image data objects, where each object is usually the return
+;                         value of aurorax_ucalgary_read(). Note that even if preparing a single
+;                         image data object, it must be enclosed in a list.
+;
+; KEYWORDS:
+;
+; OUTPUT
+;       a prepped_data structure
+;
+; OUTPUT TYPE:
+;       struct
+;
+; EXAMPLES:
+;       prepped_data = aurorax_prep_images(list(aurorax_ucalgary_read(d.dataset, d.filenames)))
+;+
+;-------------------------------------------------------------
 function aurorax_mosaic_prep_images, image_list
 
   ; Verify that image_list is indeed a list, not array
-  if (typename(image_list) ne "LIST") then stop, "(aurorax_mosaic_prep_images) Error: image_list must be a list, i.e. 'list(img_data_1, img_data_2, ...)'."
+  if (typename(image_list) ne "LIST") then begin
+    print, "[aurorax_mosaic_prep_images] Error: image_list must be a list, i.e. 'list(img_data_1, img_data_2, ...)'."
+    return, !null
+  endif
 
   ; Determine the number of expected frames
   ;
@@ -131,7 +167,10 @@ function aurorax_mosaic_prep_images, image_list
   ; Determine cadance, and generate all expected timestamps
   cadence = __determine_cadence(image_list[0].timestamp)
   expected_juldays = timegen(start=start_ts, final=end_ts, step_size=cadence, units='S')
-  if (end_ts - start_ts) gt 3 then stop, "(aurorax_mosaic_prep_images) Error: Excessive date range detected - Check that all data is from the same time range"
+  if (end_ts - start_ts) gt 3 then begin
+    print, "[aurorax_mosaic_prep_images] Error: Excessive date range detected - Check that all data is from the same time range"
+    return, !null
+  endif
   expected_timestamps = string(expected_juldays, format = '(C(CYI, "-", CMOI2.2, "-", CDI2.2, " ", CHI2.2, ":", CMI2.2, ":", CSI2.2))')
   expected_num_frames = n_elements(expected_timestamps)
 
@@ -146,7 +185,10 @@ function aurorax_mosaic_prep_images, image_list
     ; Add to site uid list
     if where(tag_names(site_image_data.metadata[0]) eq "SITE_UID", /null) ne !null then begin
       site_uid = site_image_data.metadata[0].site_uid
-    endif else stop, "(aurorax_mosaic_prep_images) Error: Could not find SITE_UID when parsing metadata."
+    endif else begin
+      print, "[aurorax_mosaic_prep_images] Error: Could not find SITE_UID when parsing metadata."
+      return, !null
+    endelse
 
     ; Determine number of channels of image data
     if (size(site_data, /dimensions))[0] eq 3 then begin

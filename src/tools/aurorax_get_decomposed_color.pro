@@ -14,10 +14,44 @@
 ; limitations under the License.
 ;-------------------------------------------------------------
 
+;-------------------------------------------------------------
+;+
+; NAME:
+;       AURORAX_GET_DECOMPOSED_COLOR
+;
+; PURPOSE:
+;       Convert RGB triple to decomposed long integer format.
+;
+; EXPLANATION:
+;       This function is useful for plotting in decomposed color mode.
+;       It converts an RGB triple to a long integer that can be used
+;       to plot the corresponding color in decomposed color mode.
+;
+; CALLING SEQUENCE:
+;       aurorax_get_decomposed_color([r,g,b])
+;
+; PARAMETERS:
+;       rgb_triple        a three element array specifying the RGB color to convert
+;
+; KEYWORDS:
+;
+; OUTPUT
+;       the decomposed long integer representation of the color
+;
+; OUTPUT TYPE:
+;       long
+;
+; EXAMPLES:
+;       long_cyan = aurorax_get_decomposed_color([0,255,255])
+;+
+;-------------------------------------------------------------
 function aurorax_get_decomposed_color, rgb_triple
 
   dims = size(rgb_triple, /dimensions)
-  if dims ne [3] and dims ne [1,3] then stop, "Please enter color as a 3-element array, [R, G, B]."
+  if dims ne [3] and dims ne [1,3] then begin
+    print, "[aurorax_get_decomposed_color] Error: enter color as a 3-element array, [R, G, B]."
+    return, !null
+  endif
   return, rgb_triple[0] + (rgb_triple[1] * 2L^8L) + (rgb_triple[2] * 2L^16L)
 
 end

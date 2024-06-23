@@ -14,10 +14,50 @@
 ; limitations under the License.
 ;-------------------------------------------------------------
 
+;-------------------------------------------------------------
+;+
+; NAME:
+;       AURORAX_MOSAIC_PREP_SKYMAPS
+;
+; PURPOSE:
+;       Prepare skymaps to create a mosaic
+;
+; EXPLANATION:
+;       Takes skymap(s) and formats them in a way such that they
+;       can be fed into the aurorax_mosaic_plot routine
+;
+; CALLING SEQUENCE:
+;       aurorax_mosaic_prep_skymap(list(skymap1, skymap2))
+;
+; PARAMETERS:
+;       image_data        a list of skymap data objects, where each object is usually the return
+;                         value of aurorax_ucalgary_read(). Note that even if preparing a single
+;                         skymap object, it must be enclosed in a list.
+;       altitude_km       the altitude (in kilometers) at which the image data should be
+;                         prepared for mosaicking
+;
+; KEYWORDS:
+;
+; OUTPUT
+;       a prepped_skymap structure
+;
+; OUTPUT TYPE:
+;       struct
+;
+; EXAMPLES:
+;       prepped_skymap = aurorax_prep_skymaps(list(aurorax_ucalgary_read(d.dataset, d.filenames)))
+;+
+;-------------------------------------------------------------
 function aurorax_mosaic_prep_skymap, skymap_list, altitude_km
 
-  if typename(skymap_list) ne 'LIST' then stop, "(aurorax_mosaic_prep_skymap) Error: Input skymaps must be stored in a list. Recieved type: "+typename(skymap_list)
-  if not isa(altitude_km, /scalar) then stop, "(aurorax_mosaic_prep_skymap) Error: Altitude must be a scalar. Recieved type: "+typename(altitude_km)
+  if typename(skymap_list) ne 'LIST' then begin
+    print, "[aurorax_mosaic_prep_skymap] Error: Input skymaps must be stored in a list. Recieved type: "+typename(skymap_list)
+    return, !null
+  endif
+  if not isa(altitude_km, /scalar) then begin
+    print, "[aurorax_mosaic_prep_skymap] Error: Altitude must be a scalar. Recieved type: "+typename(altitude_km)
+    return, !null
+  endif
 
   elevation = list()
   polyfill_lat = list()
@@ -84,9 +124,10 @@ function aurorax_mosaic_prep_skymap, skymap_list, altitude_km
           ; interpolation is required
           ; first check if supplied altitude is valid for interpolation
           if (altitude_km lt min(interp_alts)) or (altitude_km gt max(interp_alts)) then begin
-            error_msg = "(aurorax_mosaic_prep_skymap) Error: Altitude of "+strcompress(string(altitude_km),/remove_all)+" km is outside the valid " + $
+            error_msg = "[aurorax_mosaic_prep_skymap] Error: Altitude of "+strcompress(string(altitude_km),/remove_all)+" km is outside the valid " + $
               "range of ["+strcompress(string(min(interp_alts)),/remove_all)+","+strcompress(string(max(interp_alts)),/remove_all)+"] km."
-            stop, error_msg
+            print, error_msg
+            return, !null
           endif
 
           ; interpolate longitudes of pixel corners at desired altitudes

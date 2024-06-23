@@ -14,10 +14,47 @@
 ; limitations under the License.
 ;-------------------------------------------------------------
 
+;-------------------------------------------------------------
+;+
+; NAME:
+;       AURORAX_KEOGRAM_ADD_AXIS
+;
+; PURPOSE:
+;       Add a georeferenced axis to a keogram structure.
+;
+; EXPLANATION:
+;       Add one or more desired physical axes to a keogram structure, which is
+;       usually obtained via aurorax_keogram_create. Options are elevation, and
+;       geographic/magnetic lats (lons for ewograms).
+;
+; CALLING SEQUENCE:
+;       aurorax_keogram_add_axis(keogram_struct, skymap, /axis_type)
+;
+; PARAMETERS:
+;       keogram_struct      keogram structure - usually the return value of aurorax_keogram_create()
+;       skymap              the skymap to use for georeferencing
+;       altitude_km         altitude, in kilometers, of the keogram data, optional
+;
+; KEYWORDS:
+;       /GEO        adds an axis of geographic coordinates
+;       /GEO        adds an axis of geomagnetic coordinates
+;       /GEO        adds an axis of elevation angles
+;
+; OUTPUT
+;       keogram structure containing new axes
+;
+; OUTPUT TYPE:
+;       struct
+;
+; EXAMPLES:
+;       keo = aurorax_keogram_add_axis(keo, skymap, /geo, /elev, altitude_km=110)
+;+
+;-------------------------------------------------------------
 function aurorax_keogram_add_axis, keogram_struct, skymap, altitude_km=altitude_km, geo=geo, mag=mag, elev=elev
 
   if keyword_set(geo) and not keyword_set(altitude_km) then begin
-    stop, "(aurorax_keogram_add_axis) Error: Using '/geo' or '/mag' requires passing in 'altitude_km'."
+    print, "[aurorax_keogram_add_axis] Error: Using '/geo' or '/mag' requires passing in 'altitude_km'."
+    return, !null
   endif
 
   ; Determine number of channels and height of keogram
@@ -33,17 +70,20 @@ function aurorax_keogram_add_axis, keogram_struct, skymap, altitude_km=altitude_
 
   ; Check that at least one keyword is passed
   if not keyword_set(geo) and not keyword_set(mag) and not keyword_set(geo) then begin
-    stop, "(aurorax_keogram_add_axis) Error: At least one of '/geo', '/mag', '/elev', must be set to add axes.'
+    print, "[aurorax_keogram_add_axis] Error: At least one of '/geo', '/mag', '/elev', must be set to add axes.'
+    return, !null
   endif
 
   ; Check that skymap size matches keogram
   if keogram_struct.axis eq 0 then begin
     if (size(skymap.full_azimuth, /dimensions))[1] ne keo_height then begin
-      stop, "(aurorax_keogram_add_axis) Error: Skymap size does not match size of
+      print, "[aurorax_keogram_add_axis] Error: Skymap size does not match size of
+      return, !null
     endif
   endif else begin
     if (size(skymap.full_azimuth, /dimensions))[0] ne keo_height then begin
-      stop, "(aurorax_keogram_add_axis) Error: Skymap size does not match size of
+      print, "[aurorax_keogram_add_axis] Error: Skymap size does not match size of
+      return, !null
     endif
   endelse
 
@@ -93,9 +133,10 @@ function aurorax_keogram_add_axis, keogram_struct, skymap, altitude_km=altitude_
     ; interpolation is required
     ; first check if supplied altitude is valid for interpolation
     if (alitude_km lt min(interp_alts)) or (alitude_km gt max(interp_alts)) then begin
-      error_msg = "(aurorax_keogram_add_axis) Error: Altitude of "+strcompress(string(altitude_km),/remove_all)+" km is outside the valid " + $
+      error_msg = "[aurorax_keogram_add_axis] Error: Altitude of "+strcompress(string(altitude_km),/remove_all)+" km is outside the valid " + $
         "range of ["+strcompress(string(min(interp_alts)),/remove_all)+","+strcompress(string(max(interp_alts)),/remove_all)+"] km."
-      stop, error_msg
+      print, error_msg
+      return, !null
     endif
 
     ; Interpolate all latitudes
@@ -113,6 +154,7 @@ function aurorax_keogram_add_axis, keogram_struct, skymap, altitude_km=altitude_
 
   if keyword_set(mag) then begin
     print, "Warning: Magnetic coordinates are not currently supported for this routine."
+    return, !null
   endif
 
   keywords = [keyword_set(geo), keyword_set(mag), keyword_set(elev)]
