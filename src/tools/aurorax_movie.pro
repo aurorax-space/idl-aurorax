@@ -14,6 +14,36 @@
 ; limitations under the License.
 ;-------------------------------------------------------------
 
+;-------------------------------------------------------------
+;+
+; NAME:
+;       AURORAX_MOVIE
+;
+; PURPOSE:
+;       Create a movie.
+;
+; EXPLANATION:
+;       Given a list of filenames referencing images, create and
+;       save a movie.
+;
+; CALLING SEQUENCE:
+;       aurorax_movie, input_filenames, output_filename, fps
+;
+; PARAMETERS:
+;       input_filenames     an array of strings giving filenames of all images
+;       output_filenames    the filename location at which to save the image
+;       fps                 integer giving the frames per second to create movie at
+;
+; KEYWORDS:
+;
+; OUTPUT
+;
+; OUTPUT TYPE:
+;
+; EXAMPLES:
+;       aurorax_create_movive, file_search("path\to\images\*.png"), "movie.mp4", 30
+;+
+;-------------------------------------------------------------
 pro aurorax_movie, input_filenames, output_filename, fps
 
   ; Read the first image supplied to determine video size
@@ -27,14 +57,14 @@ pro aurorax_movie, input_filenames, output_filename, fps
     x_size = (size(tmp, /dimensions))[1]
     y_size = (size(tmp, /dimensions))[2]
   endif else begin
-    print, "(aurorax_movie) Error: Unrecognized image type/shape."
+    print, "[aurorax_movie] Error: Unrecognized image type/shape."
     goto, error
   endelse
 
   ; If fully qualified path is provided, directorys must exist
   catch, error_status
   if error_status eq -1166 then begin
-    print, "(aurorax_movie) Error: When providing fully qualified path," + $
+    print, "[aurorax_movie] Error: When providing fully qualified path," + $
       " directory tree must exist."
     goto, error
     catch, /cancel

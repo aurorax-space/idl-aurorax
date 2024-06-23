@@ -20,7 +20,6 @@ pro aurorax_example_create_custom_keogram
   d = aurorax_ucalgary_download('TREX_RGB_RAW_NOMINAL', '2021-11-04T03:00:00', '2021-11-04T03:59:59', site_uid="gill")
   image_data = aurorax_ucalgary_read(d.dataset, d.filenames)
 
-  ; Download and read the corresponding skymap
   ; Download all skymaps in 3 years leading up to date of interest
   d = aurorax_ucalgary_download('TREX_RGB_SKYMAP_IDLSAV', '2018-11-04T03:00:00', '2021-11-04T03:59:59', site_uid='gill')
 
@@ -34,7 +33,7 @@ pro aurorax_example_create_custom_keogram
   img = image_data.data
   time_stamp = image_data.timestamp
 
-  ; Define some lats/lons that define the keogram slice of interest
+  ; Obtain some lats/lons that define the keogram slice of interest
   latitudes = findgen(50, start=51, increment=0.22)
   longitudes = -102.0 + 5 * sin(!pi * (latitudes - 51.0) / (62.0 - 51.0))
 

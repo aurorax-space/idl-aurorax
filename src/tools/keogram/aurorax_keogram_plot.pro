@@ -14,20 +14,63 @@
 ; limitations under the License.
 ;-------------------------------------------------------------
 
-pro aurorax_keogram_plot, keogram_struct, object=object, geo=geo, mag=mag, elev=elev, dimensions=dimensions, location=location, title=title, x_tick_interval=x_tick_interval, y_tick_interval=y_tick_interval, aspect_ratio=aspect_ratio
+;-------------------------------------------------------------
+;+
+; NAME:
+;       AURORAX_KEOGRAM_PLOT
+;
+; PURPOSE:
+;       Plot a keogram object.
+;
+; EXPLANATION:
+;       Plot keogram data, adding axes stored in the keogram
+;       structure as desired, defaults to CCD axis.
+;
+; CALLING SEQUENCE:
+;       aurorax_keogram_plot, keogram_struct, /keyword_args
+;
+; PARAMETERS:
+;       keogram_struct      keogram object to plot, usually the return value of aurorax_keogram_create()
+;       title               string giving the plot title, optional
+;       dimensions          two-element array giving dimensions of the plotting window in device coordinates, optional
+;       location            two-element array giving location of the plotting window in device coordinates, optional
+;       x_tick_interval     interval between ticks on the x-axis, optional (default is 200)
+;       y_tick_interval     interval between ticks on the y-axis, optional (default is 50)
+;       aspect_ratio        float giving the aspect ratio to display keogram data
+;
+; KEYWORDS:
+;       /GEO                labels geographic coordinates on the y-axis (axis must exist in keogram structure)
+;       /MAG                labels geomagnetic coordinates on the y-axis (axis must exist in keogram structure)
+;       /ELEV               labels elevation angles on the y-axis (axis must exist in keogram structure)
+;
+; OUTPUT
+;
+; OUTPUT TYPE:
+;
+; EXAMPLES:
+;       aurorax_keogram_plot, keo, title="Geographic", /geo, location=[0,0], dimensions=[1000,400]
+;+
+;-------------------------------------------------------------
+pro aurorax_keogram_plot, keogram_struct, geo=geo, mag=mag, elev=elev, dimensions=dimensions, location=location, title=title, x_tick_interval=x_tick_interval, y_tick_interval=y_tick_interval, aspect_ratio=aspect_ratio
 
   axis_keywords = [keyword_set(geo), keyword_set(mag), keyword_set(elev)]
-  if total(axis_keywords) gt 1 then stop, "(aurorax_keogram_plot) Error: Only one of '/geo', '/mag', '/elev' may be set"
+  if total(axis_keywords) gt 1 then begin
+    print, "[aurorax_keogram_plot] Error: Only one of '/geo', '/mag', '/elev' may be set"
+    goto, error_jump
+  endif
 
   ; Make sure desired axis exists
   if keyword_set(geo) and where("GEO_Y" eq tag_names(keogram_struct), /null) eq !null then begin
-    stop, "(aurorax_keogram_plot) Error: Keyword '/geo' was set, but input keogram has no geographic axis. Use aurorax_keogram_add_axis()."
+    print, "[aurorax_keogram_plot] Error: Keyword '/geo' was set, but input keogram has no geographic axis. Use aurorax_keogram_add_axis()."
+    goto, error_jump
   endif
   if keyword_set(mag) and where("MAG_Y" eq tag_names(keogram_struct), /null) eq !null then begin
-    stop, "(aurorax_keogram_plot) Error: Keyword '/mag' was set, but input keogram has no magnetic axis. Use aurorax_keogram_add_axis()."
+    print, "[aurorax_keogram_plot] Error: Keyword '/mag' was set, but input keogram has no magnetic axis. Use aurorax_keogram_add_axis()."
+    goto, error_jump
   endif
   if keyword_set(elev) and where("ELEV_Y" eq tag_names(keogram_struct), /null) eq !null then begin
-    stop, "(aurorax_keogram_plot) Error: Keyword '/elev' was set, but input keogram has no elevation axis. Use aurorax_keogram_add_axis()."
+    print, "[aurorax_keogram_plot] Error: Keyword '/elev' was set, but input keogram has no elevation axis. Use aurorax_keogram_add_axis()."
+    goto, error_jump
   endif
 
   ; Select desired axis
@@ -109,7 +152,7 @@ pro aurorax_keogram_plot, keogram_struct, object=object, geo=geo, mag=mag, elev=
   y_axis.title = y_title
 
   custom_keogram_jump:
-
+  error_jump:
 end
 
 

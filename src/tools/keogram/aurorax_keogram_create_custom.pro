@@ -14,43 +14,11 @@
 ; limitations under the License.
 ;-------------------------------------------------------------
 
-; function that checks if point is within polygon
-function __point_is_in_polygon, point, vertices
-  x = point[0]
-  y = point[1]
-
-  x_vertices = []
-  y_vertices = []
-  for i=0, n_elements(vertices)-1 do begin
-    x_vertices = [x_vertices, (vertices[i])[0]]
-    y_vertices = [y_vertices, (vertices[i])[1]]
-  endfor
-
-  ; Close the polygon
-  closed_x = [x_vertices, x_vertices[0]]
-  closed_y = [y_vertices, y_vertices[0]]
-  i = indgen(n_elements(vertices))
-  ii = indgen(n_elements(vertices)) + 1
-
-  ; orthogonal vectors
-  x1 = closed_x[i] - x
-  y1 = closed_y[i] - y
-  x2 = closed_x[ii] - x
-  y2 = closed_y[ii] - y
-
-  ; dot product and cross product
-  dot = x1*x2 + y1*y2
-  cross = x1*y2 - y1*x2
-  theta = atan(cross,dot)
-
-  ; return 1 if inside or on boundary, return 0 otherwise
-  if (abs(total(theta)) gt !pi) then return, 1 else return, 0
-END
-
-
-; Function to obtain all indices of an array/image, within the
-; polygon defined by input list of ordered vertices.
 function __indices_in_polygon, vertices, image_shape
+  ; Function to obtain all indices of an array/image, within the
+  ; polygon defined by input list of ordered vertices.
+  ;
+  ; Note: This is a hidden function, and not available publicly
   x_verts = []
   y_verts = []
   for i=0, n_elements(vertices)-1 do begin
@@ -82,9 +50,14 @@ function __indices_in_polygon, vertices, image_shape
 end
 
 function __convert_lonlat_to_ccd, lon_locs, lat_locs, skymap, altitude_km, time_stamp=time_stamp, mag=mag
+  ; Converts a set of lat lon points to CCD coordinates
+  ; using a skymap.
+  ;
+  ; Note: This is a hidden function, and not available publicly
 
   if keyword_set(mag) and not keyword_set(time_stamp) then begin
-    stop, "(__convert_lonlat_to_ccd) Error: Magnetic coordinates require a timestamp."
+    print, "[__convert_lonlat_to_ccd] Error: Magnetic coordinates require a timestamp."
+    return, !null
   endif
 
   interp_alts = skymap.full_map_altitude / 1000.
@@ -100,7 +73,10 @@ function __convert_lonlat_to_ccd, lon_locs, lat_locs, skymap, altitude_km, time_
 
   ; convert altitudes to km for interpolation
   interp_alts = altitudes / 1000.
-  if not isa(altitude_km) then stop, "Altitude must be provided when working in lat/lon coordinates."
+  if not isa(altitude_km) then begin
+    print, "[__convert_lonlat_to_ccd] Error: altitude must be provided when working in lat/lon coordinates."
+    return, !null
+  endif
 
   if where(float(altitude_km) eq interp_alts, /null) ne !null then begin
     ; no interpolation required
@@ -116,9 +92,10 @@ function __convert_lonlat_to_ccd, lon_locs, lat_locs, skymap, altitude_km, time_
     lats_ysize = (size(lats, /dimensions))[1]
     ; first check if supplied altitude is valid for interpolation
     if (altitude_km lt min(interp_alts)) or (altitude_km gt max(interp_alts)) then begin
-      error_msg = "(__convert_lonlat_to_ccd) Error: Altitude of "+strcompress(string(altitude_km),/remove_all)+" km is outside the valid " + $
+      error_msg = "[__convert_lonlat_to_ccd] Error: Altitude of "+strcompress(string(altitude_km),/remove_all)+" km is outside the valid " + $
         "range of ["+strcompress(string(min(interp_alts)),/remove_all)+","+strcompress(string(max(interp_alts)),/remove_all)+"] km."
-      stop, error_msg
+      print, error_msg
+      return, !null
     endif
     ; interpolate entire lat lon arrays
     new_lats = lats[*,*,0]
@@ -173,10 +150,11 @@ function __convert_lonlat_to_ccd, lon_locs, lat_locs, skymap, altitude_km, time_
   return, list(x_locs, y_locs)
 end
 
-
 function __haversine_distances, target_lat, target_lon, lat_array, lon_array
   ; Computes the distance on the globe between target lat/lon,
   ; and all points defined by lat/lon arrays.
+  ;
+  ; Note: This is a hidden function, and not available publicly
 
   ; earth radius (m)
   r = 6371000.0
@@ -195,36 +173,87 @@ function __haversine_distances, target_lat, target_lon, lat_array, lon_array
 
 end
 
-
+;-------------------------------------------------------------
+;+
+; NAME:
+;       AURORAX_KEOGRAM_CREATE_CUSTOM
+;
+; PURPOSE:
+;       Create a keogram from a custom slice of image data.
+;
+; EXPLANATION:
+;       Create a keogram by slicing image data along a custom contour
+;       defined by lats/lons or CCD coordintes.
+;
+; CALLING SEQUENCE:
+;       aurorax_keogram_create_custom(images, time_stamp, "ccd", x_locs, y_locs)
+;
+; PARAMETERS:
+;       images                array of images to extract metric from
+;       time_stamp            array of timestamps corresponding to each image frame
+;       coordinate_system     a string giving the coordinate system ("ccd", "geo", "mag")
+;       x_locs                the x locations, in desired coordinate system, to slice keogram along
+;       y_locs                the y locations, in desired coordinate system, to slice keogram along
+;       width                 the width of the keogram slice, in pixel units, optional (defaults to 2)
+;       skymap                the skymap to use for georeferencing, optional
+;       altitude_km           the altitude of the image data for georeferencing, optional
+;       metric                the metric to use to compute each keogram pixel "median" (default), "mean", or "sum", optional
+;
+; KEYWORDS:
+;       /SHOW_PREVIEW         plot a preview of the keogram slice on top of the first image frame
+;
+; OUTPUT
+;       custom keogram structure containing keogram data and temporal axis
+;
+; OUTPUT TYPE:
+;       struct
+;
+; EXAMPLES:
+;       ccd_keo = aurorax_keogram_create_custom(img, time_stamp, "ccd", x_arr, y_arr, width=5, metric="sum", /show_preview)
+;       geo_keo = aurorax_keogram_create_custom(img, time_stamp, "geo", longitudes, latitudes, skymap=skymap, altitude_km=113)
+;+
+;-------------------------------------------------------------
 function aurorax_keogram_create_custom, images, time_stamp, coordinate_system, x_locs, y_locs, width=width, show_preview=show_preview, skymap=skymap, altitude_km=altitude_km, metric=metric
 
   ; check that coord system is valid
   coord_options = ['ccd', 'geo', 'mag']
   if where(coordinate_system eq coord_options, /null) eq !null then begin
-    stop, "(aurorax_keogram_create_custom) Error: Accepted coordinate systems are 'ccd', 'geo', or 'mag'."
+    print, "[aurorax_keogram_create_custom] Error: accepted coordinate systems are 'ccd', 'geo', or 'mag'."
+    return, !null
   endif
 
-  if not isa(images, /array) then stop, "(aurorax_keogram_create_custom) Error: 'images' must be an array"
+  if not isa(images, /array) then begin
+    print, "[aurorax_keogram_create_custom] Error: 'images' must be an array"
+    return, !null
+  endif
 
   ; Get the number of channels of image data
   images_shape = size(images, /dimensions)
   if n_elements(images_shape) eq 2 then begin
-    stop, "(aurorax_keogram_create_custom) Error: 'images' must contain multiple frames."
+    print, "[aurorax_keogram_create_custom] Error: 'images' must contain multiple frames."
+    return, !null
   endif else if n_elements(images_shape) eq 3 then begin
-    if images_shape[0] eq 3 then stop, "(aurorax_keogram_create_custom) Error: 'images' must contain multiple frames."
+    if images_shape[0] eq 3 then begin
+      print, "[aurorax_keogram_create_custom] Error: 'images' must contain multiple frames."
+      return, !null
+    endif
     n_channels = 1
   endif else if n_elements(images_shape) eq 4 then begin
     n_channels = images_shape[0]
-  endif else stop, "(aurorax_keogram_create_custom) Error: Unable to determine number of channels based on the supplied images. " + $
-    "Make sure you are supplying a [cols,rows,images] or [channels,cols,rows,images] sized array."
+  endif else begin
+    print, "[aurorax_keogram_create_custom] Error: Unable to determine number of channels based on the supplied images. " + $
+      "Make sure you are supplying a [cols,rows,images] or [channels,cols,rows,images] sized array."
+    return, !null
+  endelse
 
   ; Set default width
-  if not isa(width) then width = 3
+  if not isa(width) then width = 2
 
   ; Check that all necessary parameters are supplied
   if coordinate_system eq "geo" or coordinate_system eq "mag" then begin
     if not keyword_set(skymap) or not keyword_set(altitude_km) then begin
-      stop, "When working in lat/lon coordinates, a skymap and altitude must be supplied."
+      print, "When working in lat/lon coordinates, a skymap and altitude must be supplied."
+      return, !null
     endif
   endif
 
@@ -240,8 +269,6 @@ function aurorax_keogram_create_custom, images, time_stamp, coordinate_system, x
   endif else if coordinate_system eq "mag" then begin
     print, "(aurorax_keogram_create_custom) Warning: Magnetic coordinates are not currently supported for this routine."
     return, !null
-    result = __convert_lonlat_to_ccd(x_locs, y_locs, skymap, altitude_km, timestamp=timestamp, /mag)
-    x_locs = result[0] & y_locs = result[1]
   endif
 
   ; At this point, we work exclusively in CCD coordinates, everything has been converted
@@ -286,6 +313,7 @@ function aurorax_keogram_create_custom, images, time_stamp, coordinate_system, x
   endelse
 
   ; Iterate through points in pairs of two
+  path_counter = 0
   for i=0, n_elements(x_locs)-2 do begin
 
     ; Points of concern for this iteration
@@ -298,10 +326,8 @@ function aurorax_keogram_create_custom, images, time_stamp, coordinate_system, x
     dx = x_1 - x_0
     dy = y_1 - y_0
     length = sqrt(dx^2 + dy^2)
-    if length eq 0 then begin
-      stop, "(aurorax_keogram_create_custom) Error: Successive points may not be the same. Detected zero length between points of index ["+$
-        strcompress(string(i),/remove_all)+"] and ["+strcompress(string(i+1),/remove_all)+"]."
-    endif
+    if length eq 0 then begin continue
+
     dx /= length
     dy /= length
 
@@ -330,16 +356,14 @@ function aurorax_keogram_create_custom, images, time_stamp, coordinate_system, x
     y_idx_inside = idx_list[1]
 
     ; Make sure data exists for polygon
-    if x_idx_inside eq [] or y_idx_inside eq [] then begin
-      print, "(aurorax_keogram_create_custom) Error: Could not form keogram path... Try increasing 'width' or decreasing number of points in input coordinates."
-      return, !null
-    endif
+    if x_idx_inside eq [] or y_idx_inside eq [] then continue
 
     ; default to median for metric
     metrics = ["mean", "median", "sum"]
     if not keyword_set(metric) then metric = "median"
     if where(metric eq metrics, /null) eq !null then begin
-      stop, "(aurorax_bounding_box_extract_metric) Error: Metric '"+string(metric)+"' not recognized. Accepted metrics are: "+strjoin(modes, ",")+"."
+      print, "(aurorax_bounding_box_extract_metric) Error: Metric '"+string(metric)+"' not recognized. Accepted metrics are: "+strjoin(modes, ",")+"."
+      return, !null
     endif
 
     if n_channels eq 1 then begin
@@ -378,12 +402,18 @@ function aurorax_keogram_create_custom, images, time_stamp, coordinate_system, x
         preview_img[1:*,x_idx_inside,y_idx_inside] = 255
       endif
     endif else begin
-      print, "(aurorax_keogram_create_custom) Error: Urecognized image shape of "+strcompress(string(image_shape),/remove_all)+"."
+      print, "[aurorax_keogram_create_custom] Error: Urecognized image shape of "+strcompress(string(image_shape),/remove_all)+"."
       return, !null
     endelse
+    path_counter += 1
 
   endfor
 
+  if path_counter eq 0 then begin
+    print, "Could not form keogram path... First ensure that coordinates are within image range. Then try increasing 'width' or " + $
+      "decreasing number of points in input coordinates."
+    return, !null
+  endif
 
   if keyword_set(show_preview) then begin
     if n_channels eq 1 then begin
