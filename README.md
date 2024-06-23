@@ -11,8 +11,7 @@ IDL-AuroraX officially supports IDL 8.7.2+.
 Some links to help:
 - [AuroraX main website](https://aurorax.space)
 - [IDL-AuroraX documentation](https://docs.aurorax.space/code/overview)
-- [Latest packaged release](https://data.aurorax.space/data/software/idl-aurorax/latest.zip)
-- [Browse previous releases](https://data.aurorax.space/data/software/idl-aurorax)
+- [Browse releases](https://github.com/aurorax-space/idl-aurorax/releases)
 
 ## Usage
 
@@ -25,7 +24,7 @@ For usage details, please visit the AuroraX documentation website, and the basic
 
 Installation can be done two different ways: 1) using the `ipm` command (recommended), or 2) manually adding the files to your IDL path.
 
-You can view all previous versions by browsing the AuroraX data tree [here](https://data.aurorax.space/data/software/idl-aurorax).
+You can view all previous releases [here](https://github.com/aurorax-space/idl-aurorax/releases).
 
 ### Using ipm (recommended)
 
@@ -34,7 +33,7 @@ Since IDL 8.7.1, there exists an IDL package manager called [ipm](https://www.l3
 1. From the IDL command prompt, run the following:
 
     ```idl
-    IDL> ipm,/install,'https://data.aurorax.space/data/software/idl-aurorax/latest.zip'
+    IDL> ipm,/install,'https://github.com/aurorax-space/idl-aurorax'
     ```
 
 2. Add the following to your startup file, or run the command manually using the IDL command prompt:
@@ -44,7 +43,7 @@ Since IDL 8.7.1, there exists an IDL package manager called [ipm](https://www.l3
     .run aurorax_startup
     ```
 
-3. Reset your IDL session by either clicking the Reset button in the IDL editor or by typing `.reset` into the IDL command prompt. If you compiled the code manually in step 2 (instead of adding to your startup file), skip this step.
+3. [OPTIONAL] If you added the above line to your startup file, you must reset your IDL session. Do this by either clicking the Reset button in the IDL editor or by typing `.reset` into the IDL command prompt.
 
 For further information, you can view what packages are installed using `ipm,/list`. You can also view the package details using `ipm,/query,'idl-aurorax'`.
 
@@ -52,7 +51,7 @@ For further information, you can view what packages are installed using `ipm,/li
 
 Alternatively, you can install the idl-aurorax library manually by downloading the ZIP file and extracting it into, or adding it to, your IDL path. 
 
-1. Download the latest release [here](https://data.aurorax.space/data/software/idl-aurorax/latest.zip)
+1. Download the latest release [here](https://github.com/aurorax-space/idl-aurorax/releases)
 2. Extract the zip file into your IDL path (or add it as a directory to your IDL path)
 3. Add the following to your startup file (or run the command manually using the IDL command prompt).
 
@@ -61,31 +60,7 @@ Alternatively, you can install the idl-aurorax library manually by downloading t
     .run aurorax_startup
     ```
 
-4. Reset your IDL session by either clicking the Reset button in the IDL editor or by typing `.reset` into the IDL command prompt.
-
-Some additional resources about the release files are:
-
-- [Latest packaged release](https://data.aurorax.space/data/software/idl-aurorax/latest.zip)
-- [Browse previous releases](https://data.aurorax.space/data/software/idl-aurorax)
-
-### Bleeding edge
-
-If you want to install the most bleeding-edge version, use `ipm` and the Github repository URL:
-
-1. Install library from Github URL with the following command:
-
-    ```idl
-    IDL> ipm,/install,'https://github.com/aurorax-space/idl-aurorax'
-    ```
-
-2. Add the following to your startup file (or run the command manually using the IDL command prompt).
-
-    ```
-    [ open your startup.pro file and put the following in it ]
-    .run aurorax_startup
-    ```
-
-3. Reset your IDL session by either clicking the Reset button in the IDL editor or by typing `.reset` into the IDL command prompt.
+4. [OPTIONAL] If you added the above line to your startup file, you must reset your IDL session. Do this by either clicking the Reset button in the IDL editor or by typing `.reset` into the IDL command prompt.
 
 ## Updating
 
@@ -96,11 +71,8 @@ IDL> ipm,/update,'idl-aurorax'
 IDL> .reset
 ```
 
-If you installed the code manually, you can download the latest Zip file and overwite the existing files. Then, add any new `.run` commands to your startup file as defined in the "Installation" section above.
-
-- [Latest packaged release](https://data.aurorax.space/data/software/idl-aurorax/latest.zip)
-- [Browse previous releases](https://data.aurorax.space/data/software/idl-aurorax)
+If you installed the code manually, you can download the latest Zip file and overwrite the existing files. Then, add any new `.run` commands to your startup file as defined in the "Installation" section above.
 
 ## Limitations
 
-Please note, this IDL library only provides the ability to **retrieve** data. It does not have functions for uploading or editing data in the AuroraX search engine. Please use the Python library, [PyAuroraX](https://github.com/aurorax-space/pyaurorax) for this functionality.
+Note that for the AuroraX Search Engine capabilities, this IDL library only provides functionality to **retrieve** data. It does not have functions for uploading or editing data in the AuroraX search engine. Please use the Python library, [PyAuroraX](https://github.com/aurorax-space/pyaurorax) for this functionality.
