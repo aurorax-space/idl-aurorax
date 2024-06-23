@@ -326,7 +326,7 @@ function aurorax_keogram_create_custom, images, time_stamp, coordinate_system, x
     dx = x_1 - x_0
     dy = y_1 - y_0
     length = sqrt(dx^2 + dy^2)
-    if length eq 0 then begin continue
+    if length eq 0 then continue
 
     dx /= length
     dy /= length
