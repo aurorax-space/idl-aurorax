@@ -425,7 +425,6 @@ function aurorax_keogram_create_custom, images, time_stamp, coordinate_system, x
 
   ; Convert timestamp strings to UT decimal
   ut_decimal = list()
-  stop
   for i=0,n_elements(time_stamp)-1 do begin
     hh = fix(strmid(time_stamp[i], 11, 2))
     mm = fix(strmid(time_stamp[i], 14, 2))
@@ -433,6 +432,7 @@ function aurorax_keogram_create_custom, images, time_stamp, coordinate_system, x
     this_dec = HH+MM/60.0+SS/(60*60.0)
     ut_decimal.Add,this_dec
   endfor
+  ut_decimal = ut_decimal.toarray()
 
   ; Return keogram array
   return, {data:keo_arr, timestamp:time_stamp, ut_decimal: ut_decimal, ccd_y:"custom"}

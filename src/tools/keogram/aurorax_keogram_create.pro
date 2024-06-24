@@ -116,6 +116,7 @@ function aurorax_keogram_create, images, time_stamp, axis=axis
     this_dec = HH+MM/60.0+SS/(60*60.0)
     ut_decimal.Add,this_dec
   endfor
+  ut_decimal = ut_decimal.toarray()
 
   ; Return keogram array
   return, {data:keo_arr, ccd_y:ccd_y, slice_idx:keo_idx, timestamp:time_stamp, ut_decimal: ut_decimal, axis:axis}

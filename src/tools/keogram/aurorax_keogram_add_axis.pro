@@ -161,25 +161,25 @@ function aurorax_keogram_add_axis, keogram_struct, skymap, altitude_km=altitude_
 
   if array_equal(keywords, [0,0,1]) then begin
     ; Return keogram array with desired axes added
-    return, {data:keo_arr, timestamp:time_stamp, ccd_y:ccd_y, slice_idx:slice_idx, axis:keogram_struct.axis, elev_y:elev_y}
+    return, {data:keo_arr, timestamp:time_stamp, ut_decimal: keogram_struct.ut_decimal, ccd_y:ccd_y, slice_idx:slice_idx, axis:keogram_struct.axis, elev_y:elev_y}
   endif else if array_equal(keywords, [0,1,0]) then begin
     ; Return keogram array with desired axes added
-    return, {data:keo_arr, timestamp:time_stamp, ccd_y:ccd_y, slice_idx:slice_idx, axis:keogram_struct.axis}
+    return, {data:keo_arr, timestamp:time_stamp, ut_decimal: keogram_struct.ut_decimal, ccd_y:ccd_y, slice_idx:slice_idx, axis:keogram_struct.axis}
   endif else if array_equal(keywords, [0,1,1]) then begin
     ; Return keogram array with desired axes added
-    return, {data:keo_arr, timestamp:time_stamp, ccd_y:ccd_y, slice_idx:slice_idx, axis:keogram_struct.axis, elev_y:elev_y}
+    return, {data:keo_arr, timestamp:time_stamp, ut_decimal: keogram_struct.ut_decimal, ccd_y:ccd_y, slice_idx:slice_idx, axis:keogram_struct.axis, elev_y:elev_y}
   endif else if array_equal(keywords, [1,0,0]) then begin
     ; Return keogram array with desired axes added
-    return, {data:keo_arr, timestamp:time_stamp, ccd_y:ccd_y, slice_idx:slice_idx, axis:keogram_struct.axis, geo_y:geo_y}
+    return, {data:keo_arr, timestamp:time_stamp, ut_decimal: keogram_struct.ut_decimal, ccd_y:ccd_y, slice_idx:slice_idx, axis:keogram_struct.axis, geo_y:geo_y}
   endif else if array_equal(keywords, [1,0,1]) then begin
     ; Return keogram array with desired axes added
-    return, {data:keo_arr, timestamp:time_stamp, ccd_y:ccd_y, slice_idx:slice_idx, axis:keogram_struct.axis, geo_y:geo_y, elev_y:elev_y}
+    return, {data:keo_arr, timestamp:time_stamp, ut_decimal: keogram_struct.ut_decimal, ccd_y:ccd_y, slice_idx:slice_idx, axis:keogram_struct.axis, geo_y:geo_y, elev_y:elev_y}
   endif else if array_equal(keywords, [1,1,0]) then begin
     ; Return keogram array with desired axes added
-    return, {data:keo_arr, timestamp:time_stamp, ccd_y:ccd_y, slice_idx:slice_idx, axis:keogram_struct.axis, geo_y:geo_y}
+    return, {data:keo_arr, timestamp:time_stamp, ut_decimal: keogram_struct.ut_decimal, ccd_y:ccd_y, slice_idx:slice_idx, axis:keogram_struct.axis, geo_y:geo_y}
   endif else if array_equal(keywords, [1,1,1]) then begin
     ; Return keogram array with desired axes added
-    return, {data:keo_arr, timestamp:time_stamp, ccd_y:ccd_y, slice_idx:slice_idx, axis:keogram_struct.axis, geo_y:geo_y, elev_y:elev_y}
+    return, {data:keo_arr, timestamp:time_stamp, ut_decimal: keogram_struct.ut_decimal, ccd_y:ccd_y, slice_idx:slice_idx, axis:keogram_struct.axis, geo_y:geo_y, elev_y:elev_y}
   endif
 
 end
