@@ -15,6 +15,7 @@
 ;-------------------------------------------------------------
 
 pro aurorax_example_extract_luminosity_from_bounding_box
+  
   ; Download an hour of TREx RGB data
   d = aurorax_ucalgary_download('TREX_RGB_RAW_NOMINAL', '2021-11-04T03:00:00', '2021-11-04T03:59:59', site_uid='gill')
 

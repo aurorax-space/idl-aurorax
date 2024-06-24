@@ -27,7 +27,7 @@ pro aurorax_example_create_custom_keogram
   skymap_data = aurorax_ucalgary_read(d.dataset, d.filenames)
 
   ; Grab the *last* skymap out of the skymap data struct as this is most recent to date of interest
-  skymap = skymap_data.data[-1]
+  skymap = skymap_data.data[0]
 
   ; Now extract the image array and timestamps from the image data structure
   img = image_data.data
