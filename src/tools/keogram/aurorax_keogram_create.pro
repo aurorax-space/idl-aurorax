@@ -107,7 +107,17 @@ function aurorax_keogram_create, images, time_stamp, axis=axis
     ccd_y = indgen((size(keo_arr, /dimensions))[2])
   endelse
 
+  ; Convert timestamp strings to UT decimal
+  ut_decimal = list()
+  for i=0,n_elements(time_stamp)-1 do begin
+    hh = fix(strmid(time_stamp[i], 11, 2))
+    mm = fix(strmid(time_stamp[i], 14, 2))
+    ss = fix(strmid(time_stamp[i], 17, 2))
+    this_dec = HH+MM/60.0+SS/(60*60.0)
+    ut_decimal.Add,this_dec
+  endfor
+
   ; Return keogram array
-  return, {data:keo_arr, ccd_y:ccd_y, slice_idx:keo_idx, timestamp:time_stamp, axis:axis}
+  return, {data:keo_arr, ccd_y:ccd_y, slice_idx:keo_idx, timestamp:time_stamp, ut_decimal: ut_decimal, axis:axis}
 
 end
