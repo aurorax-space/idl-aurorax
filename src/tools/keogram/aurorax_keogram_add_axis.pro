@@ -37,8 +37,8 @@
 ;
 ; KEYWORDS:
 ;       /GEO        adds an axis of geographic coordinates
-;       /GEO        adds an axis of geomagnetic coordinates
-;       /GEO        adds an axis of elevation angles
+;       /MAG        adds an axis of geomagnetic coordinates
+;       /ELEV       adds an axis of elevation angles
 ;
 ; OUTPUT
 ;       keogram structure containing new axes
