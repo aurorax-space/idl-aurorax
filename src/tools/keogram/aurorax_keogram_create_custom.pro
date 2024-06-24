@@ -49,6 +49,29 @@ function __indices_in_polygon, vertices, image_shape
   return, list(x_idx_inside, y_idx_inside)
 end
 
+function __haversine_distances, target_lat, target_lon, lat_array, lon_array
+  ; Computes the distance on the globe between target lat/lon,
+  ; and all points defined by lat/lon arrays.
+  ;
+  ; Note: This is a hidden function, and not available publicly
+
+  ; earth radius (m)
+  r = 6371000.0
+
+  ; convert degrees to rads
+  phi_1 = !dtor * target_lat
+  phi_2 = !dtor * lat_array
+  delta_phi = !dtor * (lat_array - target_lat)
+  delta_lambda = !dtor * (lon_array - target_lon)
+
+  ; Haversine formula
+  a = (sin(delta_phi / 2.))^2 + cos(phi_1) * cos(phi_2) * (sin(delta_lambda / 2.))^2
+  c = 2 * atan(sqrt(a), sqrt(1-a))
+
+  return, r * c
+
+end
+
 function __convert_lonlat_to_ccd, lon_locs, lat_locs, skymap, altitude_km, time_stamp=time_stamp, mag=mag
   ; Converts a set of lat lon points to CCD coordinates
   ; using a skymap.
@@ -148,29 +171,6 @@ function __convert_lonlat_to_ccd, lon_locs, lat_locs, skymap, altitude_km, time_
   ; Return arrays of all CCD points. Note any points outside of skymap
   ; will have been automatically ommited
   return, list(x_locs, y_locs)
-end
-
-function __haversine_distances, target_lat, target_lon, lat_array, lon_array
-  ; Computes the distance on the globe between target lat/lon,
-  ; and all points defined by lat/lon arrays.
-  ;
-  ; Note: This is a hidden function, and not available publicly
-
-  ; earth radius (m)
-  r = 6371000.0
-
-  ; convert degrees to rads
-  phi_1 = !dtor * target_lat
-  phi_2 = !dtor * lat_array
-  delta_phi = !dtor * (lat_array - target_lat)
-  delta_lambda = !dtor * (lon_array - target_lon)
-
-  ; Haversine formula
-  a = (sin(delta_phi / 2.))^2 + cos(phi_1) * cos(phi_2) * (sin(delta_lambda / 2.))^2
-  c = 2 * atan(sqrt(a), sqrt(1-a))
-
-  return, r * c
-
 end
 
 ;-------------------------------------------------------------
