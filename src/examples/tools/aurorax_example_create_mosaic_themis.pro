@@ -23,9 +23,6 @@ pro aurorax_example_create_mosaic_themis
   ; Date of Interest
   date_time = '2021-11-04T09:30:00'
 
-  ; Date to search back to for skymaps
-  earliest_date_time = '2017-02-24T06:15:00'
-
   foreach site, ["atha", "fsmi", "fsim", "pina", "talo", "tpas"] do begin
     ; download and read data for this site, then add to respective list
     d = aurorax_ucalgary_download('THEMIS_ASI_RAW', date_time, date_time, site_uid=site)
@@ -33,9 +30,10 @@ pro aurorax_example_create_mosaic_themis
     data_list.add, image_data
 
     ; download all skymaps in range, read them in, then append *most recent* to respective list
-    d = aurorax_ucalgary_download('THEMIS_ASI_SKYMAP_IDLSAV', earliest_date_time, date_time, site_uid=site)
+    d = aurorax_ucalgary_download_best_skymap('THEMIS_ASI_SKYMAP_IDLSAV', site, date_time)
     skymap_data = aurorax_ucalgary_read(d.dataset, d.filenames)
-    skymap_list.add, skymap_data.data[-1]
+    skymap = skymap_data.data[0]
+    skymap_list.add, skymap
   endforeach
 
   ; set altitude in km

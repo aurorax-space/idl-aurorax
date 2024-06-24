@@ -39,9 +39,10 @@ pro aurorax_example_create_mosaic_multi_network
     data_list_110km.add, image_data
 
     ; download all skymaps in range, read them in, then append most recent to respective list
-    d = aurorax_ucalgary_download_best_skymap('TREX_RGB_SKYMAP_IDLSAV', date_time, date_time, site_uid=site)
+    d = aurorax_ucalgary_download_best_skymap('TREX_RGB_SKYMAP_IDLSAV', site, date_time)
     skymap_data = aurorax_ucalgary_read(d.dataset, d.filenames)
-    skymap_list_110km.add, skymap_data.data[-1]
+    skymap = skymap_data.data[0]
+    skymap_list_110km.add, skymap
   endforeach
 
   ; Next grab some THEMIS data
@@ -52,9 +53,10 @@ pro aurorax_example_create_mosaic_multi_network
     data_list_110km.add, image_data
 
     ; download all skymaps in range, read them in, then append *most recent* to respective list
-    d = aurorax_ucalgary_download('THEMIS_ASI_SKYMAP_IDLSAV', earliest_date_time, date_time, site_uid=site)
+    d = aurorax_ucalgary_download_best_skymap('THEMIS_ASI_SKYMAP_IDLSAV', site, date_time)
     skymap_data = aurorax_ucalgary_read(d.dataset, d.filenames)
-    skymap_list_110km.add, skymap_data.data[-1]
+    skymap = skymap_data.data[0]
+    skymap_list_110km.add, skymap
   endforeach
 
   ; Finally grab some REGO data and repeat the process *making sure to add to the other list this time*
@@ -65,9 +67,10 @@ pro aurorax_example_create_mosaic_multi_network
     data_list_230km.add, image_data
 
     ; download all skymaps in range, read them in, then append *most recent* to respective list
-    d = aurorax_ucalgary_download('REGO_SKYMAP_IDLSAV', earliest_date_time, date_time, site_uid=site)
+    d = aurorax_ucalgary_download_best_skymap('REGO_SKYMAP_IDLSAV', site, date_time)
     skymap_data = aurorax_ucalgary_read(d.dataset, d.filenames)
-    skymap_list_230km.add, skymap_data.data[-1] ; <---- Add to list for 230 km data
+    skymap = skymap_data.data[0]
+    skymap_list_230km.add, skymap ; <---- Add to list for 230 km data
   endforeach
 
   ; Prepare both sets of image data, and combine into a single array
