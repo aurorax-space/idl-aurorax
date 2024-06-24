@@ -21,14 +21,11 @@ pro aurorax_example_create_keogram_trex_rgb
   image_data = aurorax_ucalgary_read(d.dataset, d.filenames)
 
   ; Download and read the corresponding skymap
-  ; Download all skymaps in 3 years leading up to date of interest
-  d = aurorax_ucalgary_download('TREX_RGB_SKYMAP_IDLSAV', '2019-02-24T06:00:00', '2023-02-24T06:59:59', site_uid='rabb')
+  d = aurorax_ucalgary_download_best_skymap('TREX_RGB_SKYMAP_IDLSAV', 'rabb', '2023-02-24T06:00:00')
 
   ; Read in all of the skymaps that were found
   skymap_data = aurorax_ucalgary_read(d.dataset, d.filenames)
-
-  ; Grab the *last* skymap out of the skymap data struct as this is most recent to date of interest
-  skymap = skymap_data.data[-1]
+  skymap = skymap_data.data[0]
 
   ; Now extract the image array and timestamps from the image data structure
   img = image_data.data
