@@ -281,7 +281,7 @@ pro aurorax_mosaic_plot, prepped_data, prepped_skymaps, frame_idx, min_elevation
       ; Update elevation increment for efficiency
       elev_delta = default_elev_delta
       if el gt 20 then elev_delta = default_elev_delta*2.
-      if el gt 40 then elev_delta = default_elev_delta*5.
+      if el gt 40 then elev_delta = default_elev_delta*15.
       ; Only iterate through the sites that actually have data
       for i=0, n_elements(sites_with_data)-1 do begin
 

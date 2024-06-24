@@ -22,15 +22,12 @@ pro aurorax_example_ephemeris_oplot_mosaic
     ; Lets grab 20 minutes of Swarm A footprint data
     start_t = '2023-02-24T06:55:00'
     end_t = '2023-02-24T07:15:00'
-    programs = ['swarm']
-    platforms = ['swarma']
-    instrument_types = ['footprint']
-    
-    ; Create parameters hash for request
-    params = hash('start',start_t, 'end',end_t, 'programs',programs, 'platforms',platforms, 'instrument_types', instrument_types)
-    
-    ; Search for ephemeris data using idl-aurorax
-    response = aurorax_ephemeris_search(start_t,end_t,programs=programs,platforms=platforms,instrument_types=instrument_types)
+    program = 'swarm'
+    platform = 'swarma'
+    instrument_type = 'footprint'
+        
+    ; Search for ephemeris data 
+    response = aurorax_ephemeris_search(start_t,end_t,programs=program,platforms=platform,instrument_types=instrument_type)
     ephemeris_data = response.data
     
     ; Create arrays of lats and lons of footprint for all timestamps
@@ -55,7 +52,7 @@ pro aurorax_example_ephemeris_oplot_mosaic
     skymap_list = list()
 
     ; Iterate through sites we want to included in the mosaic
-    foreach site, ['atha', 'yknf', 'gill', 'rabb', 'luck'] do begin
+    foreach site, ['yknf', 'gill', 'rabb'] do begin
 
       ; download and read image data for this site and add to list
       d = aurorax_ucalgary_download('TREX_RGB_RAW_NOMINAL', mosaic_timestamp, mosaic_timestamp, site_uid=site)
