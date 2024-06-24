@@ -17,7 +17,7 @@
 ;-------------------------------------------------------------
 ;+
 ; NAME:
-;       AURORAX_SOURCES_LIST
+;       AURORAX_LIST_SOURCES
 ;
 ; PURPOSE:
 ;       Retrieve AuroraX Search Engine data sources
@@ -28,7 +28,7 @@
 ;       sources.
 ;
 ; CALLING SEQUENCE:
-;       aurorax_sources_list()
+;       aurorax_list_sources()
 ;
 ; PARAMETERS:
 ;       program           program to filter on, string, optional
@@ -42,6 +42,7 @@
 ;                                 about them
 ;       /FORMAT_IDENTIFIER_ONLY   data sources returned have minimal information about
 ;                                 them, just the identifier
+;       /INCLUDE_STATS            include stats information
 ;
 ; OUTPUT:
 ;       the found data sources
@@ -50,17 +51,22 @@
 ;       a list of structs
 ;
 ; EXAMPLES:
-;       data = aurorax_sources_list()
-;       data = aurorax_sources_list(program='swarm',/FORMAT_FULL_RECORD)
-;       data = aurorax_sources_list(platform='gillam')
-;       data = aurorax_sources_list(program='trex', platform='fort smith')
+;       data = aurorax_list_sources()
+;       data = aurorax_list_sources(program='swarm',/FORMAT_FULL_RECORD)
+;       data = aurorax_list_sources(platform='gillam')
+;       data = aurorax_list_sources(program='trex', platform='fort smith')
+;       data = aurorax_list_sources(program='trex', /INCLUDE_STATS)
 ;+
 ;-------------------------------------------------------------
-function aurorax_sources_list,program=program,platform=platform,instrument_type=instrument_type,source_type=source_type,FORMAT_FULL_RECORD=format_full_record,FORMAT_IDENTIFIER_ONLY=format_identifier_only
+function aurorax_list_sources,program=program,platform=platform,instrument_type=instrument_type,source_type=source_type,FORMAT_FULL_RECORD=format_full_record,FORMAT_IDENTIFIER_ONLY=format_identifier_only,INCLUDE_STATS=include_stats
   ; set format
   format = 'basic_info'
   if keyword_set(format_full_record) then format = 'full_record'
   if keyword_set(format_identifier_only) then format = 'identifier_only'
+
+  ; set stats flag
+  include_stats_flag = 0
+  if keyword_set(include_stats) then include_stats_flag = 1
 
   ; set params
   param_str = 'format=' + format
@@ -75,6 +81,9 @@ function aurorax_sources_list,program=program,platform=platform,instrument_type=
   endif
   if (isa(source_type) eq 1) then begin
     param_str += '&source_type=' + source_type
+  endif
+  if (include_stats_flag eq 1) then begin
+    param_str += '&include_stats=true'
   endif
 
   ; set up request
@@ -93,69 +102,16 @@ function aurorax_sources_list,program=program,platform=platform,instrument_type=
   data = json_parse(output,/TOSTRUCT)
 
   ; remove under-the-hood adhoc data sources
-  idxs_to_remove = list()
+  pruned_data = list()
   for i=0,n_elements(data)-1 do begin
-    if (data[i].identifier lt 0) then begin
-      idxs_to_remove.add,i
+    if (data[i].identifier ge 0) then begin
+      pruned_data.add,data[i]
     endif
   endfor
-  remove,idxs_to_remove.toArray(),data
 
   ; cleanup
   obj_destroy,req
 
   ; return
-  return,data
-end
-
-;-------------------------------------------------------------
-;+
-; NAME:
-;       AURORAX_SOURCES_GET_STATS
-;
-; PURPOSE:
-;       Retrieve AuroraX data source stats
-;
-; EXPLANATION:
-;       Retrieve some additional information about a data source on the
-;       AuroraX platform, such as the earliest and latest ephemeris
-;       and data product records.
-;
-; CALLING SEQUENCE:
-;       aurorax_sources_get_stats()
-;
-; PARAMETERS:
-;       identifier        data source identifier, integer
-;
-; OUTPUT:
-;       stats about the data source
-;
-; OUTPUT TYPE:
-;       a struct
-;
-; EXAMPLES:
-;       source = aurorax_sources_list(program='swarm', platform='swarma')
-;       stats = aurorax_sources_get_stats(source[0].identifier)
-;+
-;-------------------------------------------------------------
-function aurorax_sources_get_stats,identifier
-  ; set up request
-  req = OBJ_NEW('IDLnetUrl')
-  req->SetProperty,URL_SCHEME = 'https'
-  req->SetProperty,URL_PORT = 443
-  req->SetProperty,URL_HOST = 'api.aurorax.space'
-  req->SetProperty,URL_PATH = 'api/v1/data_sources/' + strtrim(identifier,2) + '/stats'
-  req->SetProperty,HEADERS = 'User-Agent: idl-aurorax/' + __aurorax_version()
-
-  ; make request
-  output = req->Get(/STRING_ARRAY)
-
-  ; serialize into struct
-  data = json_parse(output,/TOSTRUCT)
-
-  ; cleanup
-  obj_destroy,req
-
-  ; return
-  return,data
+  return,pruned_data
 end
