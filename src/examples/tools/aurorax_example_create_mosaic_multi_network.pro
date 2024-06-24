@@ -39,7 +39,7 @@ pro aurorax_example_create_mosaic_multi_network
     data_list_110km.add, image_data
 
     ; download all skymaps in range, read them in, then append most recent to respective list
-    d = aurorax_ucalgary_download('TREX_RGB_SKYMAP_IDLSAV', earliest_date_time, date_time, site_uid=site)
+    d = aurorax_ucalgary_download_best_skymap('TREX_RGB_SKYMAP_IDLSAV', date_time, date_time, site_uid=site)
     skymap_data = aurorax_ucalgary_read(d.dataset, d.filenames)
     skymap_list_110km.add, skymap_data.data[-1]
   endforeach
