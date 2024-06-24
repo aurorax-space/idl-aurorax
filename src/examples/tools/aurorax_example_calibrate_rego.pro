@@ -16,8 +16,8 @@
 
 pro aurorax_example_calibrate_rego
     
-    ; First, download and read an hour of REGO data
-    d = aurorax_ucalgary_download('REGO_RAW', '2021-11-04T03:00:00', '2021-11-04T03:59:59', site_uid="gill")
+    ; First, download and read some of REGO data
+    d = aurorax_ucalgary_download('REGO_RAW', '2021-11-04T03:25:00', '2021-11-04T03:35:00', site_uid="gill")
     image_data = aurorax_ucalgary_read(d.dataset, d.filenames)
     
     ; Download and read flatfield calibration files. We search for any calibration files
@@ -37,9 +37,9 @@ pro aurorax_example_calibrate_rego
     
     ; Calibrate the image data - note that dark frame is subtracted automatically unless /no_dark_subtract is passed
     images = image_data.data
-    calibrated_images = aurorax_calibrate_rego(images, cal_flatfield=flatfield_cal, cal_rayleighs = rayleighs_cal)
+    calibrated_images = aurorax_calibrate_rego(images, cal_flatfield=flatfield_cal, cal_rayleighs=rayleighs_cal)
         
     ; Plot before and after calibration
-    raw_im = image(images[*,*,600], title="Raw Image", location=[5,5], rgb_table=3, dimensions=[400,400])
-    cal_im = image(calibrated_images[*,*,600], title="Calibrated Image (Rayleighs)", location=[517,5], rgb_table=3, dimensions=[400,400])
+    raw_im = image(images[*,*,100], title="Raw Image", location=[5,5], rgb_table=3, dimensions=[400,400])
+    cal_im = image(calibrated_images[*,*,100], title="Calibrated Image (Rayleighs)", location=[517,5], rgb_table=3, dimensions=[400,400])
 end
