@@ -15,7 +15,7 @@
 ;-------------------------------------------------------------
 
 pro aurorax_example_create_custom_keogram
-  stop
+  
   ; First, download and read an hour of TREx RGB data
   d = aurorax_ucalgary_download('TREX_RGB_RAW_NOMINAL', '2021-11-04T03:00:00', '2021-11-04T03:59:59', site_uid="gill")
   image_data = aurorax_ucalgary_read(d.dataset, d.filenames)
