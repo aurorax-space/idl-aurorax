@@ -14,6 +14,12 @@
 ; limitations under the License.
 ;-------------------------------------------------------------
 
-pro aurorax_example_ephemeris_search
+pro aurorax_example_availability
 
+  ; retrieve data availablity information
+  data = aurorax_ephemeris_availability('20200101','20200105',program='swarm')
+
+  ; show data
+  help,data[0]
+  
 end

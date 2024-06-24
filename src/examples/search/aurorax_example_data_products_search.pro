@@ -14,6 +14,16 @@
 ; limitations under the License.
 ;-------------------------------------------------------------
 
-pro aurorax_example_ephemeris_search
+pro aurorax_example_data_products_search
+
+  ; perform search
+  response = aurorax_data_product_search('2020-01-01T00:00','2020-01-01T23:59',programs=['trex'],platforms=['fort smith'],instrument_types=['RGB ASI'])
+
+  ; show output
+  help,response
+  print,''
+
+  help,response.data[0]
+  print,''
 
 end

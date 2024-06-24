@@ -16,4 +16,25 @@
 
 pro aurorax_example_ephemeris_search
 
+  ; define timeframe and distance parameters
+  distance = 500
+  start_dt = '2019-01-01T00:00:00'
+  end_dt = '2019-01-03T23:59:59'
+
+  ; create ground criteria block
+  ground1 = aurorax_create_criteria_block(programs=['themis-asi'],platforms=['fort smith', 'gillam'],/GROUND)
+  ground = list(ground1)
+
+  ; create space criteria block
+  space1 = aurorax_create_criteria_block(programs=['swarm'],hemisphere=['northern'],/SPACE)
+  space = list(space1)
+
+  ; perform search
+  response = aurorax_conjunction_search(start_dt,end_dt,distance,ground=ground,space=space,/NBTRACE)
+
+  ; show data
+  help,response
+  print,''
+  help,response.data[0]
+
 end
