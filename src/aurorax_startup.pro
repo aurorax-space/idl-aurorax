@@ -43,6 +43,7 @@
 @aurorax_keogram_create_custom
 @aurorax_keogram_create
 @aurorax_keogram_plot
+@aurorax_montage_create
 @aurorax_mosaic_plot
 @aurorax_mosaic_oplot
 @aurorax_mosaic_prep_images

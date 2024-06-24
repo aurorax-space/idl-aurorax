@@ -20,9 +20,9 @@ pro aurorax_example_create_custom_keogram
   d = aurorax_ucalgary_download('TREX_RGB_RAW_NOMINAL', '2021-11-04T03:00:00', '2021-11-04T03:59:59', site_uid="gill")
   image_data = aurorax_ucalgary_read(d.dataset, d.filenames)
 
-  ; Download all skymaps in 3 years leading up to date of interest
-  d = aurorax_ucalgary_download('TREX_RGB_SKYMAP_IDLSAV', '2018-11-04T03:00:00', '2021-11-04T03:59:59', site_uid='gill')
-
+  ; Download best matching skymap for the given site and timestamp
+  d = aurorax_ucalgary_download_best_skymap('TREX_RGB_SKYMAP_IDLSAV', 'gill', '2021-11-04T03:00:00')
+  
   ; Read in all of the skymaps that were found
   skymap_data = aurorax_ucalgary_read(d.dataset, d.filenames)
 
