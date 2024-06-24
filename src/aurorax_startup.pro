@@ -29,6 +29,7 @@
 @aurorax_list_observatories
 @aurorax_ucalgary_get_urls
 @aurorax_ucalgary_download
+@aurorax_ucalgary_download_best_skymap
 @aurorax_ucalgary_readfile_asi
 @aurorax_ucalgary_readfile_skymap
 @aurorax_ucalgary_readfile_calibration
