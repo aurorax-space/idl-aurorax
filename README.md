@@ -2,7 +2,7 @@
 
 ![Stable version](https://img.shields.io/badge/Latest%20stable%20release-v1.0.0-orange)
 ![IDL version required](https://img.shields.io/badge/IDL-8.7.2%2B-blue)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6098075.svg)](https://doi.org/10.5281/zenodo.6098075)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.12532077.svg)](https://doi.org/10.5281/zenodo.12532077)
 
 IDL-AuroraX is an IDL library for interacting with [AuroraX](https://aurorax.space), a project working to be the world's first and foremost data platform for auroral science. The primary objective of AuroraX is to enable mining and exploration of existing and future auroral data, enabling key science and enhancing the benefits of the world's investment in auroral instrumentation. This will be accomplished with the development of key systems/standards for uniform metadata generation and search, image content analysis, interfaces to leading international tools, and a community involvement that includes more than 80% of the world's data providers.
 
