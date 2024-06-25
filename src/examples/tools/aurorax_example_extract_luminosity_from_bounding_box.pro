@@ -37,18 +37,18 @@ pro aurorax_example_extract_luminosity_from_bounding_box
 
   ; Extract some data within bounds of azimuth, CCD, elevation, and geo lats
   azim_bounds = [134, 143]
-  luminosity_in_azim = aurorax_bounding_box_extract_metric(images, "azim", azim_bounds, skymap=skymap, /show_preview)
+  luminosity_in_azim = aurorax_bounding_box_extract_metric(images, "azim", azim_bounds, percentile=70, skymap=skymap, /show_preview)
 
   ccd_bounds = [140, 173, 140, 160]
-  luminosity_in_ccd = aurorax_bounding_box_extract_metric(images, "ccd", ccd_bounds, skymap=skymap, /show_preview)
+  luminosity_in_ccd = aurorax_bounding_box_extract_metric(images, "ccd", ccd_bounds, percentile=70, skymap=skymap, /show_preview)
 
   elev_bounds = [40,60]
-  luminosity_in_elev = aurorax_bounding_box_extract_metric(images, "elev", elev_bounds, skymap=skymap, /show_preview)
+  luminosity_in_elev = aurorax_bounding_box_extract_metric(images, "elev", elev_bounds, percentile=70, skymap=skymap, /show_preview)
 
   ; For this one, lets get the mean, using the metric keyword. By default, the median
   ; is returned, but one can also obtain the mean or sum of data within the desired bounds.
   geo_bounds = [-94, -95, 55, 55.5]
-  luminosity_in_geo = aurorax_bounding_box_extract_metric(images, "geo", geo_bounds, metric="mean", skymap=skymap, altitude_km=112, /show_preview)
+  luminosity_in_geo = aurorax_bounding_box_extract_metric(images, "geo", geo_bounds, percentile=90, skymap=skymap, altitude_km=112, /show_preview)
 
   ; Let's plot the data exctracted from the RGB images withing the geo bounds.
   ; For multi channel image data, the metric will be returned for each channel.

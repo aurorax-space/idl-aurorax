@@ -35,6 +35,7 @@
 ;       mode            string giving the input coordinate type ("geo", "mag", "ccd", "azim", "elev")
 ;       xy_bounds       a two or four element array giving the bounds of the region of interest,
 ;                       for the desired mode ([lon0,lon1,lat0,lat1], [min_elev,max_elev], ... etc.)
+;       percentile      the percentile for which luminosity/intensity is extracted
 ;       metric          the metric to compute, accepted is "median" (default), "mean", or "sum"
 ;       time_stamp      the timestamp to use for magnetic coordinate conversions, optional
 ;       skymap          the skymap to use for georeferencing, optional
@@ -54,15 +55,33 @@
 ;       luminosity = aurorax_bounding_box_extract_metric(images, "geo", [-94, -95, 55, 55.5], skymap=skymap, altitude_km=110)
 ;+
 ;-------------------------------------------------------------
-function aurorax_bounding_box_extract_metric, images, mode, xy_bounds, metric=metric, show_preview=show_preview, time_stamp=time_stamp, skymap=skymap, altitude_km=altitude_km, n_channels=n_channels
-
+function aurorax_bounding_box_extract_metric, images, mode, xy_bounds, metric=metric, percentile=percentile, show_preview=show_preview, time_stamp=time_stamp, skymap=skymap, altitude_km=altitude_km, n_channels=n_channels
+  
+  
+  if keyword_set(metric) and keyword_set(percentile) then begin
+    print, "[aurorax_bounding_box_extract_metric] Error: only one of 'metric' and 'percentile' may be used at once.'
+    return, !null
+  endif
+  
   metrics = ["mean", "median", "sum"]
   if not keyword_set(metric) then metric = "median"
   if where(metric eq metrics, /null) eq !null then begin
-    print, "[aurorax_bounding_box_extract_metric] Error: Metric '"+string(metric)+"' not recognized. Accepted metrics are: "+strjoin(modes, ",")+"."
+    print, "[aurorax_bounding_box_extract_metric] Error: metric '"+string(metric)+"' not recognized. Accepted metrics are: "+strjoin(modes, ",")+"."
     return, !null
   endif
-
+  
+  if keyword_set(percentile) then begin
+    if not isa(percentile, /number) then begin
+      print, "[aurorax_bounding_box_extract_metric] Error: 'percentile' must be a number between 0 and 100.'
+      return, !null
+    endif
+    if percentile le 0 or percentile ge 100 then begin
+      print, "[aurorax_bounding_box_extract_metric] Error: 'percentile' must be a number between 0 and 100.'
+      return, !null
+    endif
+    metric = "percentile"
+  endif
+  
   modes = ["azim", "ccd", "elev", "geo", "mag"]
   mode_idx = where(strlowcase(mode) eq modes, /null)
   if mode_idx eq !null then begin
@@ -159,6 +178,16 @@ function aurorax_bounding_box_extract_metric, images, mode, xy_bounds, metric=me
         result = reform(mean(flat_bounded_data, dimension=1))
       endif else if metric eq "sum" then begin
         result = reform(total(flat_bounded_data, dimension=1))
+      endif else if metric eq "percentile" then begin
+        sorted = flat_bounded_data
+        result=[]
+        for i=0, (size(flat_bounded_data, /dimensions))[1]-1 do begin
+          ; get the x percentile value of each frame and take those as result
+          sorted_frame = flat_bounded_data[*,i]
+          sorted_frame = sorted_frame[sort(sorted_frame)]
+          percentile_idx = fix( (percentile/100.) * ((size(flat_bounded_data, /dimensions))[0]-1))
+          result = [result, sorted_frame[percentile_idx]]
+        endfor
       endif
     endif else if n_channels eq 3 then begin
       ; flatten images
@@ -171,7 +200,7 @@ function aurorax_bounding_box_extract_metric, images, mode, xy_bounds, metric=me
         preview_img = reform(preview_img, 3, (size(images, /dimensions))[1], (size(images, /dimensions))[2])
         im = image(preview_img, title="Preview of Bounded Area", position=[5,5], /device)
       endif
-
+      
       ; Obtain bounded data and then take metric over all images
       flat_bounded_data = flat_images[*,bounded_idx,*]
       if metric eq "median" then begin
@@ -180,6 +209,23 @@ function aurorax_bounding_box_extract_metric, images, mode, xy_bounds, metric=me
         result = reform(mean(flat_bounded_data, dimension=2))
       endif else if metric eq "sum" then begin
         result = reform(total(flat_bounded_data, 2))
+      endif else if metric eq "percentile" then begin
+        sorted = flat_bounded_data
+        result_r = []
+        result_g = []
+        result_b = []
+        for i=0, (size(flat_bounded_data, /dimensions))[2]-1 do begin
+          ; get the x percentile value of each frame and take those as result
+          sorted_frame = flat_bounded_data[*,*,i]
+          
+          sorted_frame = sorted_frame[*,sort(total(sorted_frame, 1))]
+          percentile_idx = fix( (percentile/100.) * ((size(flat_bounded_data, /dimensions))[1]-1))
+          
+          result_r = [result_r, (reform(sorted_frame[*,percentile_idx]))[0]]
+          result_g = [result_g, (reform(sorted_frame[*,percentile_idx]))[1]]
+          result_b = [result_b, (reform(sorted_frame[*,percentile_idx]))[2]]
+        endfor
+        result = transpose([[result_r],[result_g],[result_b]])
       endif
     endif else begin
       print, "[aurorax_bounding_box_extract_metric] Error: unrecognized image format with "+strcompress(string(n_elements(size(images,/dimensions))),/remove_all)+" dimensions."
@@ -272,6 +318,16 @@ function aurorax_bounding_box_extract_metric, images, mode, xy_bounds, metric=me
         result = reform(mean(mean(bounded_data, dimension=1), dimension=1))
       endif else if metric eq "sum" then begin
         result = reform(total(total(bounded_data, 1), 1))
+      endif else if metric eq "percentile" then begin
+        sorted = reform(bounded_data, (size(bounded_data, /dimensions))[0]*(size(bounded_data, /dimensions))[1], (size(bounded_data, /dimensions))[2])
+        result=[]
+        for i=0, (size(sorted, /dimensions))[1]-1 do begin
+          ; get the x percentile value of each frame and take those as result
+          sorted_frame = sorted[*,i]
+          sorted_frame = sorted_frame[sort(sorted_frame)]
+          percentile_idx = fix( (percentile/100.) * ((size(sorted, /dimensions))[0]-1))
+          result = [result, sorted_frame[percentile_idx]]
+        endfor
       endif
     endif else if n_channels eq 3 then begin
       if keyword_set(show_preview) then begin
@@ -290,6 +346,23 @@ function aurorax_bounding_box_extract_metric, images, mode, xy_bounds, metric=me
         result = reform(mean(mean(bounded_data, dimension=2), dimension=2))
       endif else if metric eq "sum" then begin
         result = reform(total(total(bounded_data, 2), 2))
+      endif else if metric eq "percentile" then begin
+        sorted = reform(bounded_data, 3, (size(bounded_data, /dimensions))[1]*(size(bounded_data, /dimensions))[2], (size(bounded_data, /dimensions))[3])
+        result_r = []
+        result_g = []
+        result_b = []
+        for i=0, (size(sorted, /dimensions))[2]-1 do begin
+          ; get the x percentile value of each frame and take those as result
+          sorted_frame = sorted[*,*,i]
+
+          sorted_frame = sorted_frame[*,sort(total(sorted_frame, 1))]
+          percentile_idx = fix( (percentile/100.) * ((size(sorted, /dimensions))[1]-1))
+
+          result_r = [result_r, (reform(sorted_frame[*,percentile_idx]))[0]]
+          result_g = [result_g, (reform(sorted_frame[*,percentile_idx]))[1]]
+          result_b = [result_b, (reform(sorted_frame[*,percentile_idx]))[2]]
+        endfor
+        result = transpose([[result_r],[result_g],[result_b]])
       endif
     endif else begin
       print, "[aurorax_bounding_box_extract_metric] Error: nrecognized image format with "+strcompress(string(n_elements(size(images,/dimensions))),/remove_all)+" dimensions."
@@ -367,6 +440,16 @@ function aurorax_bounding_box_extract_metric, images, mode, xy_bounds, metric=me
         result = reform(mean(flat_bounded_data, dimension=1))
       endif else if metric eq "sum" then begin
         result = reform(total(flat_bounded_data, dimension=1))
+      endif else if metric eq "percentile" then begin
+        sorted = flat_bounded_data
+        result=[]
+        for i=0, (size(sorted, /dimensions))[1]-1 do begin
+          ; get the x percentile value of each frame and take those as result
+          sorted_frame = sorted[*,i]
+          sorted_frame = sorted_frame[sort(sorted_frame)]
+          percentile_idx = fix( (percentile/100.) * ((size(sorted, /dimensions))[0]-1))
+          result = [result, sorted_frame[percentile_idx]]
+        endfor
       endif
     endif else if n_channels eq 3 then begin
       ; flatten images
@@ -388,6 +471,23 @@ function aurorax_bounding_box_extract_metric, images, mode, xy_bounds, metric=me
         result = reform(mean(flat_bounded_data, dimension=2))
       endif else if metric eq "sum" then begin
         result = reform(total(flat_bounded_data, 2))
+      endif else if metric eq "percentile" then begin
+        sorted = flat_bounded_data
+        result_r = []
+        result_g = []
+        result_b = []
+        for i=0, (size(sorted, /dimensions))[2]-1 do begin
+          ; get the x percentile value of each frame and take those as result
+          sorted_frame = sorted[*,*,i]
+
+          sorted_frame = sorted_frame[*,sort(total(sorted_frame, 1))]
+          percentile_idx = fix( (percentile/100.) * ((size(sorted, /dimensions))[1]-1))
+
+          result_r = [result_r, (reform(sorted_frame[*,percentile_idx]))[0]]
+          result_g = [result_g, (reform(sorted_frame[*,percentile_idx]))[1]]
+          result_b = [result_b, (reform(sorted_frame[*,percentile_idx]))[2]]
+        endfor
+        result = transpose([[result_r],[result_g],[result_b]])
       endif
     endif else begin
       print, "[aurorax_bounding_box_extract_metric] Error: unrecognized image format with "+strcompress(string(n_elements(size(images,/dimensions))),/remove_all)+" dimensions."
@@ -533,6 +633,16 @@ function aurorax_bounding_box_extract_metric, images, mode, xy_bounds, metric=me
         result = reform(mean(flat_bounded_data, dimension=1))
       endif else if metric eq "sum" then begin
         result = reform(total(flat_bounded_data, dimension=1))
+      endif else if metric eq "percentile" then begin
+        sorted = flat_bounded_data
+        result=[]
+        for i=0, (size(sorted, /dimensions))[1]-1 do begin
+          ; get the x percentile value of each frame and take those as result
+          sorted_frame = sorted[*,i]
+          sorted_frame = sorted_frame[sort(sorted_frame)]
+          percentile_idx = fix( (percentile/100.) * ((size(sorted, /dimensions))[0]-1))
+          result = [result, sorted_frame[percentile_idx]]
+        endfor
       endif
     endif else if n_channels eq 3 then begin
       ; flatten images
@@ -554,7 +664,25 @@ function aurorax_bounding_box_extract_metric, images, mode, xy_bounds, metric=me
         result = reform(mean(flat_bounded_data, dimension=2))
       endif else if metric eq "sum" then begin
         result = reform(total(flat_bounded_data, 2))
+      endif else if metric eq "percentile" then begin
+        sorted = flat_bounded_data
+        result_r = []
+        result_g = []
+        result_b = []
+        for i=0, (size(sorted, /dimensions))[2]-1 do begin
+          ; get the x percentile value of each frame and take those as result
+          sorted_frame = sorted[*,*,i]
+
+          sorted_frame = sorted_frame[*,sort(total(sorted_frame, 1))]
+          percentile_idx = fix( (percentile/100.) * ((size(sorted, /dimensions))[1]-1))
+
+          result_r = [result_r, (reform(sorted_frame[*,percentile_idx]))[0]]
+          result_g = [result_g, (reform(sorted_frame[*,percentile_idx]))[1]]
+          result_b = [result_b, (reform(sorted_frame[*,percentile_idx]))[2]]
+        endfor
+        result = transpose([[result_r], [result_g], [result_b]])
       endif
+
     endif else begin
       print, "(aurorax_mosaic_prep_skymap) Error: enrecognized image format with "+strcompress(string(n_elements(size(images,/dimensions))),/remove_all)+" dimensions."
       return, !null

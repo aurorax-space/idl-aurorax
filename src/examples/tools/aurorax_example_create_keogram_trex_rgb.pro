@@ -33,7 +33,7 @@ pro aurorax_example_create_keogram_trex_rgb
 
   ; Create keogram object
   keo = aurorax_keogram_create(img, time_stamp)
-
+  
   ; If you wanted to further manipulate or manually plot the keogram
   ; array, you can grab it like this:
   keo_arr = keo.data

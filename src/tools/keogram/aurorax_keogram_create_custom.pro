@@ -425,6 +425,10 @@ function aurorax_keogram_create_custom, images, time_stamp, coordinate_system, x
 
   ; Convert timestamp strings to UT decimal
   ut_decimal = list()
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
   for i=0,n_elements(time_stamp)-1 do begin
     hh = fix(strmid(time_stamp[i], 11, 2))
     mm = fix(strmid(time_stamp[i], 14, 2))

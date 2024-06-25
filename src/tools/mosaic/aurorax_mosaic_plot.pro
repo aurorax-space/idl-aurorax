@@ -252,10 +252,8 @@ pro aurorax_mosaic_plot, prepped_data, prepped_skymaps, frame_idx, min_elevation
     ; Create an array for easily switching between colortables and n_channels
     site_ct = []
     site_nchannels = []
-    ;        site_images = list()
     foreach site, sites_with_data do begin
       site_nchannels = [site_nchannels, n_channels_dict[site]]
-      ;            site_images.add, all_images[site]
       if n_channels eq 1 then begin
         if n_elements(colortable) lt n_elements(all_sites_to_plot) then begin
           site_ct = [site_ct, (colortable)[mosaic_data_idx]]
@@ -272,7 +270,7 @@ pro aurorax_mosaic_plot, prepped_data, prepped_skymaps, frame_idx, min_elevation
     if keyword_set(elevation_increment) then begin
       default_elev_delta = elevation_increment
     endif else begin
-      default_elev_delta = 0.25
+      default_elev_delta = 0.5
     endelse
     el = min_el
 
