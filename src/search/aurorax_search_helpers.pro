@@ -15,7 +15,7 @@
 ;-------------------------------------------------------------
 
 function __aurorax_version
-  return,"1.0.0rc1"
+  return,"1.0.0"
 end
 
 pro __aurorax_message,msg
