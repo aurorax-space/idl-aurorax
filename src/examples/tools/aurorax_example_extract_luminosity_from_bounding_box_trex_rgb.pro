@@ -14,7 +14,7 @@
 ; limitations under the License.
 ;-------------------------------------------------------------
 
-pro aurorax_example_extract_luminosity_from_bounding_box
+pro aurorax_example_extract_luminosity_from_bounding_box_trex_rgb
   
   ; Download an hour of TREx RGB data
   d = aurorax_ucalgary_download('TREX_RGB_RAW_NOMINAL', '2021-11-04T03:00:00', '2021-11-04T03:59:59', site_uid='gill')
@@ -37,13 +37,13 @@ pro aurorax_example_extract_luminosity_from_bounding_box
 
   ; Extract some data within bounds of azimuth, CCD, elevation, and geo lats
   azim_bounds = [134, 143]
-  luminosity_in_azim = aurorax_bounding_box_extract_metric(images, "azim", azim_bounds, percentile=70, skymap=skymap, /show_preview)
+  luminosity_in_azim = aurorax_bounding_box_extract_metric(images, "azim", azim_bounds, skymap=skymap, /show_preview)
 
   ccd_bounds = [140, 173, 140, 160]
-  luminosity_in_ccd = aurorax_bounding_box_extract_metric(images, "ccd", ccd_bounds, percentile=70, skymap=skymap, /show_preview)
+  luminosity_in_ccd = aurorax_bounding_box_extract_metric(images, "ccd", ccd_bounds, metric='mean', skymap=skymap, /show_preview)
 
   elev_bounds = [40,60]
-  luminosity_in_elev = aurorax_bounding_box_extract_metric(images, "elev", elev_bounds, percentile=70, skymap=skymap, /show_preview)
+  luminosity_in_elev = aurorax_bounding_box_extract_metric(images, "elev", elev_bounds, skymap=skymap, /show_preview)
 
   ; For this one, lets get the mean, using the metric keyword. By default, the median
   ; is returned, but one can also obtain the mean or sum of data within the desired bounds.

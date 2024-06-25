@@ -609,7 +609,7 @@ function aurorax_bounding_box_extract_metric, images, mode, xy_bounds, metric=me
 
     ; If boundaries contain no data, raise error
     if bounded_idx eq !null then begin
-      print, "[aurorax_bounding_box_extract_metric] Error: Could not extract data within lat/lon bounds. Try a larger area."
+      print, "[aurorax_bounding_box_extract_metric] Error: Could not extract data within lat/lon bounds. Try a larger area, and ensure it is within range for this image."
       return, !null
     endif
 
