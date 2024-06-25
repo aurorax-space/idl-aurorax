@@ -66,11 +66,11 @@ pro aurorax_example_create_mosaic_themis
 
   ; Define scaling bounds for image data if desiresd
   scale = hash("atha", [2500, 10000],$
-    "fsmi", [2500, 10000],$
-    "fsim", [2500, 12500],$
-    "pina", [2500, 10000],$
-    "talo", [2000, 10000],$
-    "tpas", [2500, 10000])
+               "fsmi", [2500, 10000],$
+               "fsim", [2500, 12500],$
+               "pina", [2500, 10000],$
+               "talo", [2000, 10000],$
+               "tpas", [2500, 10000])
 
   ; Plot the first frame
   image_idx = 0

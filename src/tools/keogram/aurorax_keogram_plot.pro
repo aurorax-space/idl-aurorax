@@ -37,6 +37,7 @@
 ;       x_tick_interval     interval between ticks on the x-axis, optional (default is 200)
 ;       y_tick_interval     interval between ticks on the y-axis, optional (default is 50)
 ;       aspect_ratio        float giving the aspect ratio to display keogram data
+;       colortable          int giving the IDL colortable to use for the keogram
 ;
 ; KEYWORDS:
 ;       /GEO                labels geographic coordinates on the y-axis (axis must exist in keogram structure)
@@ -51,7 +52,7 @@
 ;       aurorax_keogram_plot, keo, title="Geographic", /geo, location=[0,0], dimensions=[1000,400]
 ;+
 ;-------------------------------------------------------------
-pro aurorax_keogram_plot, keogram_struct, geo=geo, mag=mag, elev=elev, dimensions=dimensions, location=location, title=title, x_tick_interval=x_tick_interval, y_tick_interval=y_tick_interval, aspect_ratio=aspect_ratio
+pro aurorax_keogram_plot, keogram_struct, geo=geo, mag=mag, elev=elev, dimensions=dimensions, location=location, title=title, x_tick_interval=x_tick_interval, y_tick_interval=y_tick_interval, aspect_ratio=aspect_ratio, colortable=colortable
 
   axis_keywords = [keyword_set(geo), keyword_set(mag), keyword_set(elev)]
   if total(axis_keywords) gt 1 then begin
@@ -113,7 +114,8 @@ pro aurorax_keogram_plot, keogram_struct, geo=geo, mag=mag, elev=elev, dimension
   ; Create the plot
   w = window(dimensions = dimensions, location=location)
 
-  keo_image = image(keo_arr, /current, axis_style=4, aspect_ratio=aspect)
+  if not keyword_set(colortable) then colortable=0
+  keo_image = image(keo_arr, /current, axis_style=4, aspect_ratio=aspect, rgb_table=colortable)
   if keyword_set(title) and isa(title, /string) then keo_image.title = title
 
   ; Create the x axis (time)
@@ -134,7 +136,7 @@ pro aurorax_keogram_plot, keogram_struct, geo=geo, mag=mag, elev=elev, dimension
   ; Create desired y-axis
   coord_axis = []
   for i=0, n_elements(y)-1, y_tick_interval do begin
-    if ~finite(y[i]) or i eq 0 then begin
+    if ~finite(y[i]) or i eq 0 or y[i] lt 0 then begin
       coord_axis = [coord_axis, '']
     endif else begin
       coord_axis = [coord_axis, strmid(strcompress(string(y[i]),/remove_all),0,4)]

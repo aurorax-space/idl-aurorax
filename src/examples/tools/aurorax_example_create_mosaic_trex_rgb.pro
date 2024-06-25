@@ -24,7 +24,7 @@ pro aurorax_example_create_mosaic_trex_rgb
   date_time = '2023-02-24T06:15:00'
   
   ; Iterate through sites we want to included in the mosaic
-  foreach site, ['atha', 'yknf', 'gill', 'rabb', 'luck'] do begin
+  foreach site, ['yknf', 'gill', 'rabb'] do begin
     
     ; download and read image data for this site and add to list
     d = aurorax_ucalgary_download('TREX_RGB_RAW_NOMINAL', date_time, date_time, site_uid=site)
