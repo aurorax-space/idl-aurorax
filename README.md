@@ -33,7 +33,7 @@ Since IDL 8.7.1, there exists an IDL package manager called [ipm](https://www.l3
 1. From the IDL command prompt, run the following:
 
     ```idl
-    IDL> ipm,/install,'https://github.com/aurorax-space/idl-aurorax'
+    IDL> ipm,/install,'https://data.aurorax.space/data/software/idl-aurorax/latest.zip'
     ```
 
 2. Add the following to your startup file, or run the command manually using the IDL command prompt:
