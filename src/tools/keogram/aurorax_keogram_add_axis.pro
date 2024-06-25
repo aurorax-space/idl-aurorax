@@ -63,7 +63,7 @@ function aurorax_keogram_add_axis, keogram_struct, skymap, altitude_km=altitude_
   if n_elements(size(keo_arr, /dimensions)) eq 3 then begin
     n_channels = (size(keo_arr, /dimensions))[0]
     keo_height = (size(keo_arr, /dimensions))[2]
-  endif else if n_elements(size(keo_arr, /dimensions)) eq 1 then begin
+  endif else if n_elements(size(keo_arr, /dimensions)) eq 2 then begin
     n_channels = 1
     keo_height = (size(keo_arr, /dimensions))[1]
   endif
