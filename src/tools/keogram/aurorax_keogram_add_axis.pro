@@ -132,7 +132,7 @@ function aurorax_keogram_add_axis, keogram_struct, skymap, altitude_km=altitude_
   endif else begin
     ; interpolation is required
     ; first check if supplied altitude is valid for interpolation
-    if (alitude_km lt min(interp_alts)) or (alitude_km gt max(interp_alts)) then begin
+    if (altitude_km lt min(interp_alts)) or (altitude_km gt max(interp_alts)) then begin
       error_msg = "[aurorax_keogram_add_axis] Error: Altitude of "+strcompress(string(altitude_km),/remove_all)+" km is outside the valid " + $
         "range of ["+strcompress(string(min(interp_alts)),/remove_all)+","+strcompress(string(max(interp_alts)),/remove_all)+"] km."
       print, error_msg
