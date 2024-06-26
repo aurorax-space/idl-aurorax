@@ -33,6 +33,7 @@
 @aurorax_ucalgary_readfile_asi
 @aurorax_ucalgary_readfile_skymap
 @aurorax_ucalgary_readfile_calibration
+@aurorax_ucalgary_readfile_grid
 @aurorax_ucalgary_read
 @aurorax_ucalgary_is_read_supported
 

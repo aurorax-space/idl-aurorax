@@ -170,6 +170,9 @@ function aurorax_ucalgary_read,dataset,file_list,first_record=first_record,no_me
   endif else if (isa(calibration_readfile_datasets.where(dataset.name)) eq 1) then begin
     ; use calibration readfile
     read_function = 'calibration'
+  endif else if (dataset.name.contains("_GRID_") eq 1) then begin
+    ; use grid readfile
+    read_function = 'grid'
   endif
 
   ; read the data
@@ -204,6 +207,9 @@ function aurorax_ucalgary_read,dataset,file_list,first_record=first_record,no_me
     for i=0,n_elements(data)-1 do begin
       data[i] = __reorient_calibration(dataset.name,data[i])
     endfor
+  endif else if (read_function eq 'grid') then begin
+    ; read using grid readfile
+    __aurorax_ucalgary_readfile_grid,file_list,data,timestamp_list,metadata_list,first_frame=first_record,quiet=quiet_flag  
   endif
 
   ; put data into a struct
