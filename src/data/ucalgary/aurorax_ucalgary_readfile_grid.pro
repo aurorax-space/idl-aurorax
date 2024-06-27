@@ -20,8 +20,8 @@ pro __aurorax_ucalgary_readfile_grid,grid_file_path,data,timestamp_list,meta,fir
   
   ; Setting up master lists to hold data for multi-file reading
   master_timestamp = []
-  master_file_meta = list()
-  master_frame_meta = list()
+  master_file_meta = []
+  master_frame_meta = []
   
   ; Convert scalar filename to length 1 array so we can 'iterate' regardless
   if isa(grid_file_path, /scalar) then grid_file_path = [grid_file_path]
@@ -80,8 +80,6 @@ pro __aurorax_ucalgary_readfile_grid,grid_file_path,data,timestamp_list,meta,fir
     n_frame_meta_datasets = h5g_get_nmembers(meta_group_id, 'frame')
 
     ; Iterating through each frame dataset in the frame meta group
-    frame_meta = list()
-    file_meta = list()
     for i = 0, (n_frame_meta_datasets - 1) do begin
 
       frame_meta_dataset_id = h5d_open(frame_meta_group_id, 'frame'+strcompress(string(i), /remove_all))
@@ -98,10 +96,11 @@ pro __aurorax_ucalgary_readfile_grid,grid_file_path,data,timestamp_list,meta,fir
 
       ; Converting hash to struct and then appending to frame meta list
       frame_meta_struct = frame_meta_hash.tostruct()
-      frame_meta.add, frame_meta_struct
-      file_meta.add, file_meta
+      
+      master_frame_meta = [master_frame_meta, frame_meta_struct]
+      master_file_meta = [master_file_meta, file_meta]
     endfor
-
+    
     ; If first_frame_only keyword is set, slice all objects accordingly so that
     ; only data and metadata corresponding to the first frame is returned
     if keyword_set(first_frame) then begin
@@ -141,11 +140,7 @@ pro __aurorax_ucalgary_readfile_grid,grid_file_path,data,timestamp_list,meta,fir
     
     ; Append to timestamp
     master_timestamp = [master_timestamp, timestamp]
-    
-    ; Append to metadata lists
-    master_frame_meta.add, frame_meta, /extract
-    master_file_meta.add, file_meta, /extract
-    
+        
     h5_close
     
   endforeach

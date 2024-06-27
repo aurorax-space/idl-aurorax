@@ -24,11 +24,13 @@ pro aurorax_example_plot_grid_file_rgb
   grid = grid_data.data.grid[*,*,*,0]
   timestamp = grid_data.metadata.timestamp[0]
   
-  fill_val = -999.0
+  fill_val = float(grid_data.metadata.file_meta[0].fill_value)
+
   ; To plot the grid on top of a map, we need to make all cells that contain no data
   ; transparent. To do so, we simply add an alpha channel to the array, and set all
   ; values where the array equals the fill value, to the maximum transparency
-  rgba_grid = aurorax_prep_grid_image(grid, fill_val, scale=[10,100])
+  
+  rgba_grid = aurorax_prep_grid_image(grid,fill_val, scale=[10,100])
   
   ; Create a map
   map_limit = [41,-140,75,-70]
