@@ -28,7 +28,6 @@ pro aurorax_example_atm_forward
 
   ; make the request
   data = aurorax_atm_forward(time_stamp,geo_lat,geo_lon,output_flags)
-  stop
 
   ; print results
   help,data
@@ -37,5 +36,14 @@ pro aurorax_example_atm_forward
   ; print the information we asked for
   print,'Height-integrated Rayleighs:'
   print,'  427.8nm: ' + strcompress(string(data.data.height_integrated_rayleighs_4278))
+  print,'  557.7nm: ' + strcompress(string(data.data.height_integrated_rayleighs_5577))
+  print,'  630.0nm: ' + strcompress(string(data.data.height_integrated_rayleighs_6300))
+  print,'  844.6nm: ' + strcompress(string(data.data.height_integrated_rayleighs_8446))
+  print,'  LBH:     ' + strcompress(string(data.data.height_integrated_rayleighs_lbh))
+  print,'  130.4nm: ' + strcompress(string(data.data.height_integrated_rayleighs_1304))
+  print,'  135.6nm: ' + strcompress(string(data.data.height_integrated_rayleighs_1356))
+
+  ; plot the 5577 emission
+  plot,data.data.emission_5577,data.data.altitudes,xtitle='557.7nm emission (Rayleighs)',ytitle='Altitude (meters)',title='557.7nm Emission output'  
 
 end

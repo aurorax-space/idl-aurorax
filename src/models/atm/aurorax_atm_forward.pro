@@ -85,56 +85,15 @@ function aurorax_atm_forward,$
     return,!NULL
   endif
 
-  ; serialize into struct
-  data = json_parse(output,/TOSTRUCT)
-  
+  ; serialize into dictionary
+  data = json_parse(output,/dictionary)
+
   ; serialize any List() objects to float arrays
-  stop
-  if (isa(data.data.altitudes,'List') eq 1) then begin
-    data.data.altitudes = data.data.altitudes.toArray(type='Float')
-  endif
-  if (isa(data.data.EMISSION_4278,'List') eq 1) then begin
-    data.data.EMISSION_4278 = data.data.EMISSION_4278.toArray(type='Float')
-  endif
-  if (isa(data.data.EMISSION_5577,'List') eq 1) then begin
-    data.data.EMISSION_5577 = data.data.EMISSION_5577.toArray(type='Float')
-  endif
-  if (isa(data.data.EMISSION_6300,'List') eq 1) then begin
-    data.data.EMISSION_6300 = data.data.EMISSION_6300.toArray(type='Float')
-  endif
-  if (isa(data.data.EMISSION_8446,'List') eq 1) then begin
-    data.data.EMISSION_8446 = data.data.EMISSION_8446.toArray(type='Float')
-  endif
-  if (isa(data.data.EMISSION_LBH,'List') eq 1) then begin
-    data.data.EMISSION_LBH = data.data.EMISSION_LBH.toArray(type='Float')
-  endif
-  if (isa(data.data.EMISSION_1304,'List') eq 1) then begin
-    data.data.EMISSION_1304 = data.data.EMISSION_1304.toArray(type='Float')
-  endif
-  if (isa(data.data.EMISSION_1356,'List') eq 1) then begin
-    data.data.EMISSION_1356 = data.data.EMISSION_1356.toArray(type='Float')
-  endif
-  if (isa(data.data.PLASMA_ELECTRON_DENSITY,'List') eq 1) then begin
-    data.data.PLASMA_ELECTRON_DENSITY = data.data.PLASMA_ELECTRON_DENSITY.toArray(type='Float')
-  endif
-  if (isa(data.data.PLASMA_O2PLUS_DENSITY,'List') eq 1) then begin
-    data.data.PLASMA_O2PLUS_DENSITY = data.data.PLASMA_O2PLUS_DENSITY.toArray(type='Float')
-  endif
-  if (isa(data.data.PLASMA_NOPLUS_DENSITY,'List') eq 1) then begin
-    data.data.PLASMA_NOPLUS_DENSITY = data.data.PLASMA_NOPLUS_DENSITY.toArray(type='Float')
-  endif
-  if (isa(data.data.altitudes,'List') eq 1) then begin
-    data.data.altitudes = data.data.altitudes.toArray(type='Float')
-  endif
-  if (isa(data.data.altitudes,'List') eq 1) then begin
-    data.data.altitudes = data.data.altitudes.toArray(type='Float')
-  endif
-  if (isa(data.data.altitudes,'List') eq 1) then begin
-    data.data.altitudes = data.data.altitudes.toArray(type='Float')
-  endif
-  if (isa(data.data.altitudes,'List') eq 1) then begin
-    data.data.altitudes = data.data.altitudes.toArray(type='Float')
-  endif
+  foreach value, data['data'], key do begin
+    if (isa(value, 'List') eq 1) then begin
+      data['data',key] = value.toArray(type='float')
+    endif
+  endforeach
 
   ; return
   return,data
