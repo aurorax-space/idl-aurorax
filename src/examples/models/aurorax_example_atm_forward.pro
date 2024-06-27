@@ -14,16 +14,28 @@
 ; limitations under the License.
 ;-------------------------------------------------------------
 
-pro aurorax_example_ephemeris_search
+pro aurorax_example_atm_forward
 
-  ; perform search
-  response = aurorax_ephemeris_search('2019-01-01T06:00','2019-01-01T06:59',programs=['swarm'],platforms=['swarma'],instrument_types=['footprint'])
+  ; set up request
+  ;
+  ; we'll ask for the basic information, just the height-integrated rayleighs values
+  time_stamp = '2024-01-01T06:00:00'
+  geo_lat = 51.04
+  geo_lon = -114.05
+  output_flags = aurorax_atm_forward_get_output_flags(/ENABLE_ONLY_HEIGHT_INTEGRATED_RAYLEIGHS)
+  output_flags['altitudes'] = 1
+  output_flags['emission_5577'] = 1
 
-  ; show output
-  help,response
+  ; make the request
+  data = aurorax_atm_forward(time_stamp,geo_lat,geo_lon,output_flags)
+  stop
+
+  ; print results
+  help,data
   print,''
 
-  help,response.data[0]
-  print,''
+  ; print the information we asked for
+  print,'Height-integrated Rayleighs:'
+  print,'  427.8nm: ' + strcompress(string(data.data.height_integrated_rayleighs_4278))
 
 end
