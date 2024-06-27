@@ -28,14 +28,7 @@ pro aurorax_example_plot_grid_file_rgb
   ; To plot the grid on top of a map, we need to make all cells that contain no data
   ; transparent. To do so, we simply add an alpha channel to the array, and set all
   ; values where the array equals the fill value, to the maximum transparency
-  transparent_grid = bytarr((size(grid, /dimensions))[0]+1, (size(grid, /dimensions))[1], (size(grid, /dimensions))[2])
-  is_data_idx = where(reform(grid[0,*,*]) ne -999)
-  grid[where(grid eq fill_val)] = 0
-  flat_alpha_channel = reform(transparent_grid[3,*,*], (size(grid, /dimensions))[1]*(size(grid, /dimensions))[2])
-  flat_alpha_channel[is_data_idx] = 255
-  alpha_channel = reform(flat_alpha_channel, (size(grid, /dimensions))[1], (size(grid, /dimensions))[2])
-  transparent_grid[3,*,*] = alpha_channel
-  transparent_grid[0:2,*,*] = bytscl(grid)
+  rgba_grid = aurorax_prep_grid_image(grid, fill_val, scale=[10,100])
   
   ; Create a map
   map_limit = [41,-140,75,-70]
@@ -46,8 +39,8 @@ pro aurorax_example_plot_grid_file_rgb
   cont3 = mapcontinents(/lakes, fill_color = 'black')
   
   ; Plot the grid data, with transparency, on the map
-  gridimg = image(transparent_grid, LIMIT=[0,-180,90,0], GRID_UNITS=2, IMAGE_LOCATION=[-180,-90], IMAGE_DIMENSIONS=[360,180], center_latitude=60, center_longitude=-90, $
-                  MAP_PROJECTION='orthographic', BACKGROUND_COLOR='black', /overplot)
+  gridimg = image(rgba_grid, limit=[0,-180,90,0], grid_units=2, image_location=[-180,-90], image_dimensions=[360,180], center_latitude=60, center_longitude=-90, $
+                  map_projection='orthographic', background_color='black', /overplot)
   
   ; Add some labels
   t = text(0.235, 0.875, 'TREx RGB - Gridded Data', font_size=20, color='white', font_style=1)

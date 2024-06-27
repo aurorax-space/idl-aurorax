@@ -45,9 +45,7 @@ function aurorax_prep_grid_image, grid, fill_value, color_table=color_table, sca
     masked_rgba_array[3, where(grid[0,*,*] eq fill_value and grid[1,*,*] eq fill_value and grid[2,*,*] eq fill_value)] = 0
     masked_rgba_array[3, where(~(grid[0,*,*] eq fill_value and grid[1,*,*] eq fill_value and grid[2,*,*] eq fill_value))] = 255
   endelse
-
-  help, masked_rgba_array
-  help, grid_w*grid_h
+  
   masked_rgba_array = reform(masked_rgba_array, 4, grid_w, grid_h)
   return, masked_rgba_array
 
