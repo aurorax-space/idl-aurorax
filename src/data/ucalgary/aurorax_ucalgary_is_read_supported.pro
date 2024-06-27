@@ -50,6 +50,10 @@
 ;+
 ;-------------------------------------------------------------
 function aurorax_ucalgary_is_read_supported,dataset_name
+
+  ; check for grid data first
+  if dataset_name.contains("_GRID_") eq 1 then return, 1
+  
   supported_datasets = list($
     'THEMIS_ASI_RAW',$
     'REGO_RAW',$
