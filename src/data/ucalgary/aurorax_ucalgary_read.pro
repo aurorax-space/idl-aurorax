@@ -135,6 +135,7 @@ function aurorax_ucalgary_read,dataset,file_list,first_record=first_record,no_me
 
   ; check if this dataset is supported for reading
   supported = aurorax_ucalgary_is_read_supported(dataset.name)
+
   if (supported eq 0) then begin
     print,"[aurorax_read] Dataset '" + dataset.name + "' not supported for reading"
     return,!NULL
@@ -209,7 +210,7 @@ function aurorax_ucalgary_read,dataset,file_list,first_record=first_record,no_me
     endfor
   endif else if (read_function eq 'grid') then begin
     ; read using grid readfile
-    __aurorax_ucalgary_readfile_grid,file_list,data,timestamp_list,metadata_list,first_frame=first_record,quiet=quiet_flag  
+    __aurorax_ucalgary_readfile_grid,file_list,data,timestamp_list,metadata_list,first_frame=first_record
   endif
 
   ; put data into a struct
