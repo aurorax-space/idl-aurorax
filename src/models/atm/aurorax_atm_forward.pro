@@ -47,6 +47,7 @@ function aurorax_atm_forward,$
   request_hash['geodetic_latitude'] = geo_lat
   request_hash['geodetic_longitude'] = geo_lon
   request_hash['output'] = output_flags
+  if (no_cache_flag eq 1) then request_hash['no_cache'] = boolean(1)
   if (isa(maxwellian_energy_flux) eq 1) then request_hash['maxwellian_energy_flux'] = maxwellian_energy_flux
   if (isa(gaussian_energy_flux) eq 1) then request_hash['gaussian_energy_flux'] = gaussian_energy_flux
   if (isa(maxwellian_characteristic_energy) eq 1) then request_hash['maxwellian_characteristic_energy'] = maxwellian_characteristic_energy
@@ -94,6 +95,9 @@ function aurorax_atm_forward,$
       data['data',key] = value.toArray(type='float')
     endif
   endforeach
+
+  ; finally convert to struct
+  data = data.toStruct(/recursive)
 
   ; return
   return,data
