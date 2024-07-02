@@ -12,7 +12,7 @@ function aurorax_prep_grid_image, grid, fill_value, color_table=color_table, sca
            "size [cols, rows] or [channels, cols, rows]."
     return, !null
   endelse
-  print, n_channels
+
   grid_dims = size(grid, /dimensions)
   
   if n_channels eq 1 then begin
