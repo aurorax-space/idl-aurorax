@@ -38,6 +38,7 @@
 @aurorax_ucalgary_is_read_supported
 
 @aurorax_bounding_box_extract_metric
+@aurorax_ccd_contour
 @aurorax_calibrate_rego
 @aurorax_calibrate_trex_nir
 @aurorax_keogram_add_axis
