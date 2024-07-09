@@ -169,8 +169,9 @@ function __convert_lonlat_to_ccd, lon_locs, lat_locs, skymap, altitude_km, time_
   endfor
 
   ; Return arrays of all CCD points. Note any points outside of skymap
-  ; will have been automatically ommited
-  return, list(x_locs, y_locs)
+  ; will have been automatically ommited. Note we flip the y locations
+  ; as IDL plots y-pixel coordinates reversed.
+  return, list(x_locs, (size(lats,/dimensions))[1]-y_locs)
 end
 
 ;-------------------------------------------------------------
