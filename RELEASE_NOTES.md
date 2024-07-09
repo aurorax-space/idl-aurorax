@@ -6,6 +6,8 @@ Version 1.3.0
     - not applied to metadata
 - bugfix for ATM forward and inverse calculation functions for when an error occurs in the API
 - added support for overplotting contours on CCD images
+- added docstrings to ATM functions
+
 
 Version 1.2.0
 -------------------------
