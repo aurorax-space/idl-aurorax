@@ -14,6 +14,7 @@
 ; limitations under the License.
 ;-------------------------------------------------------------
 
+
 ;-------------------------------------------------------------
 ;+
 ; NAME:
@@ -56,7 +57,6 @@
 ;+
 ;-------------------------------------------------------------
 function aurorax_bounding_box_extract_metric, images, mode, xy_bounds, metric=metric, percentile=percentile, show_preview=show_preview, time_stamp=time_stamp, skymap=skymap, altitude_km=altitude_km, n_channels=n_channels
-  
   
   if keyword_set(metric) and keyword_set(percentile) then begin
     print, "[aurorax_bounding_box_extract_metric] Error: only one of 'metric' and 'percentile' may be used at once.'
@@ -568,7 +568,7 @@ function aurorax_bounding_box_extract_metric, images, mode, xy_bounds, metric=me
       lats_ysize = (size(lats, /dimensions))[1]
       ; first check if supplied altitude is valid for interpolation
       if (altitude_km lt min(interp_alts)) or (altitude_km gt max(interp_alts)) then begin
-        error_msg = "(aurorax_mosaic_prep_skymap) Error: Altitude of "+strcompress(string(altitude_km),/remove_all)+" km is outside the valid " + $
+        error_msg = "[aurorax_bounding_box_extract_metric] Error: Altitude of "+strcompress(string(altitude_km),/remove_all)+" km is outside the valid " + $
           "range of ["+strcompress(string(min(interp_alts)),/remove_all)+","+strcompress(string(max(interp_alts)),/remove_all)+"] km."
         print, error_msg
         return, !null
@@ -592,12 +592,12 @@ function aurorax_bounding_box_extract_metric, images, mode, xy_bounds, metric=me
     min_skymap_lon = min(lons, /nan)
     max_skymap_lon = max(lons, /nan)
     if (lat_0 le min_skymap_lat) or (lat_1 ge max_skymap_lat) then begin
-      print, "(aurorax_mosaic_prep_skymap) Error: latitude range supplied is outside the valid range for this skymap ("+strcompress(string(min_skymap_lat),/remove_all)+$
+      print, "[aurorax_bounding_box_extract_metric] Error: latitude range supplied is outside the valid range for this skymap ("+strcompress(string(min_skymap_lat),/remove_all)+$
         ","+strcompress(string(max_skymap_lat),/remove_all)+")."
       return, !null
     endif
     if (lon_0 le min_skymap_lon) or (lon_1 ge max_skymap_lon) then begin
-      print, "(aurorax_mosaic_prep_skymap) Error: longitude range supplied is outside the valid range for this skymap ("+strcompress(string(min_skymap_lon),/remove_all)+$
+      print, "[aurorax_bounding_box_extract_metric] Error: longitude range supplied is outside the valid range for this skymap ("+strcompress(string(min_skymap_lon),/remove_all)+$
         ","+strcompress(string(max_skymap_lon),/remove_all)+")."
       return, !null
     endif
@@ -684,14 +684,14 @@ function aurorax_bounding_box_extract_metric, images, mode, xy_bounds, metric=me
       endif
 
     endif else begin
-      print, "(aurorax_mosaic_prep_skymap) Error: enrecognized image format with "+strcompress(string(n_elements(size(images,/dimensions))),/remove_all)+" dimensions."
+      print, "[aurorax_bounding_box_extract_metric] Error: enrecognized image format with "+strcompress(string(n_elements(size(images,/dimensions))),/remove_all)+" dimensions."
       return, !null
     endelse
 
     return, result
 
   endif else if mode eq "mag" then begin
-    print, "(aurorax_mosaic_prep_skymap) Error: magnetic coordinates are not yet supported for this routine..."
+    print, "[aurorax_bounding_box_extract_metric] Error: magnetic coordinates are not yet supported for this routine..."
     return, !null
   endif
 
