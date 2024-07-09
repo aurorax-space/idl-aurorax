@@ -5,7 +5,7 @@ Version 1.3.0
     - applied to location_geo, location_gsm, nbtrace, sbtrace
     - not applied to metadata
 - bugfix for ATM forward and inverse calculation functions for when an error occurs in the API
-
+- added support for overplotting contours on CCD images
 
 Version 1.2.0
 -------------------------
