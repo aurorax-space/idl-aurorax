@@ -186,7 +186,16 @@ function aurorax_ccd_contour, skymap, constant_azimuth=constant_azimuth, constan
 
   ; Next handling case of lines of constant lat
   if isa(constant_lat) then begin
+  
+    if not isa(constant_lat, /scalar) then begin
+      print, "[aurorax_ccd_contour] Error: constant_lat must be a scalar."
+    endif
 
+    ; check that latitude is valid
+    if constant_lat lt -90 or constant_lat gt 90 then begin
+      print, "[aurorax_ccd_contour] Error: constant_lat must be in the range (-90,90)."
+    endif
+    
     ; grab necessary data from skymap
     lons = skymap.full_map_longitude
     lons[where(lons gt 180)] -= 360
@@ -208,6 +217,15 @@ function aurorax_ccd_contour, skymap, constant_azimuth=constant_azimuth, constan
   ; Next handling case of lines of constant lon
   if isa(constant_lon) then begin
     
+    if not isa(constant_lon, /scalar) then begin
+      print, "[aurorax_ccd_contour] Error: constant_lon must be a scalar."
+    endif
+
+    ; check that latitude is valid
+    if constant_lon lt -180 or constant_lon gt 180 then begin
+      print, "[aurorax_ccd_contour] Error: constant_lon must be in the range (-180,180)."
+    endif
+    
     ; grab necessary data from skymap
     lats = skymap.full_map_latitude
 
@@ -220,8 +238,12 @@ function aurorax_ccd_contour, skymap, constant_azimuth=constant_azimuth, constan
     contour_lats = findgen(n_points, increment=(max_skymap_lat - min_skymap_lat)/n_points, start=min_skymap_lat)
     result = __convert_lonlat_to_ccd(contour_lons, contour_lats, skymap, altitude_km)
     x_list = result[0] & y_list = result[1]
-
-    return, [[x_list], [y_list]]
+    
+    result = [[x_list], [y_list]]
+    if result eq !null then begin
+      print, "[aurorax_ccd_contour] Error: could not obtain any CCD coordinates within provided skymap. Please ensure " + $
+             "that valid coordinates for this skymap are being used."
+    endif else return, result
 
   endif
   
@@ -232,7 +254,11 @@ function aurorax_ccd_contour, skymap, constant_azimuth=constant_azimuth, constan
     result = __convert_lonlat_to_ccd(contour_lons, contour_lats, skymap, altitude_km)
     x_list = result[0] & y_list = result[1]
 
-    return, [[x_list], [y_list]]
+    result = [[x_list], [y_list]]
+    if result eq !null then begin
+      print, "[aurorax_ccd_contour] Error: could not obtain any CCD coordinates within provided skymap. Please ensure " + $
+             "that valid coordinates for this skymap are being used."
+    endif else return, result
   endif
 end
 
