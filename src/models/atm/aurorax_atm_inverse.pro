@@ -76,7 +76,7 @@ function aurorax_atm_inverse,$
 
   ; check status code
   if (status_code ne 200) then begin
-    if (verbose eq 1) then print,'[aurorax_atm_inverse] Error performing calculatoin: ' + output
+    print,'[aurorax_atm_inverse] Error performing calculatoin: ' + output
     return,!NULL
   endif
 

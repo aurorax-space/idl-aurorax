@@ -174,6 +174,9 @@ function aurorax_ephemeris_search,start_ts,end_ts,programs=programs,platforms=pl
   data = __aurorax_request_get_data('ephemeris',request_id)
   if (verbose eq 1) then __aurorax_message,'Data downloaded, search completed'
 
+  ; convert location nans
+  data = __aurorax_ephemeris_convert_location_nans(data)
+
   ; get elapsed time
   toc_ts = toc()
   duration_str = __aurorax_time2string(toc_ts)

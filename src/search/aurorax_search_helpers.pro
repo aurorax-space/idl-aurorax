@@ -15,7 +15,7 @@
 ;-------------------------------------------------------------
 
 function __aurorax_version
-  return,"1.2.0"
+  return,"1.3.0"
 end
 
 pro __aurorax_message,msg
@@ -162,6 +162,51 @@ function __aurorax_time2string,time
 
   ; return
   return, result
+end
+
+function __aurorax_ephemeris_convert_location_nans,data
+  ; process ephemeris data
+  converted_data = data.data  ; this is used if there is no data
+  if (n_elements(data.data) gt 0) then begin
+    ; for each ephemeris record
+    converted_data = List()
+    for i=0,n_elements(data.data)-1 do begin
+      ; build up new values
+      e = data.data[i]
+      location_geo_lat_new = e.location_geo.lat
+      location_geo_lon_new = e.location_geo.lon
+      location_gsm_lat_new = e.location_gsm.lat
+      location_gsm_lon_new = e.location_gsm.lon
+      nbtrace_lat_new = e.nbtrace.lat
+      nbtrace_lon_new = e.nbtrace.lon
+      sbtrace_lat_new = e.sbtrace.lat
+      sbtrace_lon_new = e.sbtrace.lon
+      if (isa(location_geo_lat_new,/string) eq 1) then location_geo_lat_new = !VALUES.F_NAN
+      if (isa(location_geo_lon_new,/string) eq 1) then location_geo_lon_new = !VALUES.F_NAN
+      if (isa(location_gsm_lat_new,/string) eq 1) then location_gsm_lat_new = !VALUES.F_NAN
+      if (isa(location_gsm_lon_new,/string) eq 1) then location_gsm_lon_new = !VALUES.F_NAN
+      if (isa(nbtrace_lat_new,/string) eq 1) then nbtrace_lat_new = !VALUES.F_NAN
+      if (isa(nbtrace_lon_new,/string) eq 1) then nbtrace_lon_new = !VALUES.F_NAN
+      if (isa(sbtrace_lat_new,/string) eq 1) then sbtrace_lat_new = !VALUES.F_NAN
+      if (isa(sbtrace_lon_new,/string) eq 1) then sbtrace_lon_new = !VALUES.F_NAN
+
+      ; create new struct
+      geo_s = {lat: location_geo_lat_new, lon: location_geo_lon_new}
+      gsm_s = {lat: location_gsm_lat_new, lon: location_gsm_lon_new}
+      nb_s = {lat: nbtrace_lat_new, lon: nbtrace_lon_new}
+      sb_s = {lat: sbtrace_lat_new, lon: sbtrace_lon_new}
+      e_struct = {data_source: e.data_source, epoch: e.epoch, location_geo: geo_s, location_gsm: gsm_s, nbtrace: nb_s, sbtrace: sb_s, metadata: e.metadata}
+
+      ; append
+      converted_data.Add,e_struct
+    endfor
+  endif
+
+  ; create new struct
+  converted_struct = {request_type: data.request_type, request_id: data.request_id, data: converted_data}
+
+  ; return
+  return,converted_struct
 end
 
 ;-------------------------------------------------------------

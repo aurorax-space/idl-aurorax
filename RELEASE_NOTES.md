@@ -1,3 +1,12 @@
+Version 1.3.0
+-------------------------
+
+- changed serialization of null values in ephemeris location data to be float NaN values instead of '!NULL' strings
+    - applied to location_geo, location_gsm, nbtrace, sbtrace
+    - not applied to metadata
+- bugfix for ATM forward and inverse calculation functions for when an error occurs in the API
+
+
 Version 1.2.0
 -------------------------
 
