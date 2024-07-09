@@ -14,7 +14,7 @@
 ; limitations under the License.
 ;-------------------------------------------------------------
 
-pro aurorax_example_plot_grid_file_rgb
+pro aurorax_example_plot_grid_file_trex_rgb
 
   ; First, download and read 5 minutes of grid data
   d = aurorax_ucalgary_download('TREX_RGB_GRID_MOSV001', '2023-03-24T08:10:00', '2023-03-24T08:10:00')
