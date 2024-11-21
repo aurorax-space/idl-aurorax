@@ -252,7 +252,8 @@ pro aurorax_mosaic_plot, prepped_data, prepped_skymaps, frame_idx, min_elevation
     ; Create an array for easily switching between colortables and n_channels
     site_ct = []
     site_nchannels = []
-    foreach site, sites_with_data do begin
+    foreach site, sites_with_data, k do begin
+      site_idx = sites_with_data_idx[k]
       site_nchannels = [site_nchannels, n_channels_dict[site]]
       if n_channels eq 1 then begin
         if n_elements(colortable) lt n_elements(all_sites_to_plot) then begin

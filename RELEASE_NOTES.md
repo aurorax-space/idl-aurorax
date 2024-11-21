@@ -1,3 +1,9 @@
+Version 1.3.1
+-------------------------
+
+- bugfix for plotting mosaics with a single site, while specifying a specific scaling min/max for that site
+
+
 Version 1.3.0
 -------------------------
 
