@@ -14,7 +14,7 @@
 ; limitations under the License.
 ;-------------------------------------------------------------
 
-pro aurorax_example_search_ephemeris_ml
+pro aurorax_example_ephemeris_search_ml
 
   ; ----------------------------------
   ; EXAMPLE 1 -- searching ephemeris data and filtering on the UCalgary APA model
