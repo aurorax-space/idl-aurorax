@@ -78,6 +78,7 @@ pro aurorax_movie, input_filenames, output_filename, fps
   foreach f, input_filenames do begin
     ; Read image, then add to video object
     frame = read_image(f)
+    help, frame
     !Null = vid.put(vid_stream, frame)
     continue
   endforeach
