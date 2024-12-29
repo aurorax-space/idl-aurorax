@@ -55,21 +55,3 @@ pro aurorax_example_movie_themis
   aurorax_movie, filenames, output_filename, movie_fps
   
 end
-
-
-pro testing_luck_mov
-  
-  f_list = file_search("\\bender.phys.ucalgary.ca\data\trex\rgb\stream0\2023\05\20\luck_rgb-03\ut06\20230520_06*_luck_rgb-03_full.h5")
-  f_list = f_list[5:15]
-  trex_imager_readfile, f_list, img, meta
-  img = bytscl(img, min=0, max=80)
-
-  for i=0, n_elements(img[0,0,0,*])-1 do begin
-    xyouts, 0.5, 0.025, meta[i].exposure_start_string, alignment=0.5
-    tv, img[*,*,*,i], /order, /true
-    wait, 0.05
-  endfor
-end
-
-
-  
