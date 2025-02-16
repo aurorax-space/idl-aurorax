@@ -14,39 +14,31 @@
 ; limitations under the License.
 ; -------------------------------------------------------------
 
-; -------------------------------------------------------------
 ;+
-; NAME:
-;       AURORAX_KEOGRAM_CREATE
-;
-; PURPOSE:
-;       Create a keogram object.
-;
-; EXPLANATION:
+; :Description:
 ;       Create a keogram structure from an array of image data.
 ;
-; CALLING SEQUENCE:
-;       aurorax_keogram_create(img, time_stamp)
+; :Parameters:
+;       images: in, required, Array
+;         array of images to extract metric from
+;       time_stamp: in, required, Array
+;         array of timestamps corresponding to each frame in images
 ;
-; PARAMETERS:
-;       images          array of images to extract metric from
-;       time_stamp      array of timestamps corresponding to each frame in images
-;       axis            the axis index (1 or 0) to slice the keogram from - defualt is 1 (N-S slice)
+; :Keywords:
+;       axis: in, optional, Integer
+;         the axis index (1 or 0) to slice the keogram from - default is 1 (N-S slice)
 ;
-; KEYWORDS:
+; :Returns:
+;       Struct
 ;
-; OUTPUT
-;       keogram object structure containing data and axes
-;
-; OUTPUT TYPE:
-;       struct
-;
-; EXAMPLES:
+; :Examples:
 ;       keogram = aurorax_keogram_create(img, time_stamp)
 ;       ewogram = aurorax_keogram_create(img, time_stamp, axis=1)
 ;+
-;-------------------------------------------------------------
-function aurorax_keogram_create, images, time_stamp, axis = axis
+function aurorax_keogram_create, $
+  images, $
+  time_stamp, $
+  axis = axis
   compile_opt idl2
 
   if not isa(images, /array) then begin
@@ -117,7 +109,7 @@ function aurorax_keogram_create, images, time_stamp, axis = axis
     this_dec = hh + mm / 60.0 + ss / (60 * 60.0)
     ut_decimal.add, this_dec
   endfor
-  ut_decimal = ut_decimal.toarray()
+  ut_decimal = ut_decimal.toArray()
 
   ; Return keogram array
   return, {data: keo_arr, ccd_y: ccd_y, slice_idx: keo_idx, timestamp: time_stamp, ut_decimal: ut_decimal, axis: axis}

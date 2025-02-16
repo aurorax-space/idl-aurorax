@@ -14,45 +14,48 @@
 ; limitations under the License.
 ; -------------------------------------------------------------
 
-; -------------------------------------------------------------
 ;+
-; NAME:
-;       AURORAX_MOSAIC_OPLOT
-;
-; PURPOSE:
+; :Description:
 ;       Plot lines of constant lat/lon, and custom points on a mosaic.
 ;
-; EXPLANATION:
 ;       Plot either, or a combination of, lines of constant geographic or
 ;       geomagnetic latitude and/or longitude. Can also be used to plot
 ;       a single point in geographic or geomagnetic coordinates.
 ;
-; CALLING SEQUENCE:
-;       aurorax_mosaic_oplot, constant_lats=lats, constant_lons=lons, point=[lon,lat]
+; :Keywords:
+;       constant_lats: in, optional, Scalar or Array
+;         a scalar or array giving latitude(s) to add constant lines
+;       constant_lons: in, optional, Scalar or Array
+;         a scalar or array giving longitude(s) to add constant lines
+;       point: in, optional, Array
+;         a two element array specifying the lon, lat to plot
+;       color: in, optional, Long Integer
+;         long integer giving the color to plot in (default is 0 i.e. black)
+;       thick: in, optional, Integer
+;         integer giving line thickness for any lines plotted (default is 1)
+;       linestyle: in, optional, Integer
+;         integer giving IDL linestyle (default is 0, i.e. solid)
+;       symbol: in, optional, Integer
+;         integer giving IDL symbol (default is 0, i.e. none for lines and circle for point)
+;       symsize: in, optional, Integer
+;         integer giving IDL symbol size (default is 1)
+;       mag: in, optional, Boolean
+;         specify that coordinates are given in geomagnetic coordinates (default is geographic)
 ;
-; PARAMETERS:
-;       constant_lats     a scalar or array giving latitude(s) to add constant lines, optional
-;       constant_lots     a scalar or array giving longitude(s) to add constant lines, optional
-;       point             a two element array specifying the lon, lat to plot, optional
-;       color             long integer giving the color to plot in, optional (default is 0 i.e. black)
-;       thick             integer giving line thickness for any lines plotted, optional (default is 1)
-;       linestyle         integer giving IDL linestyle, optional (default is 0, i.e. solid)
-;       symbol            integer giving IDL symbol, optional (default is 0, i.e. none for lines and circle for point)
-;       symsize           integer giving IDL symbol size, optional (default is 1)
-;
-; KEYWORDS:
-;       /MAG              specify that coordinates are given in geomagnetic coordinates (default is geographic)
-;
-; OUTPUT
-;
-; OUTPUT TYPE:
-;
-; EXAMPLES:
+; :Examples:
 ;       aurorax_mosaic_oplot, point=[245,61.2], color=aurorax_get_decomposed_color([0,0,255])
 ;       aurorax_mosaic_oplot, constant_lats=[40,50,60], constant_lons=[220,240,260], linestyle=2, thick=3
 ;+
-;-------------------------------------------------------------
-pro aurorax_mosaic_oplot, constant_lons = constant_lons, constant_lats = constant_lats, point = point, color = color, thick = thick, linestyle = linestyle, symbol = symbol, symsize = symsize, mag = mag
+pro aurorax_mosaic_oplot, $
+  constant_lons = constant_lons, $
+  constant_lats = constant_lats, $
+  point = point, $
+  color = color, $
+  thick = thick, $
+  linestyle = linestyle, $
+  symbol = symbol, $
+  symsize = symsize, $
+  mag = mag
   compile_opt idl2
 
   device, get_decomposed = old_decomp

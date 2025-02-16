@@ -98,7 +98,7 @@ end
 ;       possibility of criteria blocks. This function will generate all
 ;       possibilities for you.
 ;
-;       The function return the advanced distances, as a hash with the default
+;       The function returns the advanced distances, as a hash with the default
 ;       value for each value being the 'distance' variable supplied.
 ;
 ; :Parameters:
@@ -147,8 +147,9 @@ end
 
 ;+
 ; :Description:
-;       Search the AuroraX platform for conjunctions using the supplied filter criteria.
-;
+;       Search the AuroraX platform for conjunctions using the supplied filter criteria. 
+;       This function returns the found conjunctions, as a search response struct.
+; 
 ;       The 'start_ts' and 'end_ts' parameters are to be timestamps in a variety of formats. The
 ;       following are examples of what is allowed:
 ;
@@ -204,7 +205,7 @@ end
 ;         that they wanted it to send.
 ;
 ; :Returns:
-;       the found conjunctions, as a search response struct
+;       Struct
 ;
 ; :Examples:
 ;       ; simple example

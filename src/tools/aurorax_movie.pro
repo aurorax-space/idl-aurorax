@@ -28,7 +28,6 @@
 ;
 ; :Examples:
 ;   aurorax_create_movie, file_search("path\to\images\*.png"), "movie.mp4", 30
-;
 ;-
 pro aurorax_movie, input_filenames, output_filename, fps
   compile_opt idl2

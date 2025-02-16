@@ -14,8 +14,14 @@
 ; limitations under the License.
 ; -------------------------------------------------------------
 
-pro __aurorax_ucalgary_readfile_grid, grid_file_path, data, timestamp_list, meta, first_frame = first_frame, verbose = verbose
-  compile_opt idl2
+pro __aurorax_ucalgary_readfile_grid, $
+  grid_file_path, $
+  data, $
+  timestamp_list, $
+  meta, $
+  first_frame = first_frame, $
+  verbose = verbose
+  compile_opt idl2, hidden
 
   if not isa(verbose) then verbose = 1
 
@@ -73,7 +79,7 @@ pro __aurorax_ucalgary_readfile_grid, grid_file_path, data, timestamp_list, meta
       file_meta_hash[attribute_name] = attribute
     endfor
 
-    file_meta = file_meta_hash.tostruct()
+    file_meta = file_meta_hash.toStruct()
 
     ; Reading in the frame level metadata into a list, where each list element is a meta
     ; structure belonging to the frame of that element's list index
@@ -95,7 +101,7 @@ pro __aurorax_ucalgary_readfile_grid, grid_file_path, data, timestamp_list, meta
       endfor
 
       ; Converting hash to struct and then appending to frame meta list
-      frame_meta_struct = frame_meta_hash.tostruct()
+      frame_meta_struct = frame_meta_hash.toStruct()
 
       master_frame_meta = [master_frame_meta, frame_meta_struct]
       master_file_meta = [master_file_meta, file_meta]

@@ -14,45 +14,42 @@
 ; limitations under the License.
 ; -------------------------------------------------------------
 
-; -------------------------------------------------------------
 ;+
-; NAME:
-;       AURORAX_CALIBRATE_TREX_NIR
+; :Description:
+;       Calibrate one or more TREx INR images by applying a number of calibrations,
+;       such as dark frame subtraction, flatfield calibration, and calibration to
+;       Rayleighs. Each calibration step can be omitted, if desired.
+
+; :Parameters:
+;       images: in, required, Array
+;         array of images to calibrate
 ;
-; PURPOSE:
-;       Calibrate one or more TREx NIR images.
+; :Keywords:
+;       cal_flatfield: in, optional, Struct
+;         the flatfield calibration to use (if desired), usually a result of reading a calibration file
+;       cal_rayleighs: in, optional, Struct
+;         the rayleighs calibration to use (if desired), usually a result of reading a calibration file
+;       exposure_length_sec: in, optional, Float
+;         the exposure length for the image data being calibrated (defaults to 5.0)
+;       no_dark_subtract: in, optional, Boolean
+;         omits the dark subtraction step of the calibration process
 ;
-; EXPLANATION:
-;       Apply a number of calibrations, such as dark frame subtraction,
-;       flatfield calibration, and calibration to Rayleighs, one can
-;       apply only certain calibration steps if desired.
+; :Returns:
+;       Array
 ;
-; CALLING SEQUENCE:
-;       aurorax_calibrate_trex_nir(images, cal_flatfield, cal_rayleighs)
-;
-; PARAMETERS:
-;       images                  array of images to calibrate
-;       cal_flatfield           the flatfield calibration to use (if desired), usually a result of reading a calibration file, optional
-;       cal_rayleighs           the rayleighs calibration to use (if desired), usually a result of reading a calibration file, optional
-;       exposure_length_sec     the exposure length for the image data being calibrated, optional (defaults to 5.0)
-;
-; KEYWORDS:
-;       /NO_DARK_SUBTRACT       omits the dark subtraction step of the calibration process
-;
-; OUTPUT
-;       calibrated image data
-;
-; OUTPUT TYPE:
-;       array
-;
-; EXAMPLES:
+; :Examples:
 ;       rayleighs_images = aurorax_calibrate_trex_nir(images, cal_flatfield=flatfield_cal, cal_rayleighs=rayleighs_cal)
 ;       bg_subtracted_images = aurorax_calibrate_trex_nir(images)
 ;+
-;-------------------------------------------------------------
-function aurorax_calibrate_trex_nir, images, cal_flatfield = cal_flatfield, cal_rayleighs = cal_rayleighs, exposure_length_sec = exposure_length_sec, no_dark_subtract = no_dark_subtract
+function aurorax_calibrate_trex_nir, $
+  images, $
+  cal_flatfield = cal_flatfield, $
+  cal_rayleighs = cal_rayleighs, $
+  exposure_length_sec = exposure_length_sec, $
+  no_dark_subtract = no_dark_subtract
   compile_opt idl2
 
+  ; Init
   calibrated_images = images
 
   ; Default exposure of 5 seconds

@@ -15,7 +15,8 @@
 ; -------------------------------------------------------------
 
 function __indices_in_polygon, vertices, image_shape
-  compile_opt idl2
+  compile_opt idl2, hidden
+
   ; Function to obtain all indices of an array/image, within the
   ; polygon defined by input list of ordered vertices.
   ;
@@ -43,7 +44,7 @@ function __indices_in_polygon, vertices, image_shape
   endfor
 
   obj = obj_new('IDLanROI', x_verts, y_verts)
-  flat_idx = where(obj.containspoints(i_indices, j_indices))
+  flat_idx = where(obj.containsPoints(i_indices, j_indices))
   x_idx_inside = i_indices[flat_idx]
   y_idx_inside = j_indices[flat_idx]
 
@@ -51,7 +52,8 @@ function __indices_in_polygon, vertices, image_shape
 end
 
 function __haversine_distances, target_lat, target_lon, lat_array, lon_array
-  compile_opt idl2
+  compile_opt idl2, hidden
+
   ; Computes the distance on the globe between target lat/lon,
   ; and all points defined by lat/lon arrays.
   ;
@@ -74,7 +76,8 @@ function __haversine_distances, target_lat, target_lon, lat_array, lon_array
 end
 
 function __convert_lonlat_to_ccd, lon_locs, lat_locs, skymap, altitude_km, time_stamp = time_stamp, mag = mag
-  compile_opt idl2
+  compile_opt idl2, hidden
+
   ; Converts a set of lat lon points to CCD coordinates
   ; using a skymap.
   ;
@@ -114,6 +117,7 @@ function __convert_lonlat_to_ccd, lon_locs, lat_locs, skymap, altitude_km, time_
     ; interpolation is required
     lats_xsize = (size(lats, /dimensions))[0]
     lats_ysize = (size(lats, /dimensions))[1]
+
     ; first check if supplied altitude is valid for interpolation
     if (altitude_km lt min(interp_alts)) or (altitude_km gt max(interp_alts)) then begin
       error_msg = '[__convert_lonlat_to_ccd] Error: Altitude of ' + strcompress(string(altitude_km), /remove_all) + ' km is outside the valid ' + $
@@ -121,6 +125,7 @@ function __convert_lonlat_to_ccd, lon_locs, lat_locs, skymap, altitude_km, time_
       print, error_msg
       return, !null
     endif
+
     ; interpolate entire lat lon arrays
     new_lats = lats[*, *, 0]
     new_lons = lons[*, *, 0]
@@ -173,47 +178,57 @@ function __convert_lonlat_to_ccd, lon_locs, lat_locs, skymap, altitude_km, time_
   return, list(x_locs, (size(lats, /dimensions))[1] - y_locs)
 end
 
-; -------------------------------------------------------------
 ;+
-; NAME:
-;       AURORAX_KEOGRAM_CREATE_CUSTOM
-;
-; PURPOSE:
+; :Description:
 ;       Create a keogram from a custom slice of image data.
 ;
-; EXPLANATION:
 ;       Create a keogram by slicing image data along a custom contour
-;       defined by lats/lons or CCD coordintes.
+;       defined by lats/lons or CCD coordinates.
 ;
-; CALLING SEQUENCE:
-;       aurorax_keogram_create_custom(images, time_stamp, "ccd", x_locs, y_locs)
+; :Parameters:
+;       images: in, required, Array
+;         array of images to extract metric from
+;       time_stamp: in, required, Array
+;         array of timestamps corresponding to each image frame
+;       coordinate_system: in, required, String
+;         a string giving the coordinate system ("ccd", "geo", "mag")
+;       x_locs: in, required, Array
+;         the x locations, in desired coordinate system, to slice keogram along
+;       y_locs: in, required, Array
+;         the y locations, in desired coordinate system, to slice keogram along
+;       width: in, optional, Integer
+;         the width of the keogram slice, in pixel units, optional (defaults to 2)
+;       skymap: in, optional, Any
+;         the skymap to use for georeferencing, optional
+;       altitude_km: in, optional, Float
+;         the altitude of the image data for georeferencing, optional
+;       metric: in, optional, String
+;         the metric to use to compute each keogram pixel "median" (default), "mean", or "sum", optional
 ;
-; PARAMETERS:
-;       images                array of images to extract metric from
-;       time_stamp            array of timestamps corresponding to each image frame
-;       coordinate_system     a string giving the coordinate system ("ccd", "geo", "mag")
-;       x_locs                the x locations, in desired coordinate system, to slice keogram along
-;       y_locs                the y locations, in desired coordinate system, to slice keogram along
-;       width                 the width of the keogram slice, in pixel units, optional (defaults to 2)
-;       skymap                the skymap to use for georeferencing, optional
-;       altitude_km           the altitude of the image data for georeferencing, optional
-;       metric                the metric to use to compute each keogram pixel "median" (default), "mean", or "sum", optional
+; :Keywords:
+;       show_preview: in, optional, Boolean
+;         plot a preview of the keogram slice on top of the first image frame
 ;
-; KEYWORDS:
-;       /SHOW_PREVIEW         plot a preview of the keogram slice on top of the first image frame
+; :Returns:
+;       Struct
+;         custom keogram structure containing keogram data and temporal axis
 ;
-; OUTPUT
-;       custom keogram structure containing keogram data and temporal axis
-;
-; OUTPUT TYPE:
-;       struct
-;
-; EXAMPLES:
+; :Examples:
 ;       ccd_keo = aurorax_keogram_create_custom(img, time_stamp, "ccd", x_arr, y_arr, width=5, metric="sum", /show_preview)
 ;       geo_keo = aurorax_keogram_create_custom(img, time_stamp, "geo", longitudes, latitudes, skymap=skymap, altitude_km=113)
 ;+
 ;-------------------------------------------------------------
-function aurorax_keogram_create_custom, images, time_stamp, coordinate_system, x_locs, y_locs, width = width, show_preview = show_preview, skymap = skymap, altitude_km = altitude_km, metric = metric
+function aurorax_keogram_create_custom, $
+  images, $
+  time_stamp, $
+  coordinate_system, $
+  x_locs, $
+  y_locs, $
+  width = width, $
+  show_preview = show_preview, $
+  skymap = skymap, $
+  altitude_km = altitude_km, $
+  metric = metric
   compile_opt idl2
 
   ; check that coord system is valid
@@ -433,7 +448,7 @@ function aurorax_keogram_create_custom, images, time_stamp, coordinate_system, x
     this_dec = hh + mm / 60.0 + ss / (60 * 60.0)
     ut_decimal.add, this_dec
   endfor
-  ut_decimal = ut_decimal.toarray()
+  ut_decimal = ut_decimal.toArray()
 
   ; Return keogram array
   return, {data: keo_arr, timestamp: time_stamp, ut_decimal: ut_decimal, ccd_y: 'custom'}

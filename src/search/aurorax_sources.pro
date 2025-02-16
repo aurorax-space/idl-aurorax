@@ -17,7 +17,8 @@
 ;+
 ; :Description:
 ;       Retrieve AuroraX Search Engine data sources, with optional parameters
-;       used to filter for certain data sources.
+;       used to filter for certain data sources. This function returns the found
+;       data sources, as a list of structs.
 ;
 ; :Keywords:
 ;       program: in, optional, String
@@ -36,7 +37,7 @@
 ;           include stats information
 ;
 ; :Returns:
-;       the found data sources, as a list of structs
+;       List
 ;
 ; :Examples:
 ;       ; simple example

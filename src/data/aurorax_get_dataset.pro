@@ -14,36 +14,25 @@
 ; limitations under the License.
 ; -------------------------------------------------------------
 
-; -------------------------------------------------------------
 ;+
-; NAME:
-;       AURORAX_GET_DATASET
+; :Description:
+;       Retrieve information about a specific dataset for which you can
+;       download data for. Information includes details such as provider,
+;       short and long descriptions, and DOI details.
 ;
-; PURPOSE:
-;       Retrieve specific dataset for which you can download data.
+; :Parameters:
+;       name: in, required, String
+;         dataset name to retrieve, case-insensitive
 ;
-; EXPLANATION:
-;       Retrieve information about a specific dataset, including provider,
-;       short+long descriptions, and DOI details.
+; :Returns:
+;       Struct
 ;
-; CALLING SEQUENCE:
-;       aurorax_get_dataset()
-;
-; PARAMETERS:
-;       name         dataset name to retrieve, case-insensitive
-;
-; OUTPUT
-;       the found dataset
-;
-; OUTPUT TYPE:
-;       a struct
-;
-; EXAMPLES:
+; :Examples:
 ;       dataset = aurorax_get_dataset("THEMIS_ASI_RAW")
 ;+
-;-------------------------------------------------------------
 function aurorax_get_dataset, name
   compile_opt idl2
+
   ; set params
   param_str = '?name=' + name
 

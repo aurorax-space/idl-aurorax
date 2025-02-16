@@ -25,37 +25,37 @@
 @aurorax_sources
 @aurorax_open_externally
 
-; @aurorax_list_datasets
-; @aurorax_get_dataset
-; @aurorax_list_observatories
-; @aurorax_ucalgary_get_urls
-; @aurorax_ucalgary_download
-; @aurorax_ucalgary_download_best_skymap
-; @aurorax_ucalgary_readfile_asi
-; @aurorax_ucalgary_readfile_skymap
-; @aurorax_ucalgary_readfile_calibration
-; @aurorax_ucalgary_readfile_grid
-; @aurorax_ucalgary_readfile_trex_spect_processed
-; @aurorax_ucalgary_read
-; @aurorax_ucalgary_is_read_supported
+@aurorax_list_datasets
+@aurorax_get_dataset
+@aurorax_list_observatories
+@aurorax_ucalgary_get_urls
+@aurorax_ucalgary_download
+@aurorax_ucalgary_download_best_skymap
+@aurorax_ucalgary_readfile_asi
+@aurorax_ucalgary_readfile_skymap
+@aurorax_ucalgary_readfile_calibration
+@aurorax_ucalgary_readfile_grid
+@aurorax_ucalgary_readfile_trex_spect_processed
+@aurorax_ucalgary_read
+@aurorax_ucalgary_is_read_supported
 
-; @aurorax_bounding_box_extract_metric
-; @aurorax_ccd_contour
-; @aurorax_calibrate_rego
-; @aurorax_calibrate_trex_nir
-; @aurorax_keogram_add_axis
-; @aurorax_keogram_create_custom
-; @aurorax_keogram_create
-; @aurorax_keogram_plot
-; @aurorax_montage_create
-; @aurorax_mosaic_plot
-; @aurorax_mosaic_oplot
-; @aurorax_mosaic_prep_images
-; @aurorax_mosaic_prep_skymap
-; @aurorax_get_decomposed_color
-; @aurorax_movie
+@aurorax_bounding_box_extract_metric
+@aurorax_ccd_contour
+@aurorax_calibrate_rego
+@aurorax_calibrate_trex_nir
+@aurorax_keogram_add_axis
+@aurorax_keogram_create_custom
+@aurorax_keogram_create
+@aurorax_keogram_plot
+@aurorax_montage_create
+@aurorax_mosaic_plot
+@aurorax_mosaic_oplot
+@aurorax_mosaic_prep_images
+@aurorax_mosaic_prep_skymap
+@aurorax_get_decomposed_color
+@aurorax_movie
 
-; @aurorax_atm_forward_get_output_flags
-; @aurorax_atm_forward
-; @aurorax_atm_inverse_get_output_flags
-; @aurorax_atm_inverse
+@aurorax_atm_forward_get_output_flags
+@aurorax_atm_forward
+@aurorax_atm_inverse_get_output_flags
+@aurorax_atm_inverse

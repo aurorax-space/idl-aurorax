@@ -15,11 +15,11 @@
 ; -------------------------------------------------------------
 
 function __determine_cadence, timestamp_arr
-  compile_opt idl2
+  compile_opt idl2, hidden
+
   ; ;;
   ; Determines the cadence using a list of timestamps
   ; ;;
-
   diff_seconds = []
   curr_ts = !null
   checked_timestamps = 0
@@ -41,7 +41,7 @@ function __determine_cadence, timestamp_arr
     checked_timestamps += 1
   endfor
 
-  ; Get hash of occurences of second differences
+  ; Get hash of occurrences of second differences
   sec_freq = hash()
   foreach elem, diff_seconds do begin
     sec_freq[elem] = 0
@@ -69,7 +69,8 @@ function __determine_cadence, timestamp_arr
 end
 
 function __get_julday, time_stamp
-  compile_opt idl2
+  compile_opt idl2, hidden
+
   ; ;;
   ; Splits a timestamp string into a struct with value of julian day
   ; and string field to use for comparisons.
@@ -85,11 +86,7 @@ function __get_julday, time_stamp
     hour = fix((strsplit((strsplit(time_stamp, ' ', /extract))[1], ':', /extract))[0])
     minute = fix((strsplit((strsplit(time_stamp, ' ', /extract))[1], ':', /extract))[1])
     second = fix((strsplit((strsplit(time_stamp, ' ', /extract))[1], ':', /extract))[2])
-
-    return, julday(month, day, year, hour, minute, second)
   endif else begin
-    datetime_arr = []
-
     year = fix(((strsplit(time_stamp, '-', /extract)).toarray())[*, 0])
     month = fix(((strsplit(time_stamp, '-', /extract)).toarray())[*, 1])
     day = fix(((strsplit(time_stamp, '-', /extract)).toarray())[*, 2])
@@ -97,43 +94,30 @@ function __get_julday, time_stamp
     hour = fix(strmid((((strsplit(time_stamp, ':', /extract)).toarray())[*, 0]), 1, 2, /reverse_offset))
     minute = fix((((strsplit(time_stamp, ':', /extract)).toarray())[*, 1]))
     second = fix((((strsplit(time_stamp, ':', /extract)).toarray())[*, 2]))
-
-    return, julday(month, day, year, hour, minute, second)
   endelse
+
+  return, julday(month, day, year, hour, minute, second)
 end
 
-; -------------------------------------------------------------
 ;+
-; NAME:
-;       AURORAX_MOSAIC_PREP_IMAGES
+; :Description:
+;       Prepare image data to create a mosaic.
 ;
-; PURPOSE:
-;       Prepare image data to create a mosaic
-;
-; EXPLANATION:
 ;       Takes image data and formats it in a way such that it
-;       can be fed into the aurorax_mosaic_plot routine
+;       can be fed into the aurorax_mosaic_plot routine.
 ;
-; CALLING SEQUENCE:
-;       aurorax_mosaic_prep_images(list(img_data1, image_data2))
+; :Parameters:
+;       image_list: in, required, List
+;         A list of image data objects, where each object is usually the return
+;         value of aurorax_ucalgary_read(). Note that even if preparing a single
+;         image data object, it must be enclosed in a list.
 ;
-; PARAMETERS:
-;       image_data        a list of image data objects, where each object is usually the return
-;                         value of aurorax_ucalgary_read(). Note that even if preparing a single
-;                         image data object, it must be enclosed in a list.
+; :Returns:
+;       Struct
 ;
-; KEYWORDS:
-;
-; OUTPUT
-;       a prepped_data structure
-;
-; OUTPUT TYPE:
-;       struct
-;
-; EXAMPLES:
+; :Examples:
 ;       prepped_data = aurorax_prep_images(list(aurorax_ucalgary_read(d.dataset, d.filenames)))
 ;+
-;-------------------------------------------------------------
 function aurorax_mosaic_prep_images, image_list
   compile_opt idl2
 

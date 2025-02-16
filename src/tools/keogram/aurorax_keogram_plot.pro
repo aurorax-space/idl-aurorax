@@ -14,45 +14,53 @@
 ; limitations under the License.
 ; -------------------------------------------------------------
 
-; -------------------------------------------------------------
 ;+
-; NAME:
-;       AURORAX_KEOGRAM_PLOT
-;
-; PURPOSE:
+; :Description:
 ;       Plot a keogram object.
 ;
-; EXPLANATION:
-;       Plot keogram data, adding axes stored in the keogram
-;       structure as desired, defaults to CCD axis.
+;       Defaults to CCD axis (use geo, mag, elev, to change this).
 ;
-; CALLING SEQUENCE:
-;       aurorax_keogram_plot, keogram_struct, /keyword_args
+; :Parameters:
+;       keogram_struct: in, required, Object
+;         keogram object to plot, usually the return value of aurorax_keogram_create()
 ;
-; PARAMETERS:
-;       keogram_struct      keogram object to plot, usually the return value of aurorax_keogram_create()
-;       title               string giving the plot title, optional
-;       dimensions          two-element array giving dimensions of the plotting window in device coordinates, optional
-;       location            two-element array giving location of the plotting window in device coordinates, optional
-;       x_tick_interval     interval between ticks on the x-axis, optional (default is 200)
-;       y_tick_interval     interval between ticks on the y-axis, optional (default is 50)
-;       aspect_ratio        float giving the aspect ratio to display keogram data
-;       colortable          int giving the IDL colortable to use for the keogram
+; :Keywords:
+;       title: in, optional, String
+;         string giving the plot title
+;       dimensions: in, optional, Array
+;         two-element array giving dimensions of the plotting window in device coordinates
+;       location: in, optional, Array
+;         two-element array giving location of the plotting window in device coordinates
+;       x_tick_interval: in, optional, Integer
+;         interval between ticks on the x-axis (default is 200)
+;       y_tick_interval: in, optional, Integer
+;         interval between ticks on the y-axis (default is 50)
+;       aspect_ratio: in, optional, Float
+;         float giving the aspect ratio to display keogram data
+;       colortable: in, optional, Integer
+;         int giving the IDL colortable to use for the keogram
+;       geo: in, optional, Boolean
+;         labels geographic coordinates on the y-axis (axis must exist in keogram structure)
+;       mag: in, optional, Boolean
+;         labels geomagnetic coordinates on the y-axis (axis must exist in keogram structure)
+;       elev: in, optional, Boolean
+;         labels elevation angles on the y-axis (axis must exist in keogram structure)
 ;
-; KEYWORDS:
-;       /GEO                labels geographic coordinates on the y-axis (axis must exist in keogram structure)
-;       /MAG                labels geomagnetic coordinates on the y-axis (axis must exist in keogram structure)
-;       /ELEV               labels elevation angles on the y-axis (axis must exist in keogram structure)
-;
-; OUTPUT
-;
-; OUTPUT TYPE:
-;
-; EXAMPLES:
+; :Examples:
 ;       aurorax_keogram_plot, keo, title="Geographic", /geo, location=[0,0], dimensions=[1000,400]
 ;+
-;-------------------------------------------------------------
-pro aurorax_keogram_plot, keogram_struct, geo = geo, mag = mag, elev = elev, dimensions = dimensions, location = location, title = title, x_tick_interval = x_tick_interval, y_tick_interval = y_tick_interval, aspect_ratio = aspect_ratio, colortable = colortable
+pro aurorax_keogram_plot, $
+  keogram_struct, $
+  geo = geo, $
+  mag = mag, $
+  elev = elev, $
+  dimensions = dimensions, $
+  location = location, $
+  title = title, $
+  x_tick_interval = x_tick_interval, $
+  y_tick_interval = y_tick_interval, $
+  aspect_ratio = aspect_ratio, $
+  colortable = colortable
   compile_opt idl2
 
   axis_keywords = [keyword_set(geo), keyword_set(mag), keyword_set(elev)]

@@ -19,6 +19,8 @@
 ;       Search for ephemeris records in the AuroraX Search Engine, with
 ;       optional parameters used to filter for specific matching data.
 ;
+;       This function returns the found ephemeris records, as a search response struct
+
 ;       The 'start_ts' and 'end_ts' parameters are to be timestamps in a variety of formats. The
 ;       following are examples of what is allowed:
 ;
@@ -68,7 +70,7 @@
 ;           that they wanted it to send.
 ;
 ; :Returns:
-;       the found ephemeris records, as a search response struct
+;       Struct
 ;
 ; :Examples:
 ;       ; simple example

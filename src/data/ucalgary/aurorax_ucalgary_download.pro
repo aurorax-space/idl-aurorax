@@ -15,7 +15,8 @@
 ; -------------------------------------------------------------
 
 function __get_download_path
-  compile_opt idl2
+  compile_opt idl2, hidden
+
   ; check if the environment variable has been set
   download_path = getenv('AURORAX_ROOT_DATA_DIR')
   if not keyword_set(def_root) then begin
@@ -26,7 +27,8 @@ function __get_download_path
 end
 
 function __extract_content_length, req
-  compile_opt idl2
+  compile_opt idl2, hidden
+
   ; init
   content_length = 0
 
@@ -52,46 +54,49 @@ function __extract_content_length, req
   return, content_length
 end
 
-; -------------------------------------------------------------
 ;+
-; NAME:
-;       AURORAX_UCALGARY_DOWNLOAD
-;
-; PURPOSE:
-;       Download data from the UCalgary Open Data Platform
-;
-; EXPLANATION:
+; :Description:
 ;       Download data from the UCalgary Open Data Platform, for the given
 ;       dataset, timeframe, and optional site/device.
 ;
-; CALLING SEQUENCE:
-;       aurorax_ucalgary_download(dataset_name, start_ts, end_ts)
+; :Parameters:
+;       dataset_name: in, required, String
+;         name of the dataset to download data for
+;       start_ts: in, required, String
+;         start timestamp, format as ISO time string (YYYY-MM-DDTHH:MM:SS)
+;       end_ts: in, required, String
+;         end timestamp, format as ISO time string (YYYY-MM-DDTHH:MM:SS)
 ;
-; PARAMETERS:
-;       dataset_name       name of the dataset to download data for
-;       start_ts           start timestamp, format as ISO time string (YYYY-MM-DDTHH:MM:SS)
-;       end_ts             end timestamp, format as ISO time string (YYYY-MM-DDTHH:MM:SS)
-;       site_uid           unique 4-letter site UID to filter on (e.g., atha, gill, fsmi), optional
-;       device_uid         unique device UID to filter on (e.g., themis08, rgb-09), optional
-;       download_path      path to save data to, default is your home directory; optional
+; :Keywords:
+;       site_uid: in, optional, String
+;         unique 4-letter site UID to filter on (e.g., atha, gill, fsmi)
+;       device_uid: in, optional, String
+;         unique device UID to filter on (e.g., themis08, rgb-09)
+;       download_path: in, optional, String
+;         path to save data to, default is your home directory
+;       overwrite: in, optional, Boolean
+;         download the files regardless of them existing locally already
+;       quiet: in, optional, Boolean
+;         no print messages, data download will be silent
 ;
-; KEYWORDS:
-;       /OVERWRITE         download the files regardless of them existing locally already
-;       /QUIET             no print messages, data download will be silent
+; :Returns:
+;       Struct
 ;
-; OUTPUT
-;       information about the downloaded data
-;
-; OUTPUT TYPE:
-;       a struct
-;
-; EXAMPLES:
+; :Examples:
 ;       d = aurorax_ucalgary_download('THEMIS_ASI_RAW','2022-01-01T06:00:00','2022-01-01T06:59:59',site_uid='atha')
 ;       d = aurorax_ucalgary_download('TREX_RGB_RAW_NOMINAL','2022-01-01T06:00:00','2022-01-01T06:00:00',/overwrite)
 ;+
-;-------------------------------------------------------------
-function aurorax_ucalgary_download, dataset_name, start_ts, end_ts, site_uid = site_uid, device_uid = device_uid, download_path = download_path, overwrite = overwrite, quiet = quiet
+function aurorax_ucalgary_download, $
+  dataset_name, $
+  start_ts, $
+  end_ts, $
+  site_uid = site_uid, $
+  device_uid = device_uid, $
+  download_path = download_path, $
+  overwrite = overwrite, $
+  quiet = quiet
   compile_opt idl2
+
   ; init
   time0 = systime(1)
   total_bytes = 0

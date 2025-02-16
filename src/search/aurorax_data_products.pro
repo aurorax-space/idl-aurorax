@@ -20,8 +20,12 @@
 ;       with optional parameters used to filter for specific matching
 ;       data.
 ;
-;       The 'start_ts' and 'end_ts' parameters are to be timestamps in a variety of formats. The
-;       following are examples of what is allowed:
+;       This function returns the found data product records, as a search
+;       response struct
+
+;
+;       The 'start_ts' and 'end_ts' parameters are to be timestamps in a
+;       variety of formats. The following are examples of what is allowed:
 ;
 ;       The following are all interpreted as '2020-01-01T00:00:00':
 ;         start_ts = '2020'
@@ -71,7 +75,7 @@
 ;         that they wanted it to send.
 ;
 ; :Returns:
-;       the found data product records, as a search response struct
+;       Struct
 ;
 ; :Examples:
 ;       ; simple example
@@ -175,7 +179,6 @@ function aurorax_data_product_search, start_ts, $
   if (verbose eq 1) then __aurorax_message, 'Data is now available'
 
   ; humanize size of data to download
-  bytes_str = __aurorax_humanize_bytes(status.search_result.file_size)
   if (verbose eq 1) then __aurorax_message, 'Downloading ' + __aurorax_humanize_bytes(status.search_result.file_size) + ' of data ...'
 
   ; get data

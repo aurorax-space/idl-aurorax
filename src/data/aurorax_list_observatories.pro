@@ -14,40 +14,31 @@
 ; limitations under the License.
 ; -------------------------------------------------------------
 
-; -------------------------------------------------------------
 ;+
-; NAME:
-;       AURORAX_LIST_OVSERVATORIES
+; :Description:
+;       Retrieve list of available observatories where an instrument exist,
+;       including full name, geodetic latitude and longitude. Optional parameters
+;       are used to filter for certain matching observatories.
 ;
-; PURPOSE:
-;       Retrieve list of available observatories where an instrument exists.
+; :Parameters:
+;       instrument_array: in, required, String
+;         the instrument array. Possible values are 'themis_asi', 'rego', 'trex_rgb',
+;         'trex_nir', and 'trex_blue'.
 ;
-; EXPLANATION:
-;       Retrieve information about observatories, including full name, geodetic
-;       latitude and longitude. Optional parameters are used to filter for certain
-;       matching observatories.
+; :Keywords:
+;       uid: in, optional, String
+;         site unique identifier to filter on
 ;
-; CALLING SEQUENCE:
-;       aurorax_list_observatories(instrument_array)
+; :Returns:
+;       List(Structure)
 ;
-; PARAMETERS:
-;       insrument_array     the insrument array. Possible values are 'themis_asi',
-;                           'rego', 'trex_rgb', 'trex_nir', and 'trex_blue'.
-;       uid                 site unique identifier to filter on, optional
-;
-; OUTPUT
-;       the found observatories
-;
-; OUTPUT TYPE:
-;       a list of structs
-;
-; EXAMPLES:
+; :Examples:
 ;       observatories = aurorax_list_observatories('themis_asi')
-;       observatories = aurorax_list_datasets('trex_rgb', uid='gill')
+;       observatories = aurorax_list_observatories('trex_rgb', uid='gill')
 ;+
-;-------------------------------------------------------------
 function aurorax_list_observatories, instrument_array, uid = uid
   compile_opt idl2
+
   ; set params
   param_str = '?instrument_array=' + instrument_array
   if (isa(uid) eq 1) then begin

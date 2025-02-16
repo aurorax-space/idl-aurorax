@@ -51,7 +51,7 @@
 ;         operator for this expression will be 'not in'
 ;
 ; :Returns:
-;       a metadata filter expression, as a hash
+;       Hash
 ;
 ; :Examples:
 ;       expression = aurorax_create_metadata_filter_expression('calgary_apa_ml_v1',list('classified as APA'),/OPERATOR_IN)
@@ -128,7 +128,7 @@ end
 ;         logical operator for this filter will be 'OR'
 ;
 ; :Returns:
-;       the metadata filter, as a hash
+;       Hash
 ;
 ; :Examples:
 ;       expression1 = aurorax_create_metadata_filter_expression('calgary_apa_ml_v1', list('classified as APA'),/OPERATOR_IN)

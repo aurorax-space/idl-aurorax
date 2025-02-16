@@ -14,42 +14,36 @@
 ; limitations under the License.
 ; -------------------------------------------------------------
 
-; -------------------------------------------------------------
 ;+
-; NAME:
-;       AURORAX_KEOGRAM_ADD_AXIS
-;
-; PURPOSE:
-;       Add a georeferenced axis to a keogram structure.
-;
-; EXPLANATION:
+; :Description:
 ;       Add one or more desired physical axes to a keogram structure, which is
 ;       usually obtained via aurorax_keogram_create. Options are elevation, and
 ;       geographic/magnetic lats (lons for ewograms).
 ;
-; CALLING SEQUENCE:
-;       aurorax_keogram_add_axis(keogram_struct, skymap, /axis_type)
+;       This function returns a keogram structure containing the new axes.
 ;
-; PARAMETERS:
-;       keogram_struct      keogram structure - usually the return value of aurorax_keogram_create()
-;       skymap              the skymap to use for georeferencing
-;       altitude_km         altitude, in kilometers, of the keogram data, optional
+; :Parameters:
+;       keogram_struct: in, required, Struct
+;         keogram structure - usually the return value of aurorax_keogram_create()
+;       skymap: in, required, Struct
+;         the skymap to use for georeferencing
 ;
-; KEYWORDS:
-;       /GEO        adds an axis of geographic coordinates
-;       /MAG        adds an axis of geomagnetic coordinates
-;       /ELEV       adds an axis of elevation angles
+; :Keywords:
+;       altitude_km: in, optional, Integer or Float
+;         altitude, in kilometers, of the keogram data
+;       geo: in, optional, Boolean
+;         adds an axis of geographic coordinates
+;       mag: in, optional, Boolean
+;         adds an axis of geomagnetic coordinates
+;       elev: in, optional, Boolean
+;         adds an axis of elevation angles
 ;
-; OUTPUT
-;       keogram structure containing new axes
+; :Returns:
+;       Struct
 ;
-; OUTPUT TYPE:
-;       struct
-;
-; EXAMPLES:
+; :Examples:
 ;       keo = aurorax_keogram_add_axis(keo, skymap, /geo, /elev, altitude_km=110)
 ;+
-;-------------------------------------------------------------
 function aurorax_keogram_add_axis, keogram_struct, skymap, altitude_km = altitude_km, geo = geo, mag = mag, elev = elev
   compile_opt idl2
 

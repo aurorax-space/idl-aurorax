@@ -14,48 +14,54 @@
 ; limitations under the License.
 ; -------------------------------------------------------------
 
-; -------------------------------------------------------------
 ;+
-; NAME:
-;       AURORAX_BOUNDING_BOX_EXTRACT_METRIC
-;
-; PURPOSE:
-;       Extract a luminosity related metric from a portion of an image.
-;
-; EXPLANATION:
+; :Description:
 ;       Extract a metric, related to luminosity, from pixel data within
 ;       some bounded region within a single or set of ASI CCD images,
 ;       defined by CCD, lat/lon, elevation, or azimuth boundaries.
 ;
-; CALLING SEQUENCE:
-;       aurorax_bounding_box_extract_metric(images, mode, xy_bounds)
+; :Parameters:
+;       images: in, required, Array
+;         array of images to extract metric from
+;       mode: in, required, String
+;         string giving the input coordinate type ("geo", "mag", "ccd", "azim", "elev")
+;       xy_bounds: in, required, Array
+;         a two or four element array giving the bounds of the region of interest,
+;         for the desired mode ([lon0,lon1,lat0,lat1], [min_elev,max_elev], ... etc.)
 ;
-; PARAMETERS:
-;       images          array of images to extract metric from
-;       mode            string giving the input coordinate type ("geo", "mag", "ccd", "azim", "elev")
-;       xy_bounds       a two or four element array giving the bounds of the region of interest,
-;                       for the desired mode ([lon0,lon1,lat0,lat1], [min_elev,max_elev], ... etc.)
-;       percentile      the percentile for which luminosity/intensity is extracted
-;       metric          the metric to compute, accepted is "median" (default), "mean", or "sum"
-;       time_stamp      the timestamp to use for magnetic coordinate conversions, optional
-;       skymap          the skymap to use for georeferencing, optional
-;       altitude_km     the altitude of the image data for georeferencing, optional
-;       n_channels      manually specify the image data channels, otherwise its estimated based on shape, optional
+; :Keywords:
+;       percentile: in, optional, Float
+;         the percentile for which luminosity/intensity is extracted
+;       metric: in, optional, String
+;         the metric to compute, accepted is "median" (default), "mean", or "sum"
+;       time_stamp: in, optional, String
+;         the timestamp to use for magnetic coordinate conversions
+;       skymap: in, optional, Struct
+;         the skymap to use for georeferencing
+;       altitude_km: in, optional, Integer or Float
+;         the altitude of the image data for georeferencing
+;       n_channels: in, optional, Integer
+;         manually specify the image data channels, otherwise its estimated based on shape
+;       show_preview: in, optional, Boolean
+;         plot a preview of the bounded area on top of the first image frame
 ;
-; KEYWORDS:
-;       /SHOW_PREVIEW   plot a preview of the bounded area on top of the first image frame
+; :Returns:
+;       Array
 ;
-; OUTPUT
-;       extracted metric for all frames provided
-;
-; OUTPUT TYPE:
-;       array
-;
-; EXAMPLES:
+; :Examples:
 ;       luminosity = aurorax_bounding_box_extract_metric(images, "geo", [-94, -95, 55, 55.5], skymap=skymap, altitude_km=110)
 ;+
-;-------------------------------------------------------------
-function aurorax_bounding_box_extract_metric, images, mode, xy_bounds, metric = metric, percentile = percentile, show_preview = show_preview, time_stamp = time_stamp, skymap = skymap, altitude_km = altitude_km, n_channels = n_channels
+function aurorax_bounding_box_extract_metric, $
+  images, $
+  mode, $
+  xy_bounds, $
+  metric = metric, $
+  percentile = percentile, $
+  show_preview = show_preview, $
+  time_stamp = time_stamp, $
+  skymap = skymap, $
+  altitude_km = altitude_km, $
+  n_channels = n_channels
   compile_opt idl2
 
   if keyword_set(metric) and keyword_set(percentile) then begin

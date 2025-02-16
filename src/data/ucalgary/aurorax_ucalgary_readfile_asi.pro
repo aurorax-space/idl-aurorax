@@ -17,6 +17,7 @@
 ; definition for the PGM metadata fields
 pro aurorax_asi_pgm_metadata__define
   compile_opt idl2, hidden
+
   dummy = { $
     Aurorax_Asi_Pgm_Metadata, $
     site_uid: '', $
@@ -39,6 +40,7 @@ end
 ; definition for the PNG metadata fields
 pro aurorax_asi_png_metadata__define
   compile_opt idl2, hidden
+
   dummy = { $
     Aurorax_Asi_Png_Metadata, $
     site_uid: '', $
@@ -53,6 +55,7 @@ end
 ; definition for the H5 metadata fields
 pro aurorax_asi_h5_metadata__define
   compile_opt idl2, hidden
+
   dummy = { $
     Aurorax_Asi_H5_Metadata, $
     site_uid: '', $
@@ -74,6 +77,7 @@ end
 
 pro __aurorax_asi_cleanup_tar_files, file_list, verbose = verbose
   compile_opt idl2, hidden
+
   ; for each file
   if (verbose eq 2) then print, '[aurorax_read] Cleaning up untarred files'
   for i = 0, n_elements(file_list) - 1 do begin
@@ -83,11 +87,12 @@ pro __aurorax_asi_cleanup_tar_files, file_list, verbose = verbose
 end
 
 function __aurorax_asi_parse_pgm_comments, comments, metadata, minimal_metadata = minimal_metadata
+  compile_opt idl2, hidden
+
   ; init errors
   on_ioerror, ioerror
 
   ; init metadata variable
-  compile_opt idl2, hidden
   metadata = {Aurorax_Asi_Pgm_Metadata}
 
   ; set comments field
@@ -226,9 +231,23 @@ function __aurorax_asi_parse_h5_metadata, attributes, metadata, img_dims, minima
   return, 0
 end
 
-function __aurorax_asi_png_readfile, filename, image_data, meta_data, dimension_details, n_frames, n_bytes, untar_extract_supported, idl_version_full_support, untar_dir = untar_dir, no_untar_cleanup = no_untar_cleanup, verbose = verbose, no_metadata = no_metadata, first_frame = first_frame
-  ; init
+function __aurorax_asi_png_readfile, $
+  filename, $
+  image_data, $
+  meta_data, $
+  dimension_details, $
+  n_frames, $
+  n_bytes, $
+  untar_extract_supported, $
+  idl_version_full_support, $
+  untar_dir = untar_dir, $
+  no_untar_cleanup = no_untar_cleanup, $
+  verbose = verbose, $
+  no_metadata = no_metadata, $
+  first_frame = first_frame
   compile_opt idl2, hidden
+
+  ; init
   n_frames = 0
   n_bytes = 0
   file_list = []
@@ -359,9 +378,20 @@ function __aurorax_asi_png_readfile, filename, image_data, meta_data, dimension_
   return, 1
 end
 
-function __aurorax_asi_h5_readfile, filename, image_data, meta_data, dimension_details, n_frames, n_bytes, verbose = verbose, no_metadata = no_metadata, minimal_metadata = minimal_metadata, first_frame = first_frames
-  ; init
+function __aurorax_asi_h5_readfile, $
+  filename, $
+  image_data, $
+  meta_data, $
+  dimension_details, $
+  n_frames, $
+  n_bytes, $
+  verbose = verbose, $
+  no_metadata = no_metadata, $
+  minimal_metadata = minimal_metadata, $
+  first_frame = first_frames
   compile_opt idl2, hidden
+
+  ; init
   n_frames = 0
   n_bytes = 0
   dimension_details = [0, 0, 0, 1] ; the '1' is to designate BYTE type, the other fields get filled in when data is read
@@ -468,8 +498,15 @@ function __aurorax_asi_h5_readfile, filename, image_data, meta_data, dimension_d
   return, 1
 end
 
-function __aurorax_asi_pgm_readfile, filename, lun = lun, verbose = verbose, comments = comments, tuple_type = tuple_type, maxval = maxval
-  compile_opt idl2
+function __aurorax_asi_pgm_readfile, $
+  filename, $
+  lun = lun, $
+  verbose = verbose, $
+  comments = comments, $
+  tuple_type = tuple_type, $
+  maxval = maxval
+  compile_opt idl2, hidden
+
   ; set error cases
   if not keyword_set(verbose) then on_error, 2
   on_ioerror, ioerror
@@ -615,8 +652,9 @@ pro __aurorax_ucalgary_readfile_asi, $
   first_frame = first_frame, $
   untar_dir = untar_dir, $
   no_untar_cleanup = no_untar_cleanup
-  ; init
   compile_opt idl2, hidden
+
+  ; init
   stride = 0
   time0 = systime(1)
   filenames = ''

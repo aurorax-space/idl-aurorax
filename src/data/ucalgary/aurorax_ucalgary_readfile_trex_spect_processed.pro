@@ -15,7 +15,8 @@
 ; -------------------------------------------------------------
 
 pro __aurorax_ucalgary_readfile_trex_spect_processed, file_path, data, timestamp_list, meta, first_frame = first_frame, verbose = verbose
-  compile_opt idl2
+  compile_opt idl2, hidden
+
   ; set verbose
   if not isa(verbose) then verbose = 1
 
@@ -72,7 +73,7 @@ pro __aurorax_ucalgary_readfile_trex_spect_processed, file_path, data, timestamp
       attribute = h5a_read(attribute_id)
       file_meta_hash[attribute_name] = attribute
     endfor
-    file_meta = file_meta_hash.tostruct()
+    file_meta = file_meta_hash.toStruct()
     master_file_meta = [master_file_meta, file_meta]
 
     ; if first_frame_only keyword is set, slice all objects accordingly so that

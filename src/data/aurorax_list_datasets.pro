@@ -14,40 +14,27 @@
 ; limitations under the License.
 ; -------------------------------------------------------------
 
-; -------------------------------------------------------------
 ;+
-; NAME:
-;       AURORAX_LIST_DATASETS
-;
-; PURPOSE:
-;       Retrieve list of available datasets for which you can
-;       download data.
-;
-; EXPLANATION:
+; :Description:
 ;       Retrieve information about available datasets, including provider,
 ;       short+long descriptions, and DOI details. Optional parameters are
 ;       used to filter for certain matching datasets.
 ;
-; CALLING SEQUENCE:
-;       aurorax_list_datasets()
+; :Keywords:
+;       name: in, optional, String
+;         dataset name for filter on, case-insensitive and partial
+;         matches are allowed.
 ;
-; PARAMETERS:
-;       name         dataset name for filter on, case-insensitive and partial
-;                    matches are allowed. Optional.
+; :Returns:
+;       List(Structure)
 ;
-; OUTPUT
-;       the found datasets
-;
-; OUTPUT TYPE:
-;       a list of structs
-;
-; EXAMPLES:
+; :Examples:
 ;       datasets = aurorax_list_datasets()
 ;       datasets = aurorax_list_datasets(name='THEMIS_ASI')
 ;+
-;-------------------------------------------------------------
 function aurorax_list_datasets, name = name
   compile_opt idl2
+
   ; set params
   param_str = ''
   if (isa(name) eq 1) then begin

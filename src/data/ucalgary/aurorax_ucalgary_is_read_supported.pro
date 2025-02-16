@@ -14,16 +14,11 @@
 ; limitations under the License.
 ; -------------------------------------------------------------
 
-; -------------------------------------------------------------
 ;+
-; NAME:
-;       AURORAX_UCALGARY_IS_READ_SUPPORTED
-;
-; PURPOSE:
+; :Description:
 ;       Determine if a given dataset is supported in the aurorax_ucalgary_read()
-;       function.
+;       function. This function will return 0 for False, 1 for True.
 ;
-; EXPLANATION:
 ;       Some datasets provided by UCalgary require special readfile routines. This
 ;       function provides the ability to programmatically determine if a dataset
 ;       is supported in the aurorax_ucalgary_read() function.
@@ -32,23 +27,17 @@
 ;       example, 'THEMIS_ASI_DAILY_KEOGRAM_JPG', can be read in using the built-in
 ;       READ_JPEG procedure.
 ;
-; CALLING SEQUENCE:
-;       aurorax_ucalgary_is_read_supported(dataset_name)
+; :Parameters:
+;       dataset_name: in, required, String
+;         name of the dataset to check for read support
 ;
-; PARAMETERS:
-;       dataset_name       name of the dataset check for read support
+; :Returns:
+;       Integer
 ;
-; OUTPUT
-;       0 for False, 1 for True
-;
-; OUTPUT TYPE:
-;       integer
-;
-; EXAMPLES:
+; :Examples:
 ;       supported = aurorax_ucalgary_is_read_supported('THEMIS_ASI_RAW')
 ;       supported = aurorax_ucalgary_is_read_supported('THEMIS_ASI_DAILY_KEOGRAM_JPG')
 ;+
-;-------------------------------------------------------------
 function aurorax_ucalgary_is_read_supported, dataset_name
   compile_opt idl2
 

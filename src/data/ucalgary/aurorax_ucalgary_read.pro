@@ -15,7 +15,8 @@
 ; -------------------------------------------------------------
 
 function __reorient_asi_images, dataset_name, data
-  compile_opt idl2
+  compile_opt idl2, hidden
+
   ; NOTE:
   ; flip horizontally --> reverse(data[*,*,0],1) -- subscript index = 1
   ; flip vertically  --> reverse(data[*,*,0],2) -- subscript index = 2
@@ -47,7 +48,8 @@ function __reorient_asi_images, dataset_name, data
 end
 
 function __reorient_skymaps, dataset_name, skymap
-  compile_opt idl2
+  compile_opt idl2, hidden
+
   ; NOTE:
   ; flip horizontally --> reverse(data[*,*,0],1) -- subscript index = 1
   ; flip vertically  --> reverse(data[*,*,0],2) -- subscript index = 2
@@ -71,7 +73,8 @@ function __reorient_skymaps, dataset_name, skymap
 end
 
 function __reorient_calibration, dataset_name, cal
-  compile_opt idl2
+  compile_opt idl2, hidden
+
   ; NOTE:
   ; flip horizontally --> reverse(data[*,*,0],1) -- subscript index = 1
   ; flip vertically  --> reverse(data[*,*,0],2) -- subscript index = 2
@@ -90,44 +93,35 @@ function __reorient_calibration, dataset_name, cal
   return, cal
 end
 
-; -------------------------------------------------------------
 ;+
-; NAME:
-;       AURORAX_UCALGARY_READ
+; :Description:
+;       Read data files that were downloaded from the UCalgary Open Data Platform.
 ;
-; PURPOSE:
-;       Read data downloaded from the UCalgary Open Data Platform
+; :Parameters:
+;       dataset: in, required, Struct
+;         struct for the dataset that is being read in (retrieved from aurorax_list_dataset() function)
+;       file_list: in, required, String or Array
+;         list of files on the local computer to read in (can also be a single filename string)
 ;
-; EXPLANATION:
-;       Read data files that were dowloaded from the UCalgary Open
-;       Data Platform.
+; :Keywords:
+;       FIRST_RECORD: in, optional, Boolean
+;         only read the first record/frame/image in each file
+;       NO_METADATA: in, optional, Boolean
+;         exclude reading of metadata
+;       QUIET: in, optional, Boolean
+;         read data silently, no print messages will be shown
 ;
-; CALLING SEQUENCE:
-;       aurorax_ucalgary_read(dataset, file_list)
+; :Returns:
+;       Struct
 ;
-; PARAMETERS:
-;       dataset            struct for the dataset that is being read in (retrieved from aurorax_list_dataset() function)
-;       file_list          list of files on the local computer to read in (can also be a single filename string)
-;
-; KEYWORDS:
-;       /FIRST_RECORD      only read the first record/frame/image in each file
-;       /NO_METADATA       exclude reading of metadata
-;       /QUIET             read data silently, no print messages will be shown
-;
-; OUTPUT
-;       the loaded data
-;
-; OUTPUT TYPE:
-;       a struct
-;
-; EXAMPLES:
+; :Examples:
 ;       download_obj = aurorax_ucalgary_download('THEMIS_ASI_RAW','2022-01-01T06:00:00','2022-01-01T06:59:59',site_uid='gill')
 ;       data = aurorax_ucalgary_read(d.dataset,f)
 ;       help,data
 ;+
-;-------------------------------------------------------------
 function aurorax_ucalgary_read, dataset, file_list, first_record = first_record, no_metadata = no_metadata, quiet = quiet
   compile_opt idl2
+
   ; init
   timestamp_list = list()
   metadata_list = list()

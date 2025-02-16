@@ -14,48 +14,57 @@
 ; limitations under the License.
 ; -------------------------------------------------------------
 
-; -------------------------------------------------------------
 ;+
-; NAME:
-;       AURORAX_CCD_CONTOUR
+; :Description:
+;       Obtain the CCD coordinates of a variety of different contours, given one of a
+;       constant elevation, azimuth, geo or mag lat or lon, or arrays of lats/lons defining
+;       a contour. Used for plotting on top of an image.
 ;
-; PURPOSE:
-;       Obtain the CCD ccordinates of a variety of different contours.
+;       This function returns an array of shape (N,2), which are the x and y CCD coordinates
+;       of the contour
 ;
-; EXPLANATION:
-;       Given one of a constant elevation, azimuth, geo or mag lat or lon,
-;       or arrays of lats/lons defining a contour, returns the CCD
-;       coordinates of said contour, for plotting on top of an image.
+; :Parameters:
+;       skymap: in, required, Struct
+;         the skymap to use for georeferencing
 ;
-; CALLING SEQUENCE:
-;       aurorax_ccd_contour(skymap, ...)
+; :Keywords:
+;       constant_azimuth: in, optional, Boolean
+;         the desired constant azimuth, in degrees from north, to obtain contour for
+;       constant_elevation: in, optional, Integer or Float
+;         the desired constant elevation to obtain contour for
+;       constant_lat: in, optional, Integer or Float
+;         the desired constant latitude to obtain contour for
+;       constant_lon: in, optional, Integer or Float
+;         the desired constant longitude to obtain contour for
+;       contour_lats: in, optional, Array
+;         array of lats defining a contour
+;       contour_lons: in, optional, Array
+;         array of lons defining a contour
+;       altitude_km: in, optional, Integer
+;         the altitude of the image data for georeferencing if necessary
 ;
-; PARAMETERS:
-;       skymap                the skymap to use for georeferencing
-;       constant_azimuth      the desired constant azimuth, in degrees from north, to obtain contour for, optional
-;       constant_elevation    the desired constant elevation to obtain contour for, optional
-;       constant_lat          the desired constant latitude to obtain contour for, optional
-;       constant_lon          the desired constant longitude to obtain contour for, optional
-;       contour_lats          array of lats defining a contour, optional
-;       contour_lons          array of lons defining a contour, optional
-;       altitude_km           the altitude of the image data for georeferencing if necessary, optional
+; :Keywords:
+;       mag: in, optional, Boolean
+;         use this keyword if lats/lons are supplied in magnetic coordinates
 ;
-; KEYWORDS:
-;       /MAG          use this keyword if lats/lons are supplied in magnetic coordinates
+; :Returns:
+;       Array
 ;
-; OUTPUT
-;       the x and y CCD coordinates of the contour
-;
-; OUTPUT TYPE:
-;       array of shape (N,2)
-;
-; EXAMPLES:
+; :Examples:
 ;       contour = aurorax_ccd_contour(skymap, constant_lat = 67)
 ;       ccd_x = contour[*,0]
 ;       ccd_y = contour[*,1]
 ;+
-;-------------------------------------------------------------
-function aurorax_ccd_contour, skymap, constant_azimuth = constant_azimuth, constant_elevation = constant_elevation, constant_lat = constant_lat, constant_lon = constant_lon, contour_lats = contour_lats, contour_lons = contour_lons, altitude_km = altitude_km, mag = mag
+function aurorax_ccd_contour, $
+  skymap, $
+  constant_azimuth = constant_azimuth, $
+  constant_elevation = constant_elevation, $
+  constant_lat = constant_lat, $
+  constant_lon = constant_lon, $
+  contour_lats = contour_lats, $
+  contour_lons = contour_lons, $
+  altitude_km = altitude_km, $
+  mag = mag
   compile_opt idl2
 
   ; Check that both lat/lon are provided for custom contour

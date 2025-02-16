@@ -14,46 +14,53 @@
 ; limitations under the License.
 ; -------------------------------------------------------------
 
-; -------------------------------------------------------------
 ;+
-; NAME:
-;       AURORAX_MONTAGE_CREATE
+; :Description:
+;       Create a montage from a set of images, and display it.
 ;
-; PURPOSE:
-;       Create and display a montage.
+; :Parameters:
+;       images: in, required, Array
+;         array of images to create the montage for
+;       timestamps: in, required, Array
+;         timestamps corresponding to each frame of images
+;       n_cols: in, required, Integer
+;         integer specifying the number of columns in the montage
+;       n_rows: in, required, Integer
+;         integer specifying the number of rows in the montage
 ;
-; EXPLANATION:
-;       Create a montage from a set of images, and display
-;       it, accompanied by timestamps.
+; :Keywords:
+;       colortable: in, optional, Integer
+;         integer specifying the IDL colortable to use, optional (default is 0)
+;       timestamps_fontsize: in, optional, Integer
+;         font size for the timestamp labels, optional
+;       frame_step: in, optional, Integer
+;         interval to add frames from images to the montage, optional (default is 1)
+;       dimensions: in, optional, Array
+;         two-element array giving dimensions of the plotting window in device coordinates, optional
+;       location: in, optional, Array
+;         two-element array giving location of the plotting window in device coordinates, optional
+;       timestamps_color: in, optional, String
+;         a string giving the color to overplot timestamps, optional (default is 'white')
+;       no_timestamps: in, optional, Boolean
+;         disable default behaviour of plotting timestamps
 ;
-; CALLING SEQUENCE:
-;       aurorax_montage_create, images, time_stamp, n_cols, n_rows
-;
-; PARAMETERS:
-;       images                  array of images to create the montage for
-;       timestamps              timestamps corresponding to each frame of images
-;       n_cols                  integer specifying the number of columns in the montage
-;       n_rows                  integer specifying the number of rows in the montage
-;       colortable              integer specifying the IDL colortable to use, optional (default is 0)
-;       timestamps_fontsize     font size for the timestamp labals, optional
-;       frame_step              interval to add frames from images to the montage, optional (default is 1)
-;       dimensions              two-element array giving dimensions of the plotting window in device coordinates, optional
-;       location                two-element array giving location of the plotting window in device coordinates, optional
-;       timestamps_color        a string giving the color to overplot timestamps, optional (default is 'white')
-;
-; KEYWORDS:
-;       /NO_TIMESTAMPS          disable default behaviour of plotting timestamps
-;
-; OUTPUT
-;
-; OUTPUT TYPE:
-;
-; EXAMPLES:
+; :Examples:
 ;       aurorax_montage_create, images, timestamps, 5, 5, colortable=7, timestamps_fontsize=16
 ;+
-;-------------------------------------------------------------
-pro aurorax_montage_create, images, timestamps, n_cols, n_rows, colortable = colortable, timestamps_fontsize = timestamps_fontsize, frame_step = frame_step, dimensions = dimensions, location = location, no_timestamps = no_timestamps
+pro aurorax_montage_create, $
+  images, $
+  timestamps, $
+  n_cols, $
+  n_rows, $
+  colortable = colortable, $
+  timestamps_color = timestamps_color, $
+  timestamps_fontsize = timestamps_fontsize, $
+  frame_step = frame_step, $
+  dimensions = dimensions, $
+  location = location, $
+  no_timestamps = no_timestamps
   compile_opt idl2
+
   ; Get the number of channels of image data
   images_shape = size(images, /dimensions)
   if n_elements(images_shape) eq 2 then begin
@@ -92,12 +99,11 @@ pro aurorax_montage_create, images, timestamps, n_cols, n_rows, colortable = col
   ; set default values
   if not keyword_set(colortable) then colortable = 0
   if not keyword_set(dimensions) then dimensions = [n_cols * 150, n_rows * 131]
-  if not keyword_set(position) then position = [5, 5]
   if not keyword_set(timestamps_fontsize) then timestamps_fontsize = 12
   if not keyword_set(timestamps_color) then timestamps_color = 'white'
 
   ; Create the plot
-  w = window(dimensions = dimensions, location = location, margin = 0, /no_toolbar)
+  w = window(dimensions = dimensions, location = location, /no_toolbar)
 
   ; convert images to bytes
   images = bytscl(images)

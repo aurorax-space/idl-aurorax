@@ -66,6 +66,9 @@ end
 ;       in the AuroraX Search Engine. Optional parameters are used to
 ;       filter unwanted data sources out.
 ;
+;       This function returns the retrieved data availability information,
+;       as a list of structs
+;
 ; :Parameters:
 ;       start_date: in, required, String
 ;         start year to use, string (YYYY, YYYYMM, or YYYYMMDD)
@@ -83,7 +86,7 @@ end
 ;         source type to filter on (valid values are: leo, heo, lunar, ground, event_list)
 
 ; :Returns:
-;       retrieved data availability information, as a list of structs
+;       List
 ;
 ; :Examples:
 ;       data = aurorax_ephemeris_availability('20200101','20200105',program='swarm')
@@ -107,6 +110,9 @@ end
 ;       in the AuroraX platform. Optional parameters are used to filter
 ;       unwanted data sources out.
 ;
+;       This function returns the retrieved data availability information,
+;       as a list of structs
+;
 ; :Parameters:
 ;       start_date: in, required, String
 ;         start year to use, string (YYYY, YYYYMM, or YYYYMMDD)
@@ -124,7 +130,7 @@ end
 ;         source type to filter on (valid values are: leo, heo, lunar, ground, event_list)
 ;
 ; :Returns:
-;       retrieved data availability information, as a list of structs
+;       List
 ;
 ; :Examples:
 ;       data = aurorax_data_products_availability('20200101','20200105',program='auroramax')
