@@ -1,29 +1,30 @@
-;-------------------------------------------------------------
+; -------------------------------------------------------------
 ; Copyright 2024 University of Calgary
 ;
 ; Licensed under the Apache License, Version 2.0 (the "License");
 ; you may not use this file except in compliance with the License.
 ; You may obtain a copy of the License at
 ;
-;    http://www.apache.org/licenses/LICENSE-2.0
+; http://www.apache.org/licenses/LICENSE-2.0
 ;
 ; Unless required by applicable law or agreed to in writing, software
 ; distributed under the License is distributed on an "AS IS" BASIS,
 ; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ; See the License for the specific language governing permissions and
 ; limitations under the License.
-;-------------------------------------------------------------
+; -------------------------------------------------------------
 
 function __determine_cadence, timestamp_arr
-  ;;;
-  ;   Determines the cadence using a list of timestamps
-  ;;;
+  compile_opt idl2
+  ; ;;
+  ; Determines the cadence using a list of timestamps
+  ; ;;
 
   diff_seconds = []
   curr_ts = !null
   checked_timestamps = 0
 
-  for i=0, n_elements(timestamp_arr)-1 do begin
+  for i = 0, n_elements(timestamp_arr) - 1 do begin
     ; bail out if we've checked 10 timestamps, that'll be enough
     if (checked_timestamps gt 10) then break
 
@@ -38,7 +39,6 @@ function __determine_cadence, timestamp_arr
       curr_ts = timestamp_arr[i]
     endelse
     checked_timestamps += 1
-
   endfor
 
   ; Get hash of occurences of second differences
@@ -61,25 +61,23 @@ function __determine_cadence, timestamp_arr
   endforeach
 
   if cadence eq !null then begin
-    print, "[aurorax_mosaic_prep_images] Error: Could not determine cadence of image data."
+    print, '[aurorax_mosaic_prep_images] Error: Could not determine cadence of image data.'
     return, !null
   endif
 
   return, cadence
-
 end
 
-
 function __get_julday, time_stamp
-  ;;;
-  ;   Splits a timestamp string into a struct with value of julian day
-  ;   and string field to use for comparisons.
+  compile_opt idl2
+  ; ;;
+  ; Splits a timestamp string into a struct with value of julian day
+  ; and string field to use for comparisons.
   ;
-  ;   Note: Expects timestamps of the form: 'yyyy-mm-dd HH:MM:SS.ff utc'
-  ;;;
+  ; Note: Expects timestamps of the form: 'yyyy-mm-dd HH:MM:SS.ff utc'
+  ; ;;
 
   if (not isa(time_stamp, /array)) then begin
-
     year = fix((strsplit(time_stamp, '-', /extract))[0])
     month = fix((strsplit(time_stamp, '-', /extract))[1])
     day = fix((strsplit(time_stamp, '-', /extract))[2])
@@ -92,21 +90,19 @@ function __get_julday, time_stamp
   endif else begin
     datetime_arr = []
 
-    year = fix(((strsplit(time_stamp, '-', /extract)).toarray())[*,0])
-    month = fix(((strsplit(time_stamp, '-', /extract)).toarray())[*,1])
-    day = fix(((strsplit(time_stamp, '-', /extract)).toarray())[*,2])
+    year = fix(((strsplit(time_stamp, '-', /extract)).toarray())[*, 0])
+    month = fix(((strsplit(time_stamp, '-', /extract)).toarray())[*, 1])
+    day = fix(((strsplit(time_stamp, '-', /extract)).toarray())[*, 2])
 
-
-    hour = fix(strmid((((strsplit(time_stamp, ':', /extract)).toarray())[*,0]), 1, 2, /reverse_offset))
-    minute = fix((((strsplit(time_stamp, ':', /extract)).toarray())[*,1]))
-    second = fix((((strsplit(time_stamp, ':', /extract)).toarray())[*,2]))
+    hour = fix(strmid((((strsplit(time_stamp, ':', /extract)).toarray())[*, 0]), 1, 2, /reverse_offset))
+    minute = fix((((strsplit(time_stamp, ':', /extract)).toarray())[*, 1]))
+    second = fix((((strsplit(time_stamp, ':', /extract)).toarray())[*, 2]))
 
     return, julday(month, day, year, hour, minute, second)
-
   endelse
 end
 
-;-------------------------------------------------------------
+; -------------------------------------------------------------
 ;+
 ; NAME:
 ;       AURORAX_MOSAIC_PREP_IMAGES
@@ -139,10 +135,11 @@ end
 ;+
 ;-------------------------------------------------------------
 function aurorax_mosaic_prep_images, image_list
+  compile_opt idl2
 
   ; Verify that image_list is indeed a list, not array
-  if (typename(image_list) ne "LIST") then begin
-    print, "[aurorax_mosaic_prep_images] Error: image_list must be a list, i.e. 'list(img_data_1, img_data_2, ...)'."
+  if (typename(image_list) ne 'LIST') then begin
+    print, '[aurorax_mosaic_prep_images] Error: image_list must be a list, i.e. ''list(img_data_1, img_data_2, ...)''.'
     return, !null
   endif
 
@@ -152,9 +149,9 @@ function aurorax_mosaic_prep_images, image_list
   ; same size, and we adequately account for dropped frames.
   ;
   ; Steps:
-  ;   1) finding the over-arching start and end times of data across all sites
-  ;   2) determine the cadence using the timestamps
-  ;   3) determine the number of expected frames using the cadence, start and end
+  ; 1) finding the over-arching start and end times of data across all sites
+  ; 2) determine the cadence using the timestamps
+  ; 3) determine the number of expected frames using the cadence, start and end
   start_ts = __get_julday(image_list[0].timestamp[0])
   end_ts = __get_julday(image_list[0].timestamp[-1])
   foreach site_data, image_list do begin
@@ -166,9 +163,9 @@ function aurorax_mosaic_prep_images, image_list
 
   ; Determine cadance, and generate all expected timestamps
   cadence = __determine_cadence(image_list[0].timestamp)
-  expected_juldays = timegen(start=start_ts, final=end_ts, step_size=cadence, units='S')
+  expected_juldays = timegen(start = start_ts, final = end_ts, step_size = cadence, units = 'S')
   if (end_ts - start_ts) gt 3 then begin
-    print, "[aurorax_mosaic_prep_images] Error: Excessive date range detected - Check that all data is from the same time range"
+    print, '[aurorax_mosaic_prep_images] Error: Excessive date range detected - Check that all data is from the same time range'
     return, !null
   endif
   expected_timestamps = string(expected_juldays, format = '(C(CYI, "-", CMOI2.2, "-", CDI2.2, " ", CHI2.2, ":", CMI2.2, ":", CSI2.2))')
@@ -179,14 +176,13 @@ function aurorax_mosaic_prep_images, image_list
   images_dict = hash()
   dimensions_dict = hash()
   foreach site_image_data, image_list do begin
-
     site_data = site_image_data.data
 
     ; Add to site uid list
-    if where(tag_names(site_image_data.metadata[0]) eq "SITE_UID", /null) ne !null then begin
+    if where(tag_names(site_image_data.metadata[0]) eq 'SITE_UID', /null) ne !null then begin
       site_uid = site_image_data.metadata[0].site_uid
     endif else begin
-      print, "[aurorax_mosaic_prep_images] Error: Could not find SITE_UID when parsing metadata."
+      print, '[aurorax_mosaic_prep_images] Error: Could not find SITE_UID when parsing metadata.'
       return, !null
     endelse
 
@@ -209,27 +205,27 @@ function aurorax_mosaic_prep_images, image_list
 
     ; We don't attempt to handle the same site being passed in for multiple networks
     if where(site_uid eq images_dict.keys(), /null) ne !null then begin
-      print, strupcase(site_uid), format="Same site between differing networks detected. Omitting additional %s data"
+      print, strupcase(site_uid), format = 'Same site between differing networks detected. Omitting additional %s data'
       continue
     endif
 
     site_uid_list = [site_uid_list, site_uid]
 
     ; initialize this site's image data variable
-    site_images = reform(make_array(n_channels, width, height, expected_num_frames, /double, value=!values.f_nan))
+    site_images = reform(make_array(n_channels, width, height, expected_num_frames, /double, value = !values.f_nan))
 
     ; find the index in the data corresponding to each expected timestamp
-    for i=0, n_elements(expected_timestamps)-1 do begin
-      found_idx = where(((strsplit(site_image_data.timestamp, '.', /extract)).toarray())[*,0] eq expected_timestamps[i], /null)
+    for i = 0, n_elements(expected_timestamps) - 1 do begin
+      found_idx = where(((strsplit(site_image_data.timestamp, '.', /extract)).toarray())[*, 0] eq expected_timestamps[i], /null)
 
       ; didn't find the timestamp, just move on because there will be no data for this timestamp
       if found_idx eq !null then continue
 
       ; Add data to array
       if n_channels eq 1 then begin
-        site_images[*,*,i] = site_data[*,*,found_idx]
+        site_images[*, *, i] = site_data[*, *, found_idx]
       endif else begin
-        site_images[*,*,*,i] = site_data[*,*,*,found_idx]
+        site_images[*, *, *, i] = site_data[*, *, *, found_idx]
       endelse
     endfor
 
@@ -238,12 +234,7 @@ function aurorax_mosaic_prep_images, image_list
   endforeach
 
   ; cast into mosaic_data struct
-  prepped_data = hash('site_uid',site_uid_list, 'timestamps',expected_timestamps, 'images',images_dict, 'images_dimensions',dimensions_dict)
+  prepped_data = hash('site_uid', site_uid_list, 'timestamps', expected_timestamps, 'images', images_dict, 'images_dimensions', dimensions_dict)
 
   return, prepped_data
 end
-
-
-
-
-

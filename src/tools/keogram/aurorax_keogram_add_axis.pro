@@ -1,20 +1,20 @@
-;-------------------------------------------------------------
+; -------------------------------------------------------------
 ; Copyright 2024 University of Calgary
 ;
 ; Licensed under the Apache License, Version 2.0 (the "License");
 ; you may not use this file except in compliance with the License.
 ; You may obtain a copy of the License at
 ;
-;    http://www.apache.org/licenses/LICENSE-2.0
+; http://www.apache.org/licenses/LICENSE-2.0
 ;
 ; Unless required by applicable law or agreed to in writing, software
 ; distributed under the License is distributed on an "AS IS" BASIS,
 ; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ; See the License for the specific language governing permissions and
 ; limitations under the License.
-;-------------------------------------------------------------
+; -------------------------------------------------------------
 
-;-------------------------------------------------------------
+; -------------------------------------------------------------
 ;+
 ; NAME:
 ;       AURORAX_KEOGRAM_ADD_AXIS
@@ -50,10 +50,11 @@
 ;       keo = aurorax_keogram_add_axis(keo, skymap, /geo, /elev, altitude_km=110)
 ;+
 ;-------------------------------------------------------------
-function aurorax_keogram_add_axis, keogram_struct, skymap, altitude_km=altitude_km, geo=geo, mag=mag, elev=elev
+function aurorax_keogram_add_axis, keogram_struct, skymap, altitude_km = altitude_km, geo = geo, mag = mag, elev = elev
+  compile_opt idl2
 
   if keyword_set(geo) and not keyword_set(altitude_km) then begin
-    print, "[aurorax_keogram_add_axis] Error: Using '/geo' or '/mag' requires passing in 'altitude_km'."
+    print, '[aurorax_keogram_add_axis] Error: Using ''/geo'' or ''/mag'' requires passing in ''altitude_km''.'
     return, !null
   endif
 
@@ -70,19 +71,19 @@ function aurorax_keogram_add_axis, keogram_struct, skymap, altitude_km=altitude_
 
   ; Check that at least one keyword is passed
   if not keyword_set(geo) and not keyword_set(mag) and not keyword_set(geo) then begin
-    print, "[aurorax_keogram_add_axis] Error: At least one of '/geo', '/mag', '/elev', must be set to add axes.'
+    print, '[aurorax_keogram_add_axis] Error: At least one of ''/geo'', ''/mag'', ''/elev'', must be set to add axes.'''
     return, !null
   endif
 
   ; Check that skymap size matches keogram
   if keogram_struct.axis eq 0 then begin
     if (size(skymap.full_azimuth, /dimensions))[1] ne keo_height then begin
-      print, "[aurorax_keogram_add_axis] Error: Skymap size does not match size of
+      print, '[aurorax_keogram_add_axis] Error: Skymap size does not match size of'
       return, !null
     endif
   endif else begin
     if (size(skymap.full_azimuth, /dimensions))[0] ne keo_height then begin
-      print, "[aurorax_keogram_add_axis] Error: Skymap size does not match size of
+      print, '[aurorax_keogram_add_axis] Error: Skymap size does not match size of'
       return, !null
     endif
   endelse
@@ -133,8 +134,8 @@ function aurorax_keogram_add_axis, keogram_struct, skymap, altitude_km=altitude_
     ; interpolation is required
     ; first check if supplied altitude is valid for interpolation
     if (altitude_km lt min(interp_alts)) or (altitude_km gt max(interp_alts)) then begin
-      error_msg = "[aurorax_keogram_add_axis] Error: Altitude of "+strcompress(string(altitude_km),/remove_all)+" km is outside the valid " + $
-        "range of ["+strcompress(string(min(interp_alts)),/remove_all)+","+strcompress(string(max(interp_alts)),/remove_all)+"] km."
+      error_msg = '[aurorax_keogram_add_axis] Error: Altitude of ' + strcompress(string(altitude_km), /remove_all) + ' km is outside the valid ' + $
+        'range of [' + strcompress(string(min(interp_alts)), /remove_all) + ',' + strcompress(string(max(interp_alts)), /remove_all) + '] km.'
       print, error_msg
       return, !null
     endif
@@ -153,33 +154,32 @@ function aurorax_keogram_add_axis, keogram_struct, skymap, altitude_km=altitude_
   endelse
 
   if keyword_set(mag) then begin
-    print, "Warning: Magnetic coordinates are not currently supported for this routine."
+    print, 'Warning: Magnetic coordinates are not currently supported for this routine.'
     return, !null
   endif
 
   keywords = [keyword_set(geo), keyword_set(mag), keyword_set(elev)]
 
-  if array_equal(keywords, [0,0,1]) then begin
+  if array_equal(keywords, [0, 0, 1]) then begin
     ; Return keogram array with desired axes added
-    return, {data:keo_arr, timestamp:time_stamp, ut_decimal: keogram_struct.ut_decimal, ccd_y:ccd_y, slice_idx:slice_idx, axis:keogram_struct.axis, elev_y:elev_y}
-  endif else if array_equal(keywords, [0,1,0]) then begin
+    return, {data: keo_arr, timestamp: time_stamp, ut_decimal: keogram_struct.ut_decimal, ccd_y: ccd_y, slice_idx: slice_idx, axis: keogram_struct.axis, elev_y: elev_y}
+  endif else if array_equal(keywords, [0, 1, 0]) then begin
     ; Return keogram array with desired axes added
-    return, {data:keo_arr, timestamp:time_stamp, ut_decimal: keogram_struct.ut_decimal, ccd_y:ccd_y, slice_idx:slice_idx, axis:keogram_struct.axis}
-  endif else if array_equal(keywords, [0,1,1]) then begin
+    return, {data: keo_arr, timestamp: time_stamp, ut_decimal: keogram_struct.ut_decimal, ccd_y: ccd_y, slice_idx: slice_idx, axis: keogram_struct.axis}
+  endif else if array_equal(keywords, [0, 1, 1]) then begin
     ; Return keogram array with desired axes added
-    return, {data:keo_arr, timestamp:time_stamp, ut_decimal: keogram_struct.ut_decimal, ccd_y:ccd_y, slice_idx:slice_idx, axis:keogram_struct.axis, elev_y:elev_y}
-  endif else if array_equal(keywords, [1,0,0]) then begin
+    return, {data: keo_arr, timestamp: time_stamp, ut_decimal: keogram_struct.ut_decimal, ccd_y: ccd_y, slice_idx: slice_idx, axis: keogram_struct.axis, elev_y: elev_y}
+  endif else if array_equal(keywords, [1, 0, 0]) then begin
     ; Return keogram array with desired axes added
-    return, {data:keo_arr, timestamp:time_stamp, ut_decimal: keogram_struct.ut_decimal, ccd_y:ccd_y, slice_idx:slice_idx, axis:keogram_struct.axis, geo_y:geo_y}
-  endif else if array_equal(keywords, [1,0,1]) then begin
+    return, {data: keo_arr, timestamp: time_stamp, ut_decimal: keogram_struct.ut_decimal, ccd_y: ccd_y, slice_idx: slice_idx, axis: keogram_struct.axis, geo_y: geo_y}
+  endif else if array_equal(keywords, [1, 0, 1]) then begin
     ; Return keogram array with desired axes added
-    return, {data:keo_arr, timestamp:time_stamp, ut_decimal: keogram_struct.ut_decimal, ccd_y:ccd_y, slice_idx:slice_idx, axis:keogram_struct.axis, geo_y:geo_y, elev_y:elev_y}
-  endif else if array_equal(keywords, [1,1,0]) then begin
+    return, {data: keo_arr, timestamp: time_stamp, ut_decimal: keogram_struct.ut_decimal, ccd_y: ccd_y, slice_idx: slice_idx, axis: keogram_struct.axis, geo_y: geo_y, elev_y: elev_y}
+  endif else if array_equal(keywords, [1, 1, 0]) then begin
     ; Return keogram array with desired axes added
-    return, {data:keo_arr, timestamp:time_stamp, ut_decimal: keogram_struct.ut_decimal, ccd_y:ccd_y, slice_idx:slice_idx, axis:keogram_struct.axis, geo_y:geo_y}
-  endif else if array_equal(keywords, [1,1,1]) then begin
+    return, {data: keo_arr, timestamp: time_stamp, ut_decimal: keogram_struct.ut_decimal, ccd_y: ccd_y, slice_idx: slice_idx, axis: keogram_struct.axis, geo_y: geo_y}
+  endif else if array_equal(keywords, [1, 1, 1]) then begin
     ; Return keogram array with desired axes added
-    return, {data:keo_arr, timestamp:time_stamp, ut_decimal: keogram_struct.ut_decimal, ccd_y:ccd_y, slice_idx:slice_idx, axis:keogram_struct.axis, geo_y:geo_y, elev_y:elev_y}
+    return, {data: keo_arr, timestamp: time_stamp, ut_decimal: keogram_struct.ut_decimal, ccd_y: ccd_y, slice_idx: slice_idx, axis: keogram_struct.axis, geo_y: geo_y, elev_y: elev_y}
   endif
-
 end

@@ -1,20 +1,20 @@
-;-------------------------------------------------------------
+; -------------------------------------------------------------
 ; Copyright 2024 University of Calgary
 ;
 ; Licensed under the Apache License, Version 2.0 (the "License");
 ; you may not use this file except in compliance with the License.
 ; You may obtain a copy of the License at
 ;
-;    http://www.apache.org/licenses/LICENSE-2.0
+; http://www.apache.org/licenses/LICENSE-2.0
 ;
 ; Unless required by applicable law or agreed to in writing, software
 ; distributed under the License is distributed on an "AS IS" BASIS,
 ; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ; See the License for the specific language governing permissions and
 ; limitations under the License.
-;-------------------------------------------------------------
+; -------------------------------------------------------------
 
-;-------------------------------------------------------------
+; -------------------------------------------------------------
 ;+
 ; NAME:
 ;       AURORAX_MOSAIC_PREP_SKYMAPS
@@ -49,13 +49,14 @@
 ;+
 ;-------------------------------------------------------------
 function aurorax_mosaic_prep_skymap, skymap_list, altitude_km
+  compile_opt idl2
 
   if typename(skymap_list) ne 'LIST' then begin
-    print, "[aurorax_mosaic_prep_skymap] Error: Input skymaps must be stored in a list. Recieved type: "+typename(skymap_list)
+    print, '[aurorax_mosaic_prep_skymap] Error: Input skymaps must be stored in a list. Recieved type: ' + typename(skymap_list)
     return, !null
   endif
   if not isa(altitude_km, /scalar) then begin
-    print, "[aurorax_mosaic_prep_skymap] Error: Altitude must be a scalar. Recieved type: "+typename(altitude_km)
+    print, '[aurorax_mosaic_prep_skymap] Error: Altitude must be a scalar. Recieved type: ' + typename(altitude_km)
     return, !null
   endif
 
@@ -63,8 +64,7 @@ function aurorax_mosaic_prep_skymap, skymap_list, altitude_km
   polyfill_lat = list()
   polyfill_lon = list()
   site_uid = []
-  for k=0, n_elements(skymap_list)-1 do begin
-
+  for k = 0, n_elements(skymap_list) - 1 do begin
     skymap = skymap_list[k]
     site_uid = [site_uid, skymap.site_uid]
 
@@ -87,10 +87,9 @@ function aurorax_mosaic_prep_skymap, skymap_list, altitude_km
     interp_alts = altitudes / 1000.
 
     ; iterate through each image pixel
-    for i=0, width-1 do begin
-      for j=0, height-1 do begin
-
-        if ~ finite(elev[i,j]) then continue
+    for i = 0, width - 1 do begin
+      for j = 0, height - 1 do begin
+        if ~finite(elev[i, j]) then continue
 
         if where(float(altitude_km) eq interp_alts, /null) ne !null then begin
           ; no interpolation required
@@ -98,9 +97,9 @@ function aurorax_mosaic_prep_skymap, skymap_list, altitude_km
 
           ; grab longitudes of pixel corners at desired altitudes
           lon1 = lons[i, j, alt_idx]
-          lon2 = lons[i+1, j, alt_idx]
-          lon3 = lons[i+1, j+1, alt_idx]
-          lon4 = lons[i, j+1, alt_idx]
+          lon2 = lons[i + 1, j, alt_idx]
+          lon3 = lons[i + 1, j + 1, alt_idx]
+          lon4 = lons[i, j + 1, alt_idx]
           pix_lons = [lon1, lon2, lon3, lon4, lon1]
 
           ; Skip any nans, as we only fill pixels with 4 finite corners
@@ -108,50 +107,49 @@ function aurorax_mosaic_prep_skymap, skymap_list, altitude_km
 
           ; repeat above for latitudes
           lat1 = lats[i, j, alt_idx]
-          lat2 = lats[i+1, j, alt_idx]
-          lat3 = lats[i+1, j+1, alt_idx]
-          lat4 = lats[i, j+1, alt_idx]
+          lat2 = lats[i + 1, j, alt_idx]
+          lat3 = lats[i + 1, j + 1, alt_idx]
+          lat4 = lats[i, j + 1, alt_idx]
           pix_lats = [lat1, lat2, lat3, lat4, lat1]
 
           ; Skip any nans, as we only fill pixels with 4 finite corners
           if where(~finite(pix_lons), /null) ne !null then continue
 
           ; Insert into master arrays
-          site_polyfill_lon[*,i,j] = pix_lons
-          site_polyfill_lat[*,i,j] = pix_lats
-
+          site_polyfill_lon[*, i, j] = pix_lons
+          site_polyfill_lat[*, i, j] = pix_lats
         endif else begin
           ; interpolation is required
           ; first check if supplied altitude is valid for interpolation
           if (altitude_km lt min(interp_alts)) or (altitude_km gt max(interp_alts)) then begin
-            error_msg = "[aurorax_mosaic_prep_skymap] Error: Altitude of "+strcompress(string(altitude_km),/remove_all)+" km is outside the valid " + $
-              "range of ["+strcompress(string(min(interp_alts)),/remove_all)+","+strcompress(string(max(interp_alts)),/remove_all)+"] km."
+            error_msg = '[aurorax_mosaic_prep_skymap] Error: Altitude of ' + strcompress(string(altitude_km), /remove_all) + ' km is outside the valid ' + $
+              'range of [' + strcompress(string(min(interp_alts)), /remove_all) + ',' + strcompress(string(max(interp_alts)), /remove_all) + '] km.'
             print, error_msg
             return, !null
           endif
 
           ; interpolate longitudes of pixel corners at desired altitudes
           lon1 = interpol(lons[i, j, *], interp_alts, altitude_km)
-          lon2 = interpol(lons[i+1, j, *], interp_alts, altitude_km)
-          lon3 = interpol(lons[i+1, j+1, *], interp_alts, altitude_km)
-          lon4 = interpol(lons[i, j+1, *], interp_alts, altitude_km)
+          lon2 = interpol(lons[i + 1, j, *], interp_alts, altitude_km)
+          lon3 = interpol(lons[i + 1, j + 1, *], interp_alts, altitude_km)
+          lon4 = interpol(lons[i, j + 1, *], interp_alts, altitude_km)
           pix_lons = [lon1, lon2, lon3, lon4, lon1]
 
           ; Skip any nans, as we only fill pixels with 4 finite corners
           if where(~finite(pix_lons), /null) ne !null then continue
           ; repeat above for latitudes
           lat1 = interpol(lats[i, j, *], interp_alts, altitude_km)
-          lat2 = interpol(lats[i+1, j, *], interp_alts, altitude_km)
-          lat3 = interpol(lats[i+1, j+1, *], interp_alts, altitude_km)
-          lat4 = interpol(lats[i, j+1, *], interp_alts, altitude_km)
+          lat2 = interpol(lats[i + 1, j, *], interp_alts, altitude_km)
+          lat3 = interpol(lats[i + 1, j + 1, *], interp_alts, altitude_km)
+          lat4 = interpol(lats[i, j + 1, *], interp_alts, altitude_km)
           pix_lats = [lat1, lat2, lat3, lat4, lat1]
 
           ; Skip any nans, as we only fill pixels with 4 finite corners
           if where(~finite(pix_lons), /null) ne !null then continue
 
           ; Insert into master arrays
-          site_polyfill_lon[*,i,j] = pix_lons
-          site_polyfill_lat[*,i,j] = pix_lats
+          site_polyfill_lon[*, i, j] = pix_lons
+          site_polyfill_lat[*, i, j] = pix_lats
         endelse
       endfor
     endfor
@@ -168,11 +166,7 @@ function aurorax_mosaic_prep_skymap, skymap_list, altitude_km
   endfor
 
   ; cast into skymap_data struct
-  prepped_skymaps = hash('polyfill_lat',polyfill_lat, 'polyfill_lon',polyfill_lon, 'elevation',elevation, 'site_uid',site_uid)
+  prepped_skymaps = hash('polyfill_lat', polyfill_lat, 'polyfill_lon', polyfill_lon, 'elevation', elevation, 'site_uid', site_uid)
 
   return, prepped_skymaps
 end
-
-
-
-

@@ -1,20 +1,25 @@
-;-------------------------------------------------------------
+; -------------------------------------------------------------
 ; Copyright 2024 University of Calgary
 ;
 ; Licensed under the Apache License, Version 2.0 (the "License");
 ; you may not use this file except in compliance with the License.
 ; You may obtain a copy of the License at
 ;
-;    http://www.apache.org/licenses/LICENSE-2.0
+; http://www.apache.org/licenses/LICENSE-2.0
 ;
 ; Unless required by applicable law or agreed to in writing, software
 ; distributed under the License is distributed on an "AS IS" BASIS,
 ; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ; See the License for the specific language governing permissions and
 ; limitations under the License.
-;-------------------------------------------------------------
+; -------------------------------------------------------------
 
-function __aurorax_derive_advanced_distances,ground_count=ground_count,space_count=space_count,events_count=events_count
+function __aurorax_derive_advanced_distances, $
+  ground_count = ground_count, $
+  space_count = space_count, $
+  events_count = events_count
+  compile_opt idl2
+
   ; initialize values that aren't entered
   if (isa(ground_count) eq 0) then ground_count = 0
   if (isa(space_count) eq 0) then space_count = 0
@@ -22,141 +27,127 @@ function __aurorax_derive_advanced_distances,ground_count=ground_count,space_cou
 
   ; check to make sure there's two or more
   if (ground_count + space_count + events_count lt 2) then begin
-    print,'Error generating distance mappings: must have 2 or more total count'
-    return,hash()
+    print, 'Error generating distance mappings: must have 2 or more total count'
+    return, hash()
   endif
 
   ; set input arrays
   options = list()
-  for i=1,ground_count do begin
-    options.add,'ground' + strtrim(i,2)
+  for i = 1, ground_count do begin
+    options.add, 'ground' + strtrim(i, 2)
   endfor
-  for i=1,space_count do begin
-    options.add,'space' + strtrim(i,2)
+  for i = 1, space_count do begin
+    options.add, 'space' + strtrim(i, 2)
   endfor
-  for i=1,events_count do begin
-    options.add,'events' + strtrim(i,2)
+  for i = 1, events_count do begin
+    options.add, 'events' + strtrim(i, 2)
   endfor
 
   ; derive all combinations of options of size 2
   combinations = list()
-  for i=0,n_elements(options)-1 do begin
-    for j=0,n_elements(options)-1 do begin
+  for i = 0, n_elements(options) - 1 do begin
+    for j = 0, n_elements(options) - 1 do begin
       if (i ne j) then begin
         combo = options[i] + '-' + options[j]
         combo_reversed = options[j] + '-' + options[i]
-        if (combinations.where(combo) eq !NULL and combinations.where(combo_reversed) eq !NULL) then begin
+        if (combinations.where(combo) eq !null and combinations.where(combo_reversed) eq !null) then begin
           ; not already in the list, add it
-          combinations.add,combo
+          combinations.add, combo
         endif
       endif
     endfor
   endfor
 
   ; return
-  return,combinations
+  return, combinations
 end
 
-function __aurorax_validate_advanced_distances,distance,ground_count=ground_count,space_count=space_count,events_count=events_count
+function __aurorax_validate_advanced_distances, distance, $
+  ground_count = ground_count, $
+  space_count = space_count, $
+  events_count = events_count
+  compile_opt idl2
+
   ; initialize values that aren't entered
   if (isa(ground_count) eq 0) then ground_count = 0
   if (isa(space_count) eq 0) then space_count = 0
   if (isa(events_count) eq 0) then events_count = 0
 
   ; get expected pairings
-  expected_pairings = __aurorax_derive_advanced_distances(ground_count=ground_count,space_count=space_count,events_count=events_count)
+  expected_pairings = __aurorax_derive_advanced_distances(ground_count = ground_count, space_count = space_count, events_count = events_count)
 
   ; cross-check expected pairings with what was supplied
   supplied_keys = distance.keys()
-  for i=0,n_elements(expected_pairings)-1 do begin
-    if (supplied_keys.where(expected_pairings[i]) eq !NULL) then begin
+  for i = 0, n_elements(expected_pairings) - 1 do begin
+    if (supplied_keys.where(expected_pairings[i]) eq !null) then begin
       ; found an expected pair that was not included in the supplied distances hash, throw error
-      print,"Error: distances hash does not have all expected pairings, missing '" + expected_pairings[i] + "'"
-      return,0
+      print, 'Error: distances hash does not have all expected pairings, missing ''' + expected_pairings[i] + ''''
+      return, 0
     endif
   endfor
 
   ; is valid
-  return,1
+  return, 1
 end
 
-;-------------------------------------------------------------
 ;+
-; NAME:
-;       AURORAX_CREATE_ADVANCED_DISTANCES_HASH
+; :Description:
+;       Create advanced distances pairing for a conjunction search.
 ;
-; PURPOSE:
-;       Create advanced distances pairing for a conjunction search
-;
-; EXPLANATION:
 ;       The AuroraX conjunction search requires distance pairings for every
 ;       possibility of criteria blocks. This function will generate all
 ;       possibilities for you.
 ;
-; CALLING SEQUENCE:
-;       aurorax_create_advanced_distances_hash(distance)
+;       The function return the advanced distances, as a hash with the default
+;       value for each value being the 'distance' variable supplied.
 ;
-; PARAMETERS:
-;       distance           default distance for each pairing, integer
-;       ground_count       number of ground criteria blocks, integer, optional
-;       space_count        number of space criteria blocks, integer, optional
-;       events_count       number of events criteria blocks, integer, optional
+; :Parameters:
+;       distance: in, required, Integer
+;         default distance for each pairing
 ;
-; OUTPUT:
-;       the advanced distances
+; :Keywords:
+;       ground_count: in, optional, Integer
+;         number of ground criteria blocks
+;       space_count: in, optional, Integer
+;         number of space criteria blocks
+;       events_count: in, optional, Integer
+;         number of events criteria blocks
 ;
-; OUTPUT TYPE:
-;       a hash, with the default value for each value being the 'distance' variable supplied
+; :Returns:
+;       Hash
 ;
-; EXAMPLES:
+; :Examples:
 ;       distances = aurorax_create_advanced_distances_hash(500, ground_count=1, space_count=2)
 ;+
-;-------------------------------------------------------------
-function aurorax_create_advanced_distances_hash,distance,ground_count=ground_count,space_count=space_count,events_count=events_count
+function aurorax_create_advanced_distances_hash, $
+  distance, $
+  ground_count = ground_count, $
+  space_count = space_count, $
+  events_count = events_count
+  compile_opt idl2
+
   ; initialize values that aren't entered
   if (isa(ground_count) eq 0) then ground_count = 0
   if (isa(space_count) eq 0) then space_count = 0
   if (isa(events_count) eq 0) then events_count = 0
 
   ; get pairings
-  keys = __aurorax_derive_advanced_distances(ground_count=ground_count,space_count=space_count,events_count=events_count)
+  keys = __aurorax_derive_advanced_distances(ground_count = ground_count, space_count = space_count, events_count = events_count)
 
   ; create hash object
   values = intarr(n_elements(keys))
-  for i=0,n_elements(values)-1 do begin
+  for i = 0, n_elements(values) - 1 do begin
     values[i] = distance
   endfor
   distances = hash(keys, values)
 
   ; return
-  return,distances
+  return, distances
 end
 
-;-------------------------------------------------------------
 ;+
-; NAME:
-;       AURORAX_CONJUNCTION_SEARCH
-;
-; PURPOSE:
-;       Search AuroraX for conjunctions
-;
-; EXPLANATION:
-;       Search the AuroraX platform for conjunctions using the supplied
-;       filter criteria
-;
-; CALLING SEQUENCE:
-;       aurorax_conjunction_search(start_ts, end_ts, distance)
-;
-; PARAMETERS:
-;       start_ts           start datetime, string (different formats allowed, see below)
-;       end_ts             end datetime, string (different formats allowed, see below)
-;       distance           max distance between criteria blocks, integer or hash (different
-;                          formats allowed, see below)
-;       ground             ground criteria blocks, list, optional
-;       space              space criteria blocks, list, optional
-;       events             events criteria blocks, list, optional
-;       poll_interval      sleep time between polling events while waiting for data, integer,
-;                          optional (in seconds; default is 1s)
+; :Description:
+;       Search the AuroraX platform for conjunctions using the supplied filter criteria.
 ;
 ;       The 'start_ts' and 'end_ts' parameters are to be timestamps in a variety of formats. The
 ;       following are examples of what is allowed:
@@ -180,24 +171,42 @@ end
 ;         end_ts = '2020-12-31'
 ;         end_ts = '2020/12/31T23'
 ;         end_ts = '2020-12-31 23'
+
+; :Parameters:
+;       start_ts: in, required, String
+;         start datetime, string (different formats allowed, see above)
+;       end_ts: in, required, String
+;         end datetime, string (different formats allowed, see above)
+;       distance: in, required, Integer or Hash
+;         max distance between criteria blocks, integer or hash
 ;
-; KEYWORDS:
-;       /NBTRACE         search for nbtrace conjunctions
-;       /SBTRACE         search for sbtrace conjunctions
-;       /GEOGRAPHIC      search for geographic conjunctions
-;       /QUIET           quiet output when searching, no print messages will be shown
-;       /DRYRUN          run in dry-run mode, which will exit before sending the search
-;                        request to AuroraX. The query will be printed though, so that
-;                        users can check to make sure it would have sent the request
-;                        that they wanted it to send.
+; :Keywords:
+;       ground: in, optional, List
+;         ground criteria blocks
+;       space: in, optional, List
+;         space criteria blocks
+;       events: in, optional, List
+;         events criteria blocks
+;       poll_interval: in, optional, Integer
+;         sleep time between polling events while waiting for data (in seconds; default is 1s)
+;       nbtrace: in, optional, Boolean
+;         search for north B-trace conjunctions
+;       sbtrace: in, optional, Boolean
+;         search for south B-trace conjunctions
+;       geographic: in, optional, Boolean
+;         search for geographic conjunctions
+;       quiet: in, optional, Boolean
+;         quiet output when searching, no print messages will be shown
+;       dryrun: in, optional, Boolean
+;         run in dry-run mode, which will exit before sending the search
+;         request to AuroraX. The query will be printed though, so that
+;         users can check to make sure it would have sent the request
+;         that they wanted it to send.
 ;
-; OUTPUT:
-;       the found conjunctions
+; :Returns:
+;       the found conjunctions, as a search response struct
 ;
-; OUTPUT TYPE:
-;       a search response struct
-;
-; EXAMPLES:
+; :Examples:
 ;       ; simple example
 ;       distance = 500
 ;       start_ts = '2019-01-01T00:00:00'
@@ -222,8 +231,19 @@ end
 ;       space = list(space1)
 ;       response = aurorax_conjunction_search(start_ts,end_ts,distance,ground=ground,space=space,/nbtrace)
 ;+
-;-------------------------------------------------------------
-function aurorax_conjunction_search,start_ts,end_ts,distance,ground=ground,space=space,events=events,poll_interval=pi,NBTRACE=ct_nbtrace,SBTRACE=ct_sbtrace,GEOGRAPHIC=ct_geo,QUIET=q,DRYRUN=dr
+function aurorax_conjunction_search, start_ts, $
+  end_ts, distance, $
+  ground = ground, $
+  space = space, $
+  events = events, $
+  poll_interval = pi, $
+  nbtrace = ct_nbtrace, $
+  sbtrace = ct_sbtrace, $
+  geographic = ct_geo, $
+  quiet = q, $
+  dryrun = dr
+  compile_opt idl2
+
   ; set verbosity
   verbose = 1
   if (isa(q) eq 1) then verbose = 0
@@ -235,44 +255,44 @@ function aurorax_conjunction_search,start_ts,end_ts,distance,ground=ground,space
   ; set dry run flag
   dry_run = 0
   if (isa(dr) eq 1) then dry_run = 1
-  if (verbose eq 1 and dry_run eq 1) then __aurorax_message,'Executing in dry-run mode'
+  if (verbose eq 1 and dry_run eq 1) then __aurorax_message, 'Executing in dry-run mode'
 
   ; get ISO datetime strings
-  if (verbose eq 1) then __aurorax_message,'Parsing start and end timestamps'
-  start_iso_dt = __aurorax_datetime_parser(start_ts,/interpret_as_start)
-  end_iso_dt = __aurorax_datetime_parser(end_ts,/interpret_as_end)
-  if (start_iso_dt eq '' or end_iso_dt eq '') then return,list()
+  if (verbose eq 1) then __aurorax_message, 'Parsing start and end timestamps'
+  start_iso_dt = __aurorax_datetime_parser(start_ts, /interpret_as_start)
+  end_iso_dt = __aurorax_datetime_parser(end_ts, /interpret_as_end)
+  if (start_iso_dt eq '' or end_iso_dt eq '') then return, list()
 
   ; check criteria block count validity
   criteria_block_count = n_elements(ground) + n_elements(space) + n_elements(events)
   if (criteria_block_count gt 10) then begin
-    __aurorax_message,'Error: too many criteria blocks, max of 10 is allowed and ' + strtrim(criteria_block_count,2) + ' have been supplied. Please reduce the count and try again.'
-    return,list()
+    __aurorax_message, 'Error: too many criteria blocks, max of 10 is allowed and ' + strtrim(criteria_block_count, 2) + ' have been supplied. Please reduce the count and try again.'
+    return, list()
   endif
 
   ; set distance
-  if (isa(distance,/integer) eq 1 or isa(distance,/float) eq 1) then begin
+  if (isa(distance, /integer) eq 1 or isa(distance, /float) eq 1) then begin
     ; entered distance is a single number, use that to generate all the max distance pairings
-    distances_hash = aurorax_create_advanced_distances_hash(distance, ground_count=n_elements(ground), space_count=n_elements(space), events_count=n_elements(events))
-  endif else if (isa(distance,'HASH') eq 1) then begin
+    distances_hash = aurorax_create_advanced_distances_hash(distance, ground_count = n_elements(ground), space_count = n_elements(space), events_count = n_elements(events))
+  endif else if (isa(distance, 'HASH') eq 1) then begin
     ; entered distance is the correct object type, make sure it has all the correct pairings
-    distances_valid = __aurorax_validate_advanced_distances(distance, ground_count=n_elements(ground), space_count=n_elements(space), events_count=n_elements(events))
+    distances_valid = __aurorax_validate_advanced_distances(distance, ground_count = n_elements(ground), space_count = n_elements(space), events_count = n_elements(events))
     if (distances_valid eq 1) then begin
       distances_hash = distance
     endif else begin
-      __aurorax_message,'Error: distances object is not valid, update your distances object and try again (in most cases, the object is missing pairings)'
-      return,list()
+      __aurorax_message, 'Error: distances object is not valid, update your distances object and try again (in most cases, the object is missing pairings)'
+      return, list()
     endelse
   endif
 
   ; set conjunction types
   conjunction_types = list()
-  if keyword_set(ct_nbtrace) then conjunction_types.add,'nbtrace'
-  if keyword_set(ct_sbtrace) then conjunction_types.add,'sbtrace'
-  if keyword_set(ct_geo) then conjunction_types.add,'geographic'
+  if keyword_set(ct_nbtrace) then conjunction_types.add, 'nbtrace'
+  if keyword_set(ct_sbtrace) then conjunction_types.add, 'sbtrace'
+  if keyword_set(ct_geo) then conjunction_types.add, 'geographic'
 
   ; create data sources struct
-  if (verbose eq 1) then __aurorax_message,'Creating request struct'
+  if (verbose eq 1) then __aurorax_message, 'Creating request struct'
   post_struct = {start: start_iso_dt, end_ts: end_iso_dt, ground: list(), space: list(), events: list(), conjunction_types: list(), max_distances: distances_hash}
   if (isa(ground) eq 1) then post_struct.ground = ground
   if (isa(space) eq 1) then post_struct.space = space
@@ -281,77 +301,76 @@ function aurorax_conjunction_search,start_ts,end_ts,distance,ground=ground,space
   post_struct.max_distances = distances_hash
 
   ; serialize into a string
-  post_str = json_serialize(post_struct,/lowercase)
-  post_str = post_str.replace('LOGICAL_OPERATOR', 'logical_operator')  ; because of a bug in json_serialize where it doesn't lowercase nested hashes
-  post_str = post_str.replace('EXPRESSIONS', 'expressions')            ; because of a bug in json_serialize where it doesn't lowercase nested hashes
-  post_str = post_str.replace('end_ts','end')                          ; because 'end' isn't a valid struct tag name
+  post_str = json_serialize(post_struct, /lowercase)
+  post_str = post_str.replace('LOGICAL_OPERATOR', 'logical_operator') ; because of a bug in json_serialize where it doesn't lowercase nested hashes
+  post_str = post_str.replace('EXPRESSIONS', 'expressions') ; because of a bug in json_serialize where it doesn't lowercase nested hashes
+  post_str = post_str.replace('end_ts', 'end') ; because 'end' isn't a valid struct tag name
 
   ; stop here if in dry-run mode
   if (dry_run eq 1) then begin
-    __aurorax_message,'Dry-run mode, stopping here. Below is the query that would have been executed'
-    print,''
-    print,post_str
-    return,list()
+    __aurorax_message, 'Dry-run mode, stopping here. Below is the query that would have been executed'
+    print, ''
+    print, post_str
+    return, list()
   endif
 
   ; set up request
   tic
-  req = OBJ_NEW('IDLnetUrl')
-  req->SetProperty,URL_SCHEME = 'https'
-  req->SetProperty,URL_PORT = 443
-  req->SetProperty,URL_HOST = 'api.aurorax.space'
-  req->SetProperty,URL_PATH = 'api/v1/conjunctions/search'
-  req->SetProperty,HEADERS = ['Content-Type: application/json', 'User-Agent: idl-aurorax/' + __aurorax_version()]
+  req = obj_new('IDLnetUrl')
+  req.setProperty, url_scheme = 'https'
+  req.setProperty, url_port = 443
+  req.setProperty, url_host = 'api.aurorax.space'
+  req.setProperty, url_path = 'api/v1/conjunctions/search'
+  req.setProperty, headers = ['Content-Type: application/json', 'User-Agent: idl-aurorax/' + __aurorax_version()]
 
   ; make request
-  if (verbose eq 1) then __aurorax_message,'Sending search request ...'
-  output = req->Put(post_str, /BUFFER, /STRING_ARRAY, /POST)
+  if (verbose eq 1) then __aurorax_message, 'Sending search request ...'
+  output = req.put(post_str, /buffer, /string_array, /post)
 
   ; get status code and get response headers
-  req->GetProperty,RESPONSE_CODE=status_code,RESPONSE_HEADER=response_headers
+  req.getProperty, response_code = status_code, response_header = response_headers
 
   ; cleanup this request
-  obj_destroy,req
+  obj_destroy, req
 
   ; check status code
   if (status_code ne 202) then begin
-    if (verbose eq 1) then __aurorax_message,'Error submitting search request: ' + output
-    return,list()
+    if (verbose eq 1) then __aurorax_message, 'Error submitting search request: ' + output
+    return, list()
   endif
-  if (verbose eq 1) then __aurorax_message,'Search request accepted'
+  if (verbose eq 1) then __aurorax_message, 'Search request accepted'
 
   ; set request ID from response headers
-  request_id = __aurorax_extract_request_id_from_response_headers(response_headers,65)
+  request_id = __aurorax_extract_request_id_from_response_headers(response_headers, 65)
   if (request_id eq '') then begin
-    return,list()
+    return, list()
   endif
-  if (verbose eq 1) then __aurorax_message,'Request ID: ' + request_id
+  if (verbose eq 1) then __aurorax_message, 'Request ID: ' + request_id
 
   ; wait for request to be done
-  status = __aurorax_request_wait_for_data('conjunctions',request_id,poll_interval,verbose)
-  if (verbose eq 1) then __aurorax_message,'Data is now available'
+  status = __aurorax_request_wait_for_data('conjunctions', request_id, poll_interval, verbose)
+  if (verbose eq 1) then __aurorax_message, 'Data is now available'
 
   ; humanize size of data to download
-  bytes_str = __aurorax_humanize_bytes(status.search_result.file_size)
-  if (verbose eq 1) then __aurorax_message,'Downloading ' + __aurorax_humanize_bytes(status.search_result.file_size) + ' of data ...'
+  if (verbose eq 1) then __aurorax_message, 'Downloading ' + __aurorax_humanize_bytes(status.search_result.file_size) + ' of data ...'
 
   ; get data
-  response = __aurorax_request_get_data('conjunctions',request_id)
-  if (verbose eq 1) then __aurorax_message,'Data downloaded, search completed'
+  response = __aurorax_request_get_data('conjunctions', request_id)
+  if (verbose eq 1) then __aurorax_message, 'Data downloaded, search completed'
 
   ; post-process data (ie. change 'start' to 'start_ts', and '_end' to 'end_ts')
-  if (verbose eq 1) then __aurorax_message,'Post-processing data into IDL struct'
+  if (verbose eq 1) then __aurorax_message, 'Post-processing data into IDL struct'
   data_adjusted = list()
-  for i=0,n_elements(response.data)-1 do begin
+  for i = 0, n_elements(response.data) - 1 do begin
     events_adjusted = list()
     if (n_elements(response.data[i].events) gt 0) then begin
-      for j=0,n_elements(response.data[i].events)-1 do begin
+      for j = 0, n_elements(response.data[i].events) - 1 do begin
         new_event_struct = {e1_source: response.data[i].events[j].e1_source, e2_source: response.data[i].events[j].e2_source, start_ts: response.data[i].events[j].start, end_ts: response.data[i].events[j]._end, min_distance: response.data[i].events[j].min_distance, max_distance: response.data[i].events[j].max_distance}
-        events_adjusted.add,new_event_struct
+        events_adjusted.add, new_event_struct
       endfor
     endif
     new_record_struct = {start_ts: response.data[i].start, end_ts: response.data[i]._end, min_distance: response.data[i].min_distance, max_distance: response.data[i].max_distance, closest_epoch: response.data[i].closest_epoch, farthest_epoch: response.data[i].farthest_epoch, data_sources: response.data[i].data_sources, events: events_adjusted}
-    data_adjusted.add,new_record_struct
+    data_adjusted.add, new_record_struct
   endfor
   response.data = data_adjusted
 
@@ -360,6 +379,6 @@ function aurorax_conjunction_search,start_ts,end_ts,distance,ground=ground,space
   duration_str = __aurorax_time2string(toc_ts)
 
   ; return
-  if (verbose eq 1) then __aurorax_message,'Search completed, found ' + strtrim(status.search_result.result_count,2) + ' conjunctions in ' + duration_str
-  return,response
+  if (verbose eq 1) then __aurorax_message, 'Search completed, found ' + strtrim(status.search_result.result_count, 2) + ' conjunctions in ' + duration_str
+  return, response
 end

@@ -1,20 +1,20 @@
-;-------------------------------------------------------------
+; -------------------------------------------------------------
 ; Copyright 2024 University of Calgary
 ;
 ; Licensed under the Apache License, Version 2.0 (the "License");
 ; you may not use this file except in compliance with the License.
 ; You may obtain a copy of the License at
 ;
-;    http://www.apache.org/licenses/LICENSE-2.0
+; http://www.apache.org/licenses/LICENSE-2.0
 ;
 ; Unless required by applicable law or agreed to in writing, software
 ; distributed under the License is distributed on an "AS IS" BASIS,
 ; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ; See the License for the specific language governing permissions and
 ; limitations under the License.
-;-------------------------------------------------------------
+; -------------------------------------------------------------
 
-;-------------------------------------------------------------
+; -------------------------------------------------------------
 ;+
 ; NAME:
 ;       AURORAX_MOSAIC_PLOT
@@ -55,32 +55,33 @@
 ;
 ;+
 ;-------------------------------------------------------------
-pro aurorax_mosaic_plot, prepped_data, prepped_skymaps, frame_idx, min_elevation=min_elevation, intensity_scales=intensity_scales, colortable=colortable, elevation_increment=elevation_increment
+pro aurorax_mosaic_plot, prepped_data, prepped_skymaps, frame_idx, min_elevation = min_elevation, intensity_scales = intensity_scales, colortable = colortable, elevation_increment = elevation_increment
+  compile_opt idl2
 
   __DEFAULT_SCALE_MIN = 0
   __DEFAULT_SCALE_MAX = 20000
-  device, get_decomposed=original_decomp
+  device, get_decomposed = original_decomp
 
   ; Check type of prepped_data
-  if typename(prepped_data) eq "HASH" then begin
+  if typename(prepped_data) eq 'HASH' then begin
     prepped_data = [prepped_data]
   endif
-  if typename(prepped_data[0]) ne "HASH" then begin
-    print, "[aurorax_mosaic_plot] Error: 'prepped_data' must be either a hash (return value of aurorax_mosaic_prep_data) or a list/array of hashes.
+  if typename(prepped_data[0]) ne 'HASH' then begin
+    print, '[aurorax_mosaic_plot] Error: ''prepped_data'' must be either a hash (return value of aurorax_mosaic_prep_data) or a list/array of hashes.'
     goto, error_jump
   endif
 
   ; Check type of prepped_skymaps
-  if typename(prepped_skymaps) eq "HASH" then begin
+  if typename(prepped_skymaps) eq 'HASH' then begin
     prepped_skymaps = [prepped_skymaps]
   endif
-  if typename(prepped_skymaps[0]) ne "HASH" then begin
-    print, "[aurorax_mosaic_plot] Error: 'prepped_skymaps' must be either a hash (return value of aurorax_mosaic_prep_skymap) or a list/array of hashes.
+  if typename(prepped_skymaps[0]) ne 'HASH' then begin
+    print, '[aurorax_mosaic_plot] Error: ''prepped_skymaps'' must be either a hash (return value of aurorax_mosaic_prep_skymap) or a list/array of hashes.'
     goto, error_jump
   endif
 
-  if n_elements(prepped_skymaps) ne  n_elements(prepped_data) then begin
-    print, "[aurorax_mosaic_plot] Error: 'prepped_data' and 'prepped_skymaps' must have the same length when entered as lists/arrays."
+  if n_elements(prepped_skymaps) ne n_elements(prepped_data) then begin
+    print, '[aurorax_mosaic_plot] Error: ''prepped_data'' and ''prepped_skymaps'' must have the same length when entered as lists/arrays.'
     goto, error_jump
   endif
 
@@ -89,19 +90,19 @@ pro aurorax_mosaic_plot, prepped_data, prepped_skymaps, frame_idx, min_elevation
     if isa(min_elevation, /scalar) then begin
       ; If scalar, transform to array with same length as data
       if min_elevation lt 0 or min_elevation gt 90 then begin
-        print, "[aurorax_mosaic_plot] Error: 'min_elevation' of "+strcompress(string(min_elevation),/remove_all)+" degrees outside the range (0,90)."
+        print, '[aurorax_mosaic_plot] Error: ''min_elevation'' of ' + strcompress(string(min_elevation), /remove_all) + ' degrees outside the range (0,90).'
         goto, error_jump
       endif
       min_elevation = replicate(min_elevation, n_elements(prepped_skymaps))
     endif else begin
       ; Otherwise, check size
       if n_elements(prepped_data) ne n_elements(min_elevation) then begin
-        print, "[aurorax_mosaic_plot] Error: 'min_elevation' must have the same length as 'prepped_data' when entered a list/array."
+        print, '[aurorax_mosaic_plot] Error: ''min_elevation'' must have the same length as ''prepped_data'' when entered a list/array.'
         goto, error_jump
       endif
       foreach el, min_elevation do begin
         if el lt 0 or el gt 90 then begin
-          print, "[aurorax_mosaic_plot] Error: 'min_elevation' of "+strcompress(string(el),/remove_all)+" degrees outside the range (0,90)."
+          print, '[aurorax_mosaic_plot] Error: ''min_elevation'' of ' + strcompress(string(el), /remove_all) + ' degrees outside the range (0,90).'
           goto, error_jump
         endif
       endforeach
@@ -113,7 +114,7 @@ pro aurorax_mosaic_plot, prepped_data, prepped_skymaps, frame_idx, min_elevation
 
   ; Check colortable to match data inputs
   all_sites_to_plot = []
-  for mosaic_data_idx=0, n_elements(prepped_data)-1 do begin
+  for mosaic_data_idx = 0, n_elements(prepped_data) - 1 do begin
     sites = (prepped_data[mosaic_data_idx])['site_uid']
     foreach site, sites do begin
       if where(site eq all_sites_to_plot, /null) eq !null then all_sites_to_plot = [all_sites_to_plot, site]
@@ -126,8 +127,8 @@ pro aurorax_mosaic_plot, prepped_data, prepped_skymaps, frame_idx, min_elevation
     endif else begin
       ; Otherwise, check size
       if n_elements(prepped_data) ne n_elements(colortable) and n_elements(colortable) ne n_elements(all_sites_to_plot) then begin
-        print, "[aurorax_mosaic_plot] Error: 'colortable' must have the same length as 'prepped_data' OR the same length as the " + $
-          "total number of sites that are to be plotted when entered as a list/array. Otherwise it should be a scalar."
+        print, '[aurorax_mosaic_plot] Error: ''colortable'' must have the same length as ''prepped_data'' OR the same length as the ' + $
+          'total number of sites that are to be plotted when entered as a list/array. Otherwise it should be a scalar.'
         goto, error_jump
       endif
     endelse
@@ -137,18 +138,17 @@ pro aurorax_mosaic_plot, prepped_data, prepped_skymaps, frame_idx, min_elevation
   endelse
 
   ; Check that ALL site uids match between images and skymaps. This is crucial for order
-  for mosaic_data_idx=0, n_elements(prepped_data)-1 do begin
-    if not array_equal((prepped_data[mosaic_data_idx])["site_uid"], (prepped_skymaps[mosaic_data_idx])["site_uid"]) then begin
-      print, "[aurorax_mosaic_plot] Error: Mismatched site_uid array between prepped_data["+string(mosaic_data_idx, format='(I1.1)') + $
-        "] and prepped_skymap["+string(mosaic_data_idx, format='(I1.1)')+"]. Make sure that all image data and skymap data is " + $
-        "ordered the same before using as inputs."
+  for mosaic_data_idx = 0, n_elements(prepped_data) - 1 do begin
+    if not array_equal((prepped_data[mosaic_data_idx])['site_uid'], (prepped_skymaps[mosaic_data_idx])['site_uid']) then begin
+      print, '[aurorax_mosaic_plot] Error: Mismatched site_uid array between prepped_data[' + string(mosaic_data_idx, format = '(I1.1)') + $
+        '] and prepped_skymap[' + string(mosaic_data_idx, format = '(I1.1)') + ']. Make sure that all image data and skymap data is ' + $
+        'ordered the same before using as inputs.'
       goto, error_jump
     endif
   endfor
 
   ; Iterate through each set of prepped data/skymaps
-  for mosaic_data_idx=0, n_elements(prepped_data)-1 do begin
-
+  for mosaic_data_idx = 0, n_elements(prepped_data) - 1 do begin
     ; Extract this iterations data
     data = prepped_data[mosaic_data_idx]
     skymap = prepped_skymaps[mosaic_data_idx]
@@ -166,12 +166,12 @@ pro aurorax_mosaic_plot, prepped_data, prepped_skymaps, frame_idx, min_elevation
         image_intensity_scales[site_uid] = [__DEFAULT_SCALE_MIN, __DEFAULT_SCALE_MAX]
       endforeach
     endif else if isa(intensity_scales, /array) then begin
-      if typename(intensity_scales) eq "HASH" then begin
+      if typename(intensity_scales) eq 'HASH' then begin
         image_intensity_scales = intensity_scales
       endif else begin
         if n_elements(intensity_scales) ne 2 then begin
-          print, "[aurorax_mosaic_plot] Error: Passing a non-hash into 'intensity_scales' requires " + $
-            "two elements. For scaling on a per-site basis, please pass a hash of the form 'hash('site_1_uid',[scale_min,scale_max],'site_2_uid',...)'
+          print, '[aurorax_mosaic_plot] Error: Passing a non-hash into ''intensity_scales'' requires ' + $
+            'two elements. For scaling on a per-site basis, please pass a hash of the form ''hash(''site_1_uid'',[scale_min,scale_max],''site_2_uid'',...)'''
           goto, error_jump
         endif
         image_intensity_scales_dict = hash()
@@ -181,7 +181,7 @@ pro aurorax_mosaic_plot, prepped_data, prepped_skymaps, frame_idx, min_elevation
         image_intensity_scales = image_intensity_scales_dict
       endelse
     endif else begin
-      print, "[aurorax_mosaic_plot] Error: 'intensity_scales' must be a hash or array like type."
+      print, '[aurorax_mosaic_plot] Error: ''intensity_scales'' must be a hash or array like type.'
       goto, error_jump
     endelse
     intensity_scales = image_intensity_scales
@@ -220,11 +220,11 @@ pro aurorax_mosaic_plot, prepped_data, prepped_skymaps, frame_idx, min_elevation
 
       ; Now, obtain the frame of interest, for this site, from the image data and flatten it
       if n_channels eq 1 then begin
-        img = ((data['images'])[site])[*,*,frame_idx]
+        img = ((data['images'])[site])[*, *, frame_idx]
         flattened_img = reform(img, width * height)
         tmp = flattened_img
       endif else begin
-        img = ((data['images'])[site])[*,*,*,frame_idx]
+        img = ((data['images'])[site])[*, *, *, frame_idx]
         flattened_img = reform(img, n_channels, width * height)
         tmp = flattened_img
       endelse
@@ -232,7 +232,7 @@ pro aurorax_mosaic_plot, prepped_data, prepped_skymaps, frame_idx, min_elevation
       if total(tmp) eq 0. then continue ; if no data then there's nothing to add to mosaic
 
       ; Scale this data based on previously defined scaling bounds
-      tmp = bytscl(tmp, min=(image_intensity_scales[site])[0], max=(image_intensity_scales[site])[1], top=255)
+      tmp = bytscl(tmp, min = (image_intensity_scales[site])[0], max = (image_intensity_scales[site])[1], top = 255)
 
       ; Add the timestamp to tracking list if it is unique
       if where(meta_timestamp eq unique_timestamps, /null) eq !null then unique_timestamps = [unique_timestamps, meta_timestamp]
@@ -245,7 +245,7 @@ pro aurorax_mosaic_plot, prepped_data, prepped_skymaps, frame_idx, min_elevation
 
     ; Confirm that all data is from the same timestamp
     if n_elements(unique_timestamps) ne 1 then begin
-      print, "[aurorax_mosaic_plot] Error: 'Images have different timestamps'"
+      print, '[aurorax_mosaic_plot] Error: ''Images have different timestamps'''
       goto, error_jump
     endif
 
@@ -279,11 +279,10 @@ pro aurorax_mosaic_plot, prepped_data, prepped_skymaps, frame_idx, min_elevation
     while el lt 90 do begin
       ; Update elevation increment for efficiency
       elev_delta = default_elev_delta
-      if el gt 20 then elev_delta = default_elev_delta*2.
-      if el gt 40 then elev_delta = default_elev_delta*15.
+      if el gt 20 then elev_delta = default_elev_delta * 2.
+      if el gt 40 then elev_delta = default_elev_delta * 15.
       ; Only iterate through the sites that actually have data
-      for i=0, n_elements(sites_with_data)-1 do begin
-
+      for i = 0, n_elements(sites_with_data) - 1 do begin
         site_id = sites_with_data[i]
         site_idx = sites_with_data_idx[i]
 
@@ -291,7 +290,7 @@ pro aurorax_mosaic_plot, prepped_data, prepped_skymaps, frame_idx, min_elevation
         n_channels = site_nchannels[site_idx]
 
         ; Get all pixels within current elevation threshold
-        el_idx = where(elev[site_idx] gt el and elev[site_idx] lt  el + elev_delta, /null)
+        el_idx = where(elev[site_idx] gt el and elev[site_idx] lt el + elev_delta, /null)
         if el_idx eq !null then continue
 
         ; Grab this level's filling lat/lons
@@ -302,35 +301,29 @@ pro aurorax_mosaic_plot, prepped_data, prepped_skymaps, frame_idx, min_elevation
         if n_channels eq 1 then begin
           el_lvl_cmap_vals = (all_images[site_id])[el_idx]
         endif else begin
-          el_lvl_cmap_vals = (all_images[site_id])[*,el_idx]
+          el_lvl_cmap_vals = (all_images[site_id])[*, el_idx]
         endelse
 
         ; Set up colortable
         if n_channels eq 1 then begin
           ; single channel plotting using colortable
-          device, decomposed=0
+          device, decomposed = 0
           loadct, site_ct[i], /silent
-          for k=0, n_elements(el_idx)-1 do begin
-            polyfill, el_lvl_fill_lons[*,k], el_lvl_fill_lats[*,k], color=el_lvl_cmap_vals[k]
+          for k = 0, n_elements(el_idx) - 1 do begin
+            polyfill, el_lvl_fill_lons[*, k], el_lvl_fill_lats[*, k], color = el_lvl_cmap_vals[k]
           endfor
         endif else begin
           ; multi-channel plotting using decomposed color
-          device, decomposed=1
-          for k=0, n_elements(el_idx)-1 do begin
-            polyfill, el_lvl_fill_lons[*,k], el_lvl_fill_lats[*,k], color=aurorax_get_decomposed_color(el_lvl_cmap_vals[*,k])
+          device, decomposed = 1
+          for k = 0, n_elements(el_idx) - 1 do begin
+            polyfill, el_lvl_fill_lons[*, k], el_lvl_fill_lats[*, k], color = aurorax_get_decomposed_color(el_lvl_cmap_vals[*, k])
           endfor
         endelse
-
       endfor
       el += elev_delta
-
     endwhile
   endfor
 
   error_jump:
-  device, get_decomposed=original_decomp
-
+  device, get_decomposed = original_decomp
 end
-
-
-

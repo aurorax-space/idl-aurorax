@@ -1,5 +1,26 @@
 # Development
 
+## Setting up for development
+
+This software is set up to be developed using Windows. In order to get your Windows environment set up for development, a few things need to be done:
+
+1. Ensure Git is installed
+2. Clone the repository
+3. Set up dependencies
+
+    ```
+    cd <path to cloned repo>
+    ./developer_setup.ps1
+    ```
+
+## Generating the documentation
+
+The docs are presently an alpha state item. To build them:
+
+```idl
+idldoc,root='path\to\idl-aurorax\src',output='path\to\idl-aurorax\docs'
+```
+
 ## Preparing a new distributable package
 
 When a new release is ready for deployment, there are a few tasks that need to be done.

@@ -1,43 +1,23 @@
-;-------------------------------------------------------------
+; -------------------------------------------------------------
 ; Copyright 2024 University of Calgary
 ;
 ; Licensed under the Apache License, Version 2.0 (the "License");
 ; you may not use this file except in compliance with the License.
 ; You may obtain a copy of the License at
 ;
-;    http://www.apache.org/licenses/LICENSE-2.0
+; http://www.apache.org/licenses/LICENSE-2.0
 ;
 ; Unless required by applicable law or agreed to in writing, software
 ; distributed under the License is distributed on an "AS IS" BASIS,
 ; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ; See the License for the specific language governing permissions and
 ; limitations under the License.
-;-------------------------------------------------------------
+; -------------------------------------------------------------
 
-;-------------------------------------------------------------
 ;+
-; NAME:
-;       AURORAX_EPHEMERIS_SEARCH
-;
-; PURPOSE:
-;       Retrieve AuroraX Search Engine ephemeris records
-;
-; EXPLANATION:
-;       Retrieve ephemeris records from the AuroraX Search Engine, with 
+; :Description:
+;       Search for ephemeris records in the AuroraX Search Engine, with
 ;       optional parameters used to filter for specific matching data.
-;
-; CALLING SEQUENCE:
-;       aurorax_ephemeris_search(start_ts, end_ts)
-;
-; PARAMETERS:
-;       start_ts           start timestamp, string (different formats allowed, see below)
-;       end_ts             end timestamp, string (different formats allowed, see below)
-;       programs           programs to filter for, list(string), optional
-;       platforms          platforms to filter for, list(string), optional
-;       instrument_types   instrument types to filter for, list(string), optional
-;       metadata_filters   metadata filters to filter for, hash, optional
-;       poll_interval      sleep time between polling events while waiting for data, integer,
-;                          optional (in seconds; default is 1s)
 ;
 ;       The 'start_ts' and 'end_ts' parameters are to be timestamps in a variety of formats. The
 ;       following are examples of what is allowed:
@@ -62,20 +42,35 @@
 ;         end_ts = '2020/12/31T23'
 ;         end_ts = '2020-12-31 23'
 ;
-; KEYWORDS:
-;       /QUIET           quiet output when searching, no print messages will be shown
-;       /DRYRUN          run in dry-run mode, which will exit before sending the search
-;                        request to AuroraX. The query will be printed though, so that
-;                        users can check to make sure it would have sent the request
-;                        that they wanted it to send.
+; :Parameters:
+;       start_ts: in, required, String
+;           start timestamp, string (different formats allowed, see below)
+;       end_ts: in, required, String
+;           end timestamp, string (different formats allowed, see below)
 ;
-; OUTPUT:
-;       the found ephemeris records
+; :Keywords:
+;       programs: in, optional, List
+;           programs to filter for
+;       platforms: in, optional, List
+;           platforms to filter for
+;       instrument_types: in, optional, List
+;           instrument types to filter for
+;       metadata_filters: in, optional, Hash
+;           metadata filters to filter for
+;       poll_interval: in, optional, Integer
+;           sleep time between polling events while waiting for data (in seconds; default is 1s)
+;       quiet: in, optional, Boolean
+;           quiet output when searching, no print messages will be shown
+;       dryrun: in, optional, Boolean
+;           run in dry-run mode, which will exit before sending the search
+;           request to AuroraX. The query will be printed though, so that
+;           users can check to make sure it would have sent the request
+;           that they wanted it to send.
 ;
-; OUTPUT TYPE:
-;       a search response struct
+; :Returns:
+;       the found ephemeris records, as a search response struct
 ;
-; EXAMPLES:
+; :Examples:
 ;       ; simple example
 ;       response = aurorax_ephemeris_search('2020-01-01T00:00','2020-01-01T23:59',programs=['swarm'],platforms=['swarma'],instrument_types=['footprint'])
 ;
@@ -85,8 +80,18 @@
 ;       metadata_filters = aurorax_create_metadata_filter(expressions,/OPERATOR_AND)
 ;       response = aurorax_ephemeris_search('2020-01-01T00:00','2020-01-01T23:59',programs=['swarm'],metadata_filters=metadata_filters)
 ;+
-;-------------------------------------------------------------
-function aurorax_ephemeris_search,start_ts,end_ts,programs=programs,platforms=platforms,instrument_types=instrument_types,metadata_filters=metadata_filters,poll_interval=pi,QUIET=q,DRYRUN=dr
+function aurorax_ephemeris_search, $
+  start_ts, $
+  end_ts, $
+  programs = programs, $
+  platforms = platforms, $
+  instrument_types = instrument_types, $
+  metadata_filters = metadata_filters, $
+  poll_interval = pi, $
+  quiet = q, $
+  dryrun = dr
+  compile_opt idl2
+
   ; set verbosity
   verbose = 1
   if (isa(q) eq 1) then verbose = 0
@@ -98,81 +103,80 @@ function aurorax_ephemeris_search,start_ts,end_ts,programs=programs,platforms=pl
   ; set dry run flag
   dry_run = 0
   if (isa(dr) eq 1) then dry_run = 1
-  if (verbose eq 1 and dry_run eq 1) then __aurorax_message,'Executing in dry-run mode'
+  if (verbose eq 1 and dry_run eq 1) then __aurorax_message, 'Executing in dry-run mode'
 
   ; get ISO datetime strings
-  if (verbose eq 1) then __aurorax_message,'Parsing start and end timestamps'
-  start_iso_dt = __aurorax_datetime_parser(start_ts,/interpret_as_start)
-  end_iso_dt = __aurorax_datetime_parser(end_ts,/interpret_as_end)
-  if (start_iso_dt eq '' or end_iso_dt eq '') then return,list()
+  if (verbose eq 1) then __aurorax_message, 'Parsing start and end timestamps'
+  start_iso_dt = __aurorax_datetime_parser(start_ts, /interpret_as_start)
+  end_iso_dt = __aurorax_datetime_parser(end_ts, /interpret_as_end)
+  if (start_iso_dt eq '' or end_iso_dt eq '') then return, list()
 
   ; create data sources struct
-  if (verbose eq 1) then __aurorax_message,'Creating request struct'
+  if (verbose eq 1) then __aurorax_message, 'Creating request struct'
   data_sources_struct = {programs: list(), platforms: list(), instrument_types: list(), ephemeris_metadata_filters: hash()}
-  if (isa(programs) eq 1) then data_sources_struct.programs = list(programs,/extract)
-  if (isa(platforms) eq 1) then data_sources_struct.platforms = list(platforms,/extract)
-  if (isa(instrument_types) eq 1) then data_sources_struct.instrument_types = list(instrument_types,/extract)
+  if (isa(programs) eq 1) then data_sources_struct.programs = list(programs, /extract)
+  if (isa(platforms) eq 1) then data_sources_struct.platforms = list(platforms, /extract)
+  if (isa(instrument_types) eq 1) then data_sources_struct.instrument_types = list(instrument_types, /extract)
   if (isa(metadata_filters) eq 1) then data_sources_struct.ephemeris_metadata_filters = hash(metadata_filters)
 
   ; create post struct and serialize into a string
   post_struct = {data_sources: data_sources_struct, start: start_iso_dt, end_ts: end_iso_dt}
-  post_str = json_serialize(post_struct,/lowercase)
-  post_str = post_str.replace('LOGICAL_OPERATOR', 'logical_operator')  ; because of a bug in json_serialize where it doesn't lowercase nested hashes
-  post_str = post_str.replace('EXPRESSIONS', 'expressions')            ; because of a bug in json_serialize where it doesn't lowercase nested hashes
-  post_str = post_str.replace('end_ts','end')                          ; because 'end' isn't a valid struct tag name
+  post_str = json_serialize(post_struct, /lowercase)
+  post_str = post_str.replace('LOGICAL_OPERATOR', 'logical_operator') ; because of a bug in json_serialize where it doesn't lowercase nested hashes
+  post_str = post_str.replace('EXPRESSIONS', 'expressions') ; because of a bug in json_serialize where it doesn't lowercase nested hashes
+  post_str = post_str.replace('end_ts', 'end') ; because 'end' isn't a valid struct tag name
 
   ; stop here if in dry-run mode
   if (dry_run eq 1) then begin
-    __aurorax_message,'Dry-run mode, stopping here. Below is the query that would have been executed'
-    print,''
-    print,post_str
-    return,list()
+    __aurorax_message, 'Dry-run mode, stopping here. Below is the query that would have been executed'
+    print, ''
+    print, post_str
+    return, list()
   endif
 
   ; set up request
   tic
-  req = OBJ_NEW('IDLnetUrl')
-  req->SetProperty,URL_SCHEME = 'https'
-  req->SetProperty,URL_PORT = 443
-  req->SetProperty,URL_HOST = 'api.aurorax.space'
-  req->SetProperty,URL_PATH = 'api/v1/ephemeris/search'
-  req->SetProperty,HEADERS = ['Content-Type: application/json', 'User-Agent: idl-aurorax/' + __aurorax_version()]
+  req = obj_new('IDLnetUrl')
+  req.setProperty, url_scheme = 'https'
+  req.setProperty, url_port = 443
+  req.setProperty, url_host = 'api.aurorax.space'
+  req.setProperty, url_path = 'api/v1/ephemeris/search'
+  req.setProperty, headers = ['Content-Type: application/json', 'User-Agent: idl-aurorax/' + __aurorax_version()]
 
   ; make request
-  if (verbose eq 1) then __aurorax_message,'Sending search request ...'
-  output = req->Put(post_str, /BUFFER, /STRING_ARRAY, /POST)
+  if (verbose eq 1) then __aurorax_message, 'Sending search request ...'
+  output = req.put(post_str, /buffer, /string_array, /post)
 
   ; get status code and get response headers
-  req->GetProperty,RESPONSE_CODE=status_code,RESPONSE_HEADER=response_headers
+  req.getProperty, response_code = status_code, response_header = response_headers
 
   ; cleanup this request
-  obj_destroy,req
+  obj_destroy, req
 
   ; check status code
   if (status_code ne 202) then begin
-    if (verbose eq 1) then __aurorax_message,'Error submitting search request: ' + output
-    return,list()
+    if (verbose eq 1) then __aurorax_message, 'Error submitting search request: ' + output
+    return, list()
   endif
-  if (verbose eq 1) then __aurorax_message,'Search request accepted'
+  if (verbose eq 1) then __aurorax_message, 'Search request accepted'
 
   ; set request ID from response headers
-  request_id = __aurorax_extract_request_id_from_response_headers(response_headers,62)
+  request_id = __aurorax_extract_request_id_from_response_headers(response_headers, 62)
   if (request_id eq '') then begin
-    return,list()
+    return, list()
   endif
-  if (verbose eq 1) then __aurorax_message,'Request ID: ' + request_id
+  if (verbose eq 1) then __aurorax_message, 'Request ID: ' + request_id
 
   ; wait for request to be done
-  status = __aurorax_request_wait_for_data('ephemeris',request_id,poll_interval,verbose)
-  if (verbose eq 1) then __aurorax_message,'Data is now available'
+  status = __aurorax_request_wait_for_data('ephemeris', request_id, poll_interval, verbose)
+  if (verbose eq 1) then __aurorax_message, 'Data is now available'
 
   ; humanize size of data to download
-  bytes_str = __aurorax_humanize_bytes(status.search_result.file_size)
-  if (verbose eq 1) then __aurorax_message,'Downloading ' + __aurorax_humanize_bytes(status.search_result.file_size) + ' of data ...'
+  if (verbose eq 1) then __aurorax_message, 'Downloading ' + __aurorax_humanize_bytes(status.search_result.file_size) + ' of data ...'
 
   ; get data
-  data = __aurorax_request_get_data('ephemeris',request_id)
-  if (verbose eq 1) then __aurorax_message,'Data downloaded, search completed'
+  data = __aurorax_request_get_data('ephemeris', request_id)
+  if (verbose eq 1) then __aurorax_message, 'Data downloaded, search completed'
 
   ; convert location nans
   data = __aurorax_ephemeris_convert_location_nans(data)
@@ -182,6 +186,6 @@ function aurorax_ephemeris_search,start_ts,end_ts,programs=programs,platforms=pl
   duration_str = __aurorax_time2string(toc_ts)
 
   ; return
-  if (verbose eq 1) then __aurorax_message,'Search completed, found ' + strtrim(status.search_result.result_count,2) + ' records in ' + duration_str
-  return,data
+  if (verbose eq 1) then __aurorax_message, 'Search completed, found ' + strtrim(status.search_result.result_count, 2) + ' records in ' + duration_str
+  return, data
 end

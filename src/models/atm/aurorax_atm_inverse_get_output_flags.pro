@@ -1,20 +1,20 @@
-;-------------------------------------------------------------
+; -------------------------------------------------------------
 ; Copyright 2024 University of Calgary
 ;
 ; Licensed under the Apache License, Version 2.0 (the "License");
 ; you may not use this file except in compliance with the License.
 ; You may obtain a copy of the License at
 ;
-;    http://www.apache.org/licenses/LICENSE-2.0
+; http://www.apache.org/licenses/LICENSE-2.0
 ;
 ; Unless required by applicable law or agreed to in writing, software
 ; distributed under the License is distributed on an "AS IS" BASIS,
 ; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ; See the License for the specific language governing permissions and
 ; limitations under the License.
-;-------------------------------------------------------------
+; -------------------------------------------------------------
 
-;-------------------------------------------------------------
+; -------------------------------------------------------------
 ;+
 ; NAME:
 ;       AURORAX_ATM_INVERSE_GET_OUTPUT_FLAGS
@@ -48,7 +48,8 @@
 ;       aurorax_atm_inverse_get_output_flags(/SET_ALL_TRUE)
 ;+
 ;-------------------------------------------------------------
-function aurorax_atm_inverse_get_output_flags,set_all_true=set_all_true
+function aurorax_atm_inverse_get_output_flags, set_all_true = set_all_true
+  compile_opt idl2
   ; create hash
   output_flags = hash()
   output_flags['altitudes'] = 0
@@ -86,5 +87,5 @@ function aurorax_atm_inverse_get_output_flags,set_all_true=set_all_true
   endif
 
   ; return
-  return,output_flags
+  return, output_flags
 end

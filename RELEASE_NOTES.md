@@ -1,3 +1,10 @@
+Version 1.4.0
+-------------------------
+
+- added `aurorax_get_dataset()` function
+- preparations for adding support for TREx Spectrograph L1 data
+
+
 Version 1.3.1
 -------------------------
 

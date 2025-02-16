@@ -1,20 +1,20 @@
-;-------------------------------------------------------------
+; -------------------------------------------------------------
 ; Copyright 2024 University of Calgary
 ;
 ; Licensed under the Apache License, Version 2.0 (the "License");
 ; you may not use this file except in compliance with the License.
 ; You may obtain a copy of the License at
 ;
-;    http://www.apache.org/licenses/LICENSE-2.0
+; http://www.apache.org/licenses/LICENSE-2.0
 ;
 ; Unless required by applicable law or agreed to in writing, software
 ; distributed under the License is distributed on an "AS IS" BASIS,
 ; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ; See the License for the specific language governing permissions and
 ; limitations under the License.
-;-------------------------------------------------------------
+; -------------------------------------------------------------
 
-;-------------------------------------------------------------
+; -------------------------------------------------------------
 ;+
 ; NAME:
 ;       AURORAX_ATM_FORWARD_GET_OUTPUT_FLAGS
@@ -23,11 +23,11 @@
 ;       Initialize ATM 'forward' calculation output flag settings.
 ;
 ; EXPLANATION:
-;       Create an hash object which used to represent all output values included in 
-;       an ATM forward calculation. ATM calculations are performed in a way where 
-;       you can toggle ON/OFF whichever pieces of information you do or don't want. 
+;       Create an hash object which used to represent all output values included in
+;       an ATM forward calculation. ATM calculations are performed in a way where
+;       you can toggle ON/OFF whichever pieces of information you do or don't want.
 ;       This improves efficiency of the calculation routine resulting in faster queries.
-;       
+;
 ;       By default, all output flags are disabled. There exist several helper keywords
 ;       to enable all flags, or enable only height-integrated Rayleighs flags.
 ;
@@ -35,7 +35,7 @@
 ;       aurorax_atm_forward_get_output_flags()
 ;
 ; KEYWORDS:
-;       /SET_ALL_TRUE                               enable all output flags to 
+;       /SET_ALL_TRUE                               enable all output flags to
 ;       /ENABLE_ONLY_HEIGHT_INTEGRATED_RAYLEIGHS    enable only all height-integrated Rayleighs flags
 ;
 ; OUTPUT
@@ -50,7 +50,8 @@
 ;       aurorax_atm_forward_get_output_flags(/ENABLE_ONLY_HEIGHT_INTEGRATED_RAYLEIGHS)
 ;+
 ;-------------------------------------------------------------
-function aurorax_atm_forward_get_output_flags,set_all_true=set_all_true,enable_only_height_integrated_rayleighs=enable_only_height_integrated_rayleighs
+function aurorax_atm_forward_get_output_flags, set_all_true = set_all_true, enable_only_height_integrated_rayleighs = enable_only_height_integrated_rayleighs
+  compile_opt idl2
   ; create hash
   output_flags = hash()
   output_flags['altitudes'] = 0
@@ -100,5 +101,5 @@ function aurorax_atm_forward_get_output_flags,set_all_true=set_all_true,enable_o
   endif
 
   ; return
-  return,output_flags
+  return, output_flags
 end

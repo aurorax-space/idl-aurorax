@@ -1,34 +1,35 @@
-;-------------------------------------------------------------
+; -------------------------------------------------------------
 ; Copyright 2024 University of Calgary
 ;
 ; Licensed under the Apache License, Version 2.0 (the "License");
 ; you may not use this file except in compliance with the License.
 ; You may obtain a copy of the License at
 ;
-;    http://www.apache.org/licenses/LICENSE-2.0
+; http://www.apache.org/licenses/LICENSE-2.0
 ;
 ; Unless required by applicable law or agreed to in writing, software
 ; distributed under the License is distributed on an "AS IS" BASIS,
 ; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ; See the License for the specific language governing permissions and
 ; limitations under the License.
-;-------------------------------------------------------------
+; -------------------------------------------------------------
 
-pro __aurorax_ucalgary_readfile_grid,grid_file_path,data,timestamp_list,meta,first_frame=first_frame,verbose=verbose
+pro __aurorax_ucalgary_readfile_grid, grid_file_path, data, timestamp_list, meta, first_frame = first_frame, verbose = verbose
+  compile_opt idl2
 
-  if not isa(verbose) then verbose=1
-  
+  if not isa(verbose) then verbose = 1
+
   ; Setting up master lists to hold data for multi-file reading
   master_timestamp = []
   master_file_meta = []
   master_frame_meta = []
-  
+
   ; Convert scalar filename to length 1 array so we can 'iterate' regardless
   if isa(grid_file_path, /scalar) then grid_file_path = [grid_file_path]
-  
+
   foreach f, grid_file_path do begin
-    if (verbose gt 0) then print,'[aurorax_read] Reading file: ' + f
-    
+    if (verbose gt 0) then print, '[aurorax_read] Reading file: ' + f
+
     ; Reading the grid data into an
     ; array object to be returned.
     file_id = h5f_open(f)
@@ -81,8 +82,7 @@ pro __aurorax_ucalgary_readfile_grid,grid_file_path,data,timestamp_list,meta,fir
 
     ; Iterating through each frame dataset in the frame meta group
     for i = 0, (n_frame_meta_datasets - 1) do begin
-
-      frame_meta_dataset_id = h5d_open(frame_meta_group_id, 'frame'+strcompress(string(i), /remove_all))
+      frame_meta_dataset_id = h5d_open(frame_meta_group_id, 'frame' + strcompress(string(i), /remove_all))
       n_frame_meta_attributes = h5a_get_num_attrs(frame_meta_dataset_id)
 
       ; Iterating through each attribute for the current iteration's dataset and adding to hash
@@ -96,57 +96,54 @@ pro __aurorax_ucalgary_readfile_grid,grid_file_path,data,timestamp_list,meta,fir
 
       ; Converting hash to struct and then appending to frame meta list
       frame_meta_struct = frame_meta_hash.tostruct()
-      
+
       master_frame_meta = [master_frame_meta, frame_meta_struct]
       master_file_meta = [master_file_meta, file_meta]
     endfor
-    
+
     ; If first_frame_only keyword is set, slice all objects accordingly so that
     ; only data and metadata corresponding to the first frame is returned
     if keyword_set(first_frame) then begin
-
       if size(grid, /n_dimensions) eq 3 then begin
-        grid = grid[*,*,0]
+        grid = grid[*, *, 0]
       endif else if size(grid, /n_dimensions) eq 4 then begin
-        grid = grid[*,*,*,0]
+        grid = grid[*, *, *, 0]
       endif
-      confidence = confidence[*,*,0]
+      confidence = confidence[*, *, 0]
       timestamp = timestamp[0]
       frame_meta = frame_meta[0]
       file_meta = file_meta[0]
     endif
-    
+
     ; Append to grid array
     master_shape = size(master_grid, /dimensions)
     grid_shape = size(grid, /dimensions)
     new_nframes = master_shape[-1] + grid_shape[-1]
     if isa(master_grid) then begin
-      master_grid = reform([reform(master_grid,master_grid.length), $
-                    reform(grid,grid.length)],[master_shape[0:n_elements(master_shape)-2], new_nframes])
+      master_grid = reform([reform(master_grid, master_grid.length), $
+        reform(grid, grid.length)], [master_shape[0 : n_elements(master_shape) - 2], new_nframes])
     endif else begin
       master_grid = grid
     endelse
-    
+
     ; Append to confidence array
     master_shape = size(master_confidence, /dimensions)
     confidence_shape = size(confidence, /dimensions)
     new_nframes = master_shape[-1] + confidence_shape[-1]
     if isa(master_confidence) then begin
-      master_confidence = reform([reform(master_confidence,master_confidence.length), $
-        reform(confidence,confidence.length)],[master_shape[0:n_elements(master_shape)-2], new_nframes])
+      master_confidence = reform([reform(master_confidence, master_confidence.length), $
+        reform(confidence, confidence.length)], [master_shape[0 : n_elements(master_shape) - 2], new_nframes])
     endif else begin
       master_confidence = confidence
     endelse
-    
+
     ; Append to timestamp
     master_timestamp = [master_timestamp, timestamp]
-        
+
     h5_close
-    
   endforeach
 
   ; Creating the meta struct that is to be returned
-  meta = {timestamp:master_timestamp, file_meta:master_file_meta, frame_meta:master_frame_meta}
-  data = {grid:master_grid, confidence:master_confidence}
-
+  meta = {timestamp: master_timestamp, file_meta: master_file_meta, frame_meta: master_frame_meta}
+  data = {grid: master_grid, confidence: master_confidence}
 end

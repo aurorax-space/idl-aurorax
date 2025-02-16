@@ -17,42 +17,35 @@
 ; -------------------------------------------------------------
 ;+
 ; NAME:
-;       AURORAX_LIST_DATASETS
+;       AURORAX_GET_DATASET
 ;
 ; PURPOSE:
-;       Retrieve list of available datasets for which you can
-;       download data.
+;       Retrieve specific dataset for which you can download data.
 ;
 ; EXPLANATION:
-;       Retrieve information about available datasets, including provider,
-;       short+long descriptions, and DOI details. Optional parameters are
-;       used to filter for certain matching datasets.
+;       Retrieve information about a specific dataset, including provider,
+;       short+long descriptions, and DOI details.
 ;
 ; CALLING SEQUENCE:
-;       aurorax_list_datasets()
+;       aurorax_get_dataset()
 ;
 ; PARAMETERS:
-;       name         dataset name for filter on, case-insensitive and partial
-;                    matches are allowed. Optional.
+;       name         dataset name to retrieve, case-insensitive
 ;
 ; OUTPUT
-;       the found datasets
+;       the found dataset
 ;
 ; OUTPUT TYPE:
-;       a list of structs
+;       a struct
 ;
 ; EXAMPLES:
-;       datasets = aurorax_list_datasets()
-;       datasets = aurorax_list_datasets(name='THEMIS_ASI')
+;       dataset = aurorax_get_dataset("THEMIS_ASI_RAW")
 ;+
 ;-------------------------------------------------------------
-function aurorax_list_datasets, name = name
+function aurorax_get_dataset, name
   compile_opt idl2
   ; set params
-  param_str = ''
-  if (isa(name) eq 1) then begin
-    param_str += '?name=' + name
-  endif
+  param_str = '?name=' + name
 
   ; set up request
   req = obj_new('IDLnetUrl')
@@ -68,6 +61,14 @@ function aurorax_list_datasets, name = name
   ; serialize into struct
   status = json_parse(output, /tostruct)
 
+  ; remove all but the matching dataset
+  matched_dataset = !null
+  for i = 0, n_elements(status) - 1 do begin
+    if (status[i].name eq name) then begin
+      matched_dataset = status[i]
+    endif
+  endfor
+
   ; return
-  return, status
+  return, matched_dataset
 end

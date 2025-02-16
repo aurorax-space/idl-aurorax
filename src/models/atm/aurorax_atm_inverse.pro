@@ -1,20 +1,20 @@
-;-------------------------------------------------------------
+; -------------------------------------------------------------
 ; Copyright 2024 University of Calgary
 ;
 ; Licensed under the Apache License, Version 2.0 (the "License");
 ; you may not use this file except in compliance with the License.
 ; You may obtain a copy of the License at
 ;
-;    http://www.apache.org/licenses/LICENSE-2.0
+; http://www.apache.org/licenses/LICENSE-2.0
 ;
 ; Unless required by applicable law or agreed to in writing, software
 ; distributed under the License is distributed on an "AS IS" BASIS,
 ; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ; See the License for the specific language governing permissions and
 ; limitations under the License.
-;-------------------------------------------------------------
+; -------------------------------------------------------------
 
-;-------------------------------------------------------------
+; -------------------------------------------------------------
 ;+
 ; NAME:
 ;       AURORAX_ATM_INVERSE
@@ -32,11 +32,11 @@
 ;
 ; PARAMETERS:
 ;       time_stamp                            Timestamp in UTC, format must be YYYY-MM-DDTHH:MM:SS. Required
-;       geo_lat                               Latitude in geodetic coordinates. Currently limited to the Transition Region Explorer 
-;                                               (TREx) region of >=50.0 and <61.5 degrees. An error will be raised if outside of this 
+;       geo_lat                               Latitude in geodetic coordinates. Currently limited to the Transition Region Explorer
+;                                               (TREx) region of >=50.0 and <61.5 degrees. An error will be raised if outside of this
 ;                                               range. This parameter is required.
-;       geo_lon                               Longitude in geodetic coordinates. Currently limited to the Transition Region Explorer 
-;                                               (TREx) region of >=-110 and <-70 degrees. An error will be raised if outside of this 
+;       geo_lon                               Longitude in geodetic coordinates. Currently limited to the Transition Region Explorer
+;                                               (TREx) region of >=-110 and <-70 degrees. An error will be raised if outside of this
 ;                                               range. This parameter is required.
 ;       intensity_4278                        Intensity of the 427.8nm (blue) wavelength in Rayleighs. This parameter is required.
 ;       intensity_5577                        Intensity of the 557.7nm (green) wavelength in Rayleighs. This parameter is required.
@@ -44,7 +44,7 @@
 ;       intensity_8446                        Intensity of the 844.6nm (near infrared) wavelength in Rayleighs. This parameter is required.
 ;       output_flags                          Flags to indictate which values are included in the output, generated
 ;                                             using the aurorax_atm_forward_get_output_flags() function. Required
-;       precipitation_flux_spectral_type      The precipitation flux spectral type to use. Possible values are gaussian or maxwellian. The 
+;       precipitation_flux_spectral_type      The precipitation flux spectral type to use. Possible values are gaussian or maxwellian. The
 ;                                               default is gaussian. This parameter is optional.
 ;       nrlmsis_model_version                 NRLMSIS version number. Possible values are 00 or 2.0. Default is 2.0. This parameter
 ;                                               is optional. More details about this empirical model can be found here, and here.
@@ -68,20 +68,21 @@
 ;       Refer to examples directory, or data.phys.ucalgary.ca
 ;+
 ;-------------------------------------------------------------
-function aurorax_atm_inverse,$
-  time_stamp,$
-  geo_lat,$
-  geo_lon,$
-  intensity_4278,$
-  intensity_5577,$
-  intensity_6300,$
-  intensity_8446,$
-  output_flags,$
-  precipitation_flux_spectral_type=precipitation_flux_spectral_type,$
-  nrlmsis_model_version=nrlmsis_model_version,$
-  atmospheric_attenuation_correction=atmospheric_attenuation_correction,$
-  atm_model_version=atm_model_version,$
-  no_cache=no_cache
+function aurorax_atm_inverse, $
+  time_stamp, $
+  geo_lat, $
+  geo_lon, $
+  intensity_4278, $
+  intensity_5577, $
+  intensity_6300, $
+  intensity_8446, $
+  output_flags, $
+  precipitation_flux_spectral_type = precipitation_flux_spectral_type, $
+  nrlmsis_model_version = nrlmsis_model_version, $
+  atmospheric_attenuation_correction = atmospheric_attenuation_correction, $
+  atm_model_version = atm_model_version, $
+  no_cache = no_cache
+  compile_opt idl2
 
   ; set keyword flags
   no_cache_flag = 0
@@ -109,38 +110,38 @@ function aurorax_atm_inverse,$
   if (isa(atm_model_version) eq 1) then request_hash['atm_model_version'] = atm_model_version
 
   ; create post struct and serialize into a string
-  post_str = json_serialize(request_hash,/lowercase)
+  post_str = json_serialize(request_hash, /lowercase)
 
   ; set up request
-  req = OBJ_NEW('IDLnetUrl')
-  req->SetProperty,URL_SCHEME = 'https'
-  req->SetProperty,URL_PORT = 443
-  req->SetProperty,URL_HOST = 'api.phys.ucalgary.ca'
-  req->SetProperty,URL_PATH = 'api/v1/atm/inverse'
-  req->SetProperty,HEADERS = ['Content-Type: application/json', 'User-Agent: idl-aurorax/' + __aurorax_version()]
+  req = obj_new('IDLnetUrl')
+  req.setProperty, url_scheme = 'https'
+  req.setProperty, url_port = 443
+  req.setProperty, url_host = 'api.phys.ucalgary.ca'
+  req.setProperty, url_path = 'api/v1/atm/inverse'
+  req.setProperty, headers = ['Content-Type: application/json', 'User-Agent: idl-aurorax/' + __aurorax_version()]
 
   ; make request
-  output = req->Put(post_str, /BUFFER, /STRING_ARRAY, /POST)
+  output = req.put(post_str, /buffer, /string_array, /post)
 
   ; get status code and get response headers
-  req->GetProperty,RESPONSE_CODE=status_code,RESPONSE_HEADER=response_headers
+  req.getProperty, response_code = status_code, response_header = response_headers
 
   ; cleanup this request
-  obj_destroy,req
+  obj_destroy, req
 
   ; check status code
   if (status_code ne 200) then begin
-    print,'[aurorax_atm_inverse] Error performing calculatoin: ' + output
-    return,!NULL
+    print, '[aurorax_atm_inverse] Error performing calculatoin: ' + output
+    return, !null
   endif
 
   ; serialize into dictionary
-  data = json_parse(output,/dictionary)
+  data = json_parse(output, /dictionary)
 
   ; serialize any List() objects to float arrays
   foreach value, data['data'], key do begin
     if (isa(value, 'List') eq 1) then begin
-      data['data',key] = value.toArray(type='float')
+      data['data', key] = value.toArray(type = 'float')
     endif
   endforeach
 
@@ -148,5 +149,5 @@ function aurorax_atm_inverse,$
   data = data.toStruct(/recursive)
 
   ; return
-  return,data
+  return, data
 end

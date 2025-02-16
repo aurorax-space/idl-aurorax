@@ -14,16 +14,20 @@
 ; limitations under the License.
 ; -------------------------------------------------------------
 
-pro aurorax_example_ephemeris_search
+pro spectrograph_example
   compile_opt idl2
+  ; download an hour of TREx Spectrograph data
+  ;
+  ; using the aurorax_list_datasets() function, we figured out that
+  ; the dataset names we want to use
+  d = aurorax_ucalgary_download('TREX_SPECT_RAW', '2019-01-01T06:00:00', '2019-01-01T06:59:59', site_uid = 'luck')
+  f = d.filenames
+  data = aurorax_ucalgary_read(d.dataset, f)
+  help, data
+  data = aurorax_ucalgary_read(d.dataset, f[0], /quiet)
+  help, data
 
-  ; perform search
-  response = aurorax_ephemeris_search('2019-01-01T06:00', '2019-01-01T06:59', programs = ['swarm'], platforms = ['swarma'], instrument_types = ['footprint'])
-
-  ; show output
-  help, response
-  print, ''
-
-  help, response.data[0]
-  print, ''
+  d = aurorax_ucalgary_download('TREX_SPECT_PROCESSED_V1', '2019-01-01T06:00:00', '2019-01-01T06:59:59', site_uid = 'luck')
+  f = d.filenames
+  data = aurorax_ucalgary_read(d.dataset, f)
 end

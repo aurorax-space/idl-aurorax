@@ -1,20 +1,20 @@
-;-------------------------------------------------------------
+; -------------------------------------------------------------
 ; Copyright 2024 University of Calgary
 ;
 ; Licensed under the Apache License, Version 2.0 (the "License");
 ; you may not use this file except in compliance with the License.
 ; You may obtain a copy of the License at
 ;
-;    http://www.apache.org/licenses/LICENSE-2.0
+; http://www.apache.org/licenses/LICENSE-2.0
 ;
 ; Unless required by applicable law or agreed to in writing, software
 ; distributed under the License is distributed on an "AS IS" BASIS,
 ; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ; See the License for the specific language governing permissions and
 ; limitations under the License.
-;-------------------------------------------------------------
+; -------------------------------------------------------------
 
-;-------------------------------------------------------------
+; -------------------------------------------------------------
 ;+
 ; NAME:
 ;       AURORAX_UCALGARY_GET_URLS
@@ -50,7 +50,8 @@
 ;       u = aurorax_ucalgary_get_urls('TREX_RGB_RAW_NOMINAL','2022-01-01T06:00:00','2022-01-01T06:00:00')
 ;+
 ;-------------------------------------------------------------
-function aurorax_ucalgary_get_urls,dataset_name,start_ts,end_ts,site_uid=site_uid,device_uid=device_uid
+function aurorax_ucalgary_get_urls, dataset_name, start_ts, end_ts, site_uid = site_uid, device_uid = device_uid
+  compile_opt idl2
   ; set required params
   param_str = '?name=' + dataset_name
   param_str += '&start=' + start_ts
@@ -65,19 +66,19 @@ function aurorax_ucalgary_get_urls,dataset_name,start_ts,end_ts,site_uid=site_ui
   endif
 
   ; set up request
-  req = OBJ_NEW('IDLnetUrl')
-  req->SetProperty,URL_SCHEME = 'https'
-  req->SetProperty,URL_PORT = 443
-  req->SetProperty,URL_HOST = 'api.phys.ucalgary.ca'
-  req->SetProperty,URL_PATH = 'api/v1/data_distribution/urls' + param_str
-  req->SetProperty,HEADERS = 'User-Agent: idl-aurorax/' + __aurorax_version()
+  req = obj_new('IDLnetUrl')
+  req.setProperty, url_scheme = 'https'
+  req.setProperty, url_port = 443
+  req.setProperty, url_host = 'api.phys.ucalgary.ca'
+  req.setProperty, url_path = 'api/v1/data_distribution/urls' + param_str
+  req.setProperty, headers = 'User-Agent: idl-aurorax/' + __aurorax_version()
 
   ; make request
-  output = req->Get(/STRING_ARRAY)
+  output = req.get(/string_array)
 
   ; serialize into struct
-  status = json_parse(output,/TOSTRUCT)
+  status = json_parse(output, /tostruct)
 
   ; return
-  return,status
+  return, status
 end
