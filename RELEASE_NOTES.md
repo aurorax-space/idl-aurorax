@@ -3,6 +3,9 @@ Version 1.4.0
 
 - added `aurorax_get_dataset()` function
 - preparations for adding support for TREx Spectrograph L1 data
+- changes for parameters for `aurorax_list_observatories()` function
+  - the `name` parameter is now required, and not a keyword. New name for the input is `instrument_array`.
+  - addition of `uid` optional keyword
 
 
 Version 1.3.1

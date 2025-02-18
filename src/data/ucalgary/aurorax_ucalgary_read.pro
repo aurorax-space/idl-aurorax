@@ -187,7 +187,7 @@ function aurorax_ucalgary_read, dataset, file_list, first_record = first_record,
       __aurorax_ucalgary_readfile_asi, file_list, img, meta, count = n_frames, first_frame = first_record, no_metadata = no_metadata
     endelse
 
-    ; set the data
+    ; set the data 
     data = img
     data = __reorient_asi_images(dataset.name, data)
 

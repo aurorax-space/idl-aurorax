@@ -19,7 +19,7 @@ pro aurorax_asi_pgm_metadata__define
   compile_opt idl2, hidden
 
   dummy = { $
-    Aurorax_Asi_Pgm_Metadata, $
+    aurorax_asi_pgm_metadata, $
     site_uid: '', $
     imager_uid: '', $
     site_latitude: 0.0, $
@@ -42,7 +42,7 @@ pro aurorax_asi_png_metadata__define
   compile_opt idl2, hidden
 
   dummy = { $
-    Aurorax_Asi_Png_Metadata, $
+    aurorax_asi_png_metadata, $
     site_uid: '', $
     device_uid: '', $
     mode_uid: '', $
@@ -57,7 +57,7 @@ pro aurorax_asi_h5_metadata__define
   compile_opt idl2, hidden
 
   dummy = { $
-    Aurorax_Asi_H5_Metadata, $
+    aurorax_asi_h5_metadata, $
     site_uid: '', $
     imager_uid: '', $
     site_latitude: 0.0, $
@@ -93,7 +93,7 @@ function __aurorax_asi_parse_pgm_comments, comments, metadata, minimal_metadata 
   on_ioerror, ioerror
 
   ; init metadata variable
-  metadata = {Aurorax_Asi_Pgm_Metadata}
+  metadata = {aurorax_asi_pgm_metadata}
 
   ; set comments field
   metadata.comments = comments[0]
@@ -163,12 +163,13 @@ function __aurorax_asi_parse_pgm_comments, comments, metadata, minimal_metadata 
   if not keyword_set(NO_METADATA) then begin
     print, '[aurorax_read] Error - could not read metadata, use /no_metadata keyword to read image'
   endif
-  metadata = {Aurorax_Asi_Pgm_Metadata}
+  metadata = {aurorax_asi_pgm_metadata}
   return, 1
 end
 
 function __aurorax_asi_parse_h5_metadata, attributes, metadata, img_dims, minimal_metadata = minimal_metadata
-  compile_opt idl2
+  compile_opt idl2, hidden
+
   ; for each expected frame
   for i = 0, n_elements(attributes['timestamp']) - 1 do begin
     ; set exposure start string
@@ -316,11 +317,11 @@ function __aurorax_asi_png_readfile, $
     ; allocate memory for image data and metadata if this is the first frame
     if (n_frames eq 0) then begin
       image_data = make_array([channels, width, height, n_elements(file_list)], type = image_size.type, /nozero)
-      meta_data = replicate({Aurorax_Asi_Png_Metadata}, n_elements(file_list))
+      meta_data = replicate({aurorax_asi_png_metadata}, n_elements(file_list))
     endif
 
     ; set metadata
-    frame_metadata = {Aurorax_Asi_Png_Metadata}
+    frame_metadata = {aurorax_asi_png_metadata}
     if not keyword_set(no_metadata) then begin
       basename = file_basename(file_list[i])
       basename_split = strsplit(basename, '_', /extract)
@@ -474,15 +475,9 @@ function __aurorax_asi_h5_readfile, $
   h5f_close, file_id
 
   ; populate metadata object
-  meta_data = replicate({Aurorax_Asi_H5_Metadata}, n_frames)
+  meta_data = replicate({aurorax_asi_h5_metadata}, n_frames)
   if not keyword_set(no_metadata) then begin
     ret = __aurorax_asi_parse_h5_metadata(attributes, meta_data, dimension_details, minimal_metadata = minimal_metadata)
-  endif
-
-  ; remove extra unused memory
-  if (n_frames gt 0 and n_frames lt n_elements(file_list)) then begin
-    image_data = image_data[*, *, *, 0 : n_frames - 1]
-    meta_data = meta_data[0 : n_frames - 1]
   endif
 
   ; normal return
@@ -503,9 +498,8 @@ function __aurorax_asi_pgm_readfile, $
   lun = lun, $
   verbose = verbose, $
   comments = comments, $
-  tuple_type = tuple_type, $
   maxval = maxval
-  compile_opt idl2, hidden
+  compile_opt strictarr, hidden
 
   ; set error cases
   if not keyword_set(verbose) then on_error, 2
@@ -546,7 +540,6 @@ function __aurorax_asi_pgm_readfile, $
   height = 0
   depth = 0
   maxval = -1l
-  tupletype = ''
   depth = ([1, 1, 3, 1, 1, 3, 0])[filetype - 1]
   line = ''
   comments = ''
@@ -656,14 +649,12 @@ pro __aurorax_ucalgary_readfile_asi, $
 
   ; init
   stride = 0
-  time0 = systime(1)
   filenames = ''
   n_files = 0
   first_call = 1
   n_frames = 0
   n_bytes = 0
   _n_frames = 0
-  idl_version_minimum = '8.2.3'
   idl_version_full_support = '8.7.1'
   untar_extract_supported = 1
 
@@ -843,12 +834,12 @@ pro __aurorax_ucalgary_readfile_asi, $
           dimensions = isize.dimensions[0 : isize.n_dimensions]
           dimensions[isize.n_dimensions] = n_start
           images = make_array(dimensions, type = isize.type, /nozero)
-          metadata = replicate({Aurorax_Asi_Pgm_Metadata}, n_start)
+          metadata = replicate({aurorax_asi_pgm_metadata}, n_start)
           dimensions[isize.n_dimensions] = n_chunk
         endif else if (n_frames ge n_start) then begin
           ; need to expand the arrays
           images = [[[images]], [[make_array(dimensions, type = isize.type, /nozero)]]]
-          metadata = [metadata, replicate({Aurorax_Asi_Pgm_Metadata}, n_chunk)]
+          metadata = [metadata, replicate({aurorax_asi_pgm_metadata}, n_chunk)]
           n_start = n_start + n_chunk
         endif
 

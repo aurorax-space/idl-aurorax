@@ -20,25 +20,31 @@
 ;       short+long descriptions, and DOI details. Optional parameters are
 ;       used to filter for certain matching datasets.
 ;
+; :Parameters:
+;       instrument_array: in, required, String
+;         The instrument array to list observatories for. Valid values are: themis_asi, rego,
+;         trex_rgb, trex_nir, trex_blue, and trex_spectrograph. Value is case insensitive.
+;
 ; :Keywords:
-;       name: in, optional, String
-;         dataset name for filter on, case-insensitive and partial
-;         matches are allowed.
+;       uid: in, optional, String
+;         Supply a observatory unique identifier used for filtering (usually 4-letter site
+;         code). If that UID is found in the available observatories received from the API, it
+;         will be included in the results. This parameter is optional.
 ;
 ; :Returns:
 ;       List(Structure)
 ;
 ; :Examples:
-;       datasets = aurorax_list_datasets()
-;       datasets = aurorax_list_datasets(name='THEMIS_ASI')
+;       datasets = aurorax_list_datasets('themis_asi')
+;       datasets = aurorax_list_datasets('trex_rgb', uid='atha')
 ;+
-function aurorax_list_datasets, name = name
+function aurorax_list_datasets, instrument_array, uid = uid
   compile_opt idl2
 
   ; set params
-  param_str = ''
-  if (isa(name) eq 1) then begin
-    param_str += '?name=' + name
+  param_str = '?name=' + instrument_array
+  if keyword_set(uid) then begin
+    param_str += '&uid=' + uid
   endif
 
   ; set up request
@@ -55,6 +61,14 @@ function aurorax_list_datasets, name = name
   ; serialize into struct
   status = json_parse(output, /tostruct)
 
+  ; filter out any that shouldn't show, based on the supported_libraries value
+  filtered_sources = list()
+  for i = 0, n_elements(status) - 1 do begin
+    if (status[i].supported_libraries.where('idl-aurorax') ne !null) then begin
+      filtered_sources.add, status[i]
+    endif
+  endfor
+
   ; return
-  return, status
+  return, filtered_sources
 end

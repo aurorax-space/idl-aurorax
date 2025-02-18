@@ -1,0 +1,201 @@
+{
+  "version": "2.0.0",
+  "cells": [
+    {
+      "type": "markdown",
+      "content": [
+        "# Explore datasets",
+        "",
+        "All data available is organized by unique 'dataset' identifier strings, similar to CDAWeb. For example, `THEMIS_ASI_RAW` is the dataset name for the raw THEMIS all-sky imager data, one of the common datasets for that instrument array.",
+        "",
+        "There are a few functions to help explore the available datasets and information about them. There is `aurorax_list_datasets()` to retrieve any datasets matching optional filters, and `aurorax_get_dataset()` which retrieves a specific single dataset.",
+        "",
+        "You can also navigate to the [Dataset Descriptions](https://data.phys.ucalgary.ca/about_datasets) page and navigate to a particular instrument page. There, you will find a listing of all available (and commonly utilized) datasets for an instrument, along with instrument location/field-of-view maps, and observatory locations.",
+        "",
+        "Each dataset has a few attributes. For example, DOI and citation information, data tree location, and provider."
+      ],
+      "metadata": {},
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "content": [
+        "; list datasets",
+        "datasets = aurorax_list_datasets()",
+        "print, 'Found ' + strcompress(fix(n_elements(datasets)), /remove_all) + ' datasets when searching with no filter'",
+        ""
+      ],
+      "metadata": {},
+      "outputs": [
+        {
+          "items": [
+            {
+              "mime": "text/plain",
+              "content": [
+                "Found 73 datasets when searching with no filter",
+                ""
+              ]
+            }
+          ],
+          "metadata": {
+            "id": "not-saved"
+          }
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "content": [
+        "; show the first one",
+        "help, datasets[0]",
+        ""
+      ],
+      "metadata": {},
+      "outputs": [
+        {
+          "items": [
+            {
+              "mime": "text/plain",
+              "content": [
+                "** Structure <adeae00>, 11 tags, length=160, data length=149, refs=2:",
+                "   NAME            STRING    'REGO_CALIBRATION_FLATFIELD_IDLSAV'",
+                "   SHORT_DESCRIPTION",
+                "                   STRING    'REGO All Sky Imagers Flatfield calibration data (IDL save format)'",
+                "   LONG_DESCRIPTION",
+                "                   STRING    'Redline Geospace Observatory (REGO) All Sky Imager array. More information can'...",
+                "   DATA_TREE_URL   STRING    'https://data.phys.ucalgary.ca/sort_by_project/GO-Canada/REGO/calibration'",
+                "   FILE_LISTING_SUPPORTED",
+                "                   BOOLEAN   true (1)",
+                "   LEVEL           STRING    'L3'",
+                "   DOI             STRING    'https://doi.org/10.11575/Z7X6-5C42'",
+                "   DOI_DETAILS     STRING    'https://commons.datacite.org/doi.org/10.11575/z7x6-5c42'",
+                "   CITATION        STRING    'Spanswick, E., & Donovan, E. (2014). Redline Geospace Observatory (REGO) datas'...",
+                "   SUPPORTED_LIBRARIES",
+                "                   OBJREF    <ObjHeapVar40(LIST)>",
+                "   FILE_TIME_RESOLUTION",
+                "                   STRING    'not_applicable'",
+                ""
+              ]
+            }
+          ],
+          "metadata": {
+            "id": "not-saved"
+          }
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "content": [
+        "; to retrieve the information for a specific dataset, we can use",
+        "; the 'aurorax_get_dataset()' function",
+        "dataset = aurorax_get_dataset('TREX_RGB_RAW_NOMINAL')",
+        "help, dataset",
+        ""
+      ],
+      "metadata": {},
+      "outputs": [
+        {
+          "items": [
+            {
+              "mime": "text/plain",
+              "content": [
+                "** Structure <af6c7c0>, 11 tags, length=160, data length=149, refs=1:",
+                "   NAME            STRING    'TREX_RGB_RAW_NOMINAL'",
+                "   SHORT_DESCRIPTION",
+                "                   STRING    'TREx RGB All Sky Imagers 3-sec raw data'",
+                "   LONG_DESCRIPTION",
+                "                   STRING    'Transition Region Explorer (TREx) full-color RGB All Sky Imager array. More in'...",
+                "   DATA_TREE_URL   STRING    'https://data.phys.ucalgary.ca/sort_by_project/TREx/RGB/stream0'",
+                "   FILE_LISTING_SUPPORTED",
+                "                   BOOLEAN   true (1)",
+                "   LEVEL           STRING    'L0'",
+                "   DOI             STRING    'https://doi.org/10.11575/4P8E-1K65'",
+                "   DOI_DETAILS     STRING    'https://commons.datacite.org/doi.org/10.11575/4p8e-1k65'",
+                "   CITATION        STRING    'Spanswick, E., & Donovan, E. Transition Region Explorer - RGB Dataset [Data se'...",
+                "   SUPPORTED_LIBRARIES",
+                "                   OBJREF    <ObjHeapVar337(LIST)>",
+                "   FILE_TIME_RESOLUTION",
+                "                   STRING    '1min'\r"
+              ]
+            }
+          ],
+          "metadata": {
+            "id": "not-saved"
+          }
+        }
+      ]
+    },
+    {
+      "type": "markdown",
+      "content": [
+        "# Explore observatories",
+        "",
+        "A set of observatories are available for each instrument array. These observatories provide information about the sites where data was produced during the array operations. Each observatory object provides site code and full names, along with their geodetic latitude and longitude.",
+        "",
+        "You can use the `aurorax_list_observatories()` function to retrieve observatory information. To determine the valid 'instrument_array' values, please refer to the IDL-AuroraX API reference, or utilize the integrated docs for the functions."
+      ],
+      "metadata": {},
+      "outputs": []
+    },
+    {
+      "type": "code",
+      "content": [
+        "; list all observatories for THEMIS ASI",
+        "observatories = aurorax_list_observatories('themis_asi')",
+        "print, 'Found ' + strcompress(fix(n_elements(observatories)), /remove_all) + ' observatories part of the \"themis_asi\" instrument array'",
+        ""
+      ],
+      "metadata": {},
+      "outputs": [
+        {
+          "items": [
+            {
+              "mime": "text/plain",
+              "content": [
+                "Found 24 observatories part of the \"themis_asi\" instrument array",
+                ""
+              ]
+            }
+          ],
+          "metadata": {
+            "id": "not-saved"
+          }
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "content": [
+        "; You can also filter using the UID parameter. This filter",
+        "; will find partial matches as well.",
+        "aurorax_list_observatories('trex_rgb', uid = 'atha')",
+        ""
+      ],
+      "metadata": {},
+      "outputs": [
+        {
+          "items": [
+            {
+              "mime": "text/plain",
+              "content": [
+                "[",
+                "    {",
+                "        \"UID\": \"atha\",",
+                "        \"FULL_NAME\": \"Athabasca, AB, Canada\",",
+                "        \"GEODETIC_LATITUDE\": 54.600000000000001,",
+                "        \"GEODETIC_LONGITUDE\": -113.64000000000000",
+                "    }",
+                "]",
+                ""
+              ]
+            }
+          ],
+          "metadata": {
+            "id": "not-saved"
+          }
+        }
+      ]
+    }
+  ]
+}
