@@ -65,8 +65,6 @@ function aurorax_ccd_contour, $
   contour_lons = contour_lons, $
   altitude_km = altitude_km, $
   mag = mag
-  compile_opt idl2
-
   ; Check that both lat/lon are provided for custom contour
   if isa(contour_lats) + isa(contour_lons) eq 1 then begin
     print, '[aurorax_ccd_contour] Error: When manually providing a contour, contour_lats & contour_lons must both be provided.'

@@ -30,8 +30,6 @@
 ;   aurorax_create_movie, file_search("path\to\images\*.png"), "movie.mp4", 30
 ;-
 pro aurorax_movie, input_filenames, output_filename, fps
-  compile_opt idl2
-
   ; Read the first image supplied to determine video size
   tmp = read_image(input_filenames[0])
 

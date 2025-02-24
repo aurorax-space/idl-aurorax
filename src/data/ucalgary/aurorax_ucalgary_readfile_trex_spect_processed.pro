@@ -15,7 +15,7 @@
 ; -------------------------------------------------------------
 
 pro __aurorax_ucalgary_readfile_trex_spect_processed, file_path, data, timestamp_list, meta, first_frame = first_frame, verbose = verbose
-  compile_opt idl2, hidden
+  compile_opt hidden
 
   ; set verbose
   if not isa(verbose) then verbose = 1

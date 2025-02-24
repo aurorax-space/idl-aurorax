@@ -61,8 +61,6 @@ pro aurorax_keogram_plot, $
   y_tick_interval = y_tick_interval, $
   aspect_ratio = aspect_ratio, $
   colortable = colortable
-  compile_opt idl2
-
   axis_keywords = [keyword_set(geo), keyword_set(mag), keyword_set(elev)]
   if total(axis_keywords) gt 1 then begin
     print, '[aurorax_keogram_plot] Error: Only one of ''/geo'', ''/mag'', ''/elev'' may be set'

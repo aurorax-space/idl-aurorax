@@ -62,8 +62,6 @@ function aurorax_bounding_box_extract_metric, $
   skymap = skymap, $
   altitude_km = altitude_km, $
   n_channels = n_channels
-  compile_opt idl2
-
   if keyword_set(metric) and keyword_set(percentile) then begin
     print, '[aurorax_bounding_box_extract_metric] Error: only one of ''metric'' and ''percentile'' may be used at once.'''
     return, !null
@@ -72,7 +70,7 @@ function aurorax_bounding_box_extract_metric, $
   metrics = ['mean', 'median', 'sum']
   if not keyword_set(metric) then metric = 'median'
   if where(metric eq metrics, /null) eq !null then begin
-    print, '[aurorax_bounding_box_extract_metric] Error: metric ''' + string(metric) + ''' not recognized. Accepted metrics are: ' + strjoin(modes, ',') + '.'
+    print, '[aurorax_bounding_box_extract_metric] Error: metric \''' + string(metric) + ''' not recognized. Accepted metrics are: ' + strjoin(modes, ',') + '.'
     return, !null
   endif
 

@@ -78,8 +78,6 @@ function aurorax_atm_inverse, $
   atmospheric_attenuation_correction = atmospheric_attenuation_correction, $
   atm_model_version = atm_model_version, $
   no_cache = no_cache
-  compile_opt idl2
-
   ; set keyword flags
   no_cache_flag = 0
   if keyword_set(no_cache) then no_cache_flag = 1

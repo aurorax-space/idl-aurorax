@@ -19,7 +19,7 @@ function __perform_dark_frame_calibration, images, size
   ; of a bottom corner grid from the image (ie. 4x4.).
 
   ; NOTE: This is an internal-only used function. It is not publicly exposed.
-  compile_opt idl2, hidden
+  compile_opt hidden
 
   ; Add dimension if it's a single frame
   if n_elements(size(images, /dimensions)) eq 2 then begin
@@ -51,7 +51,7 @@ function __perform_flatfield_calibration, images, cal_flatfield
   ; Performs flatfield calibration using a calibration file
   ;
   ; NOTE: This is an internal-only used function. It is not publicly exposed.
-  compile_opt idl2, hidden
+  compile_opt hidden
 
   ; Add dimension if it's a single frame
   if n_elements(size(images, /dimensions)) eq 2 then begin
@@ -71,7 +71,7 @@ function __perform_rayleighs_calibration, images, cal_rayleighs, exposure_length
   ; Performs rayleighs calibration using a calibration file
   ;
   ; NOTE: This is an internal-only used function. It is not publicly exposed.
-  compile_opt idl2, hidden
+  compile_opt hidden
 
   ; Add dimension if it's a single frame
   if n_elements(size(images, /dimensions)) eq 2 then begin

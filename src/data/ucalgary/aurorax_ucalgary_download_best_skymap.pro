@@ -49,8 +49,6 @@ function aurorax_ucalgary_download_best_skymap, $
   download_path = download_path, $
   overwrite = overwrite, $
   quiet = quiet
-  compile_opt idl2
-
   ; set keyword flags
   overwrite_flag = 0
   quiet_flag = 0

@@ -33,8 +33,6 @@
 ;       long_cyan = aurorax_get_decomposed_color([0,255,255])
 ;+
 function aurorax_get_decomposed_color, rgb_triple
-  compile_opt idl2
-
   dims = size(rgb_triple, /dimensions)
   if dims ne [3] and dims ne [1, 3] then begin
     print, '[aurorax_get_decomposed_color] Error: enter color as a 3-element array, [R, G, B].'

@@ -96,8 +96,6 @@ function aurorax_data_product_search, start_ts, $
   poll_interval = pi, $
   quiet = q, $
   dryrun = dr
-  compile_opt idl2
-
   ; set verbosity
   verbose = 1
   if (isa(q) eq 1) then verbose = 0

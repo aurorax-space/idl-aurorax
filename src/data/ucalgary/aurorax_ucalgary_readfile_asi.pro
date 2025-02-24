@@ -16,7 +16,7 @@
 
 ; definition for the PGM metadata fields
 pro aurorax_asi_pgm_metadata__define
-  compile_opt idl2, hidden
+  compile_opt hidden
 
   dummy = { $
     aurorax_asi_pgm_metadata, $
@@ -39,7 +39,7 @@ end
 
 ; definition for the PNG metadata fields
 pro aurorax_asi_png_metadata__define
-  compile_opt idl2, hidden
+  compile_opt hidden
 
   dummy = { $
     aurorax_asi_png_metadata, $
@@ -54,7 +54,7 @@ end
 
 ; definition for the H5 metadata fields
 pro aurorax_asi_h5_metadata__define
-  compile_opt idl2, hidden
+  compile_opt hidden
 
   dummy = { $
     aurorax_asi_h5_metadata, $
@@ -76,7 +76,7 @@ pro aurorax_asi_h5_metadata__define
 end
 
 pro __aurorax_asi_cleanup_tar_files, file_list, verbose = verbose
-  compile_opt idl2, hidden
+  compile_opt hidden
 
   ; for each file
   if (verbose eq 2) then print, '[aurorax_read] Cleaning up untarred files'
@@ -87,7 +87,7 @@ pro __aurorax_asi_cleanup_tar_files, file_list, verbose = verbose
 end
 
 function __aurorax_asi_parse_pgm_comments, comments, metadata, minimal_metadata = minimal_metadata
-  compile_opt idl2, hidden
+  compile_opt hidden
 
   ; init errors
   on_ioerror, ioerror
@@ -168,7 +168,7 @@ function __aurorax_asi_parse_pgm_comments, comments, metadata, minimal_metadata 
 end
 
 function __aurorax_asi_parse_h5_metadata, attributes, metadata, img_dims, minimal_metadata = minimal_metadata
-  compile_opt idl2, hidden
+  compile_opt hidden
 
   ; for each expected frame
   for i = 0, n_elements(attributes['timestamp']) - 1 do begin
@@ -246,7 +246,7 @@ function __aurorax_asi_png_readfile, $
   verbose = verbose, $
   no_metadata = no_metadata, $
   first_frame = first_frame
-  compile_opt idl2, hidden
+  compile_opt hidden
 
   ; init
   n_frames = 0
@@ -390,7 +390,7 @@ function __aurorax_asi_h5_readfile, $
   no_metadata = no_metadata, $
   minimal_metadata = minimal_metadata, $
   first_frame = first_frames
-  compile_opt idl2, hidden
+  compile_opt hidden
 
   ; init
   n_frames = 0
@@ -499,7 +499,7 @@ function __aurorax_asi_pgm_readfile, $
   verbose = verbose, $
   comments = comments, $
   maxval = maxval
-  compile_opt strictarr, hidden
+  compile_opt hidden
 
   ; set error cases
   if not keyword_set(verbose) then on_error, 2
@@ -645,7 +645,7 @@ pro __aurorax_ucalgary_readfile_asi, $
   first_frame = first_frame, $
   untar_dir = untar_dir, $
   no_untar_cleanup = no_untar_cleanup
-  compile_opt idl2, hidden
+  compile_opt hidden
 
   ; init
   stride = 0

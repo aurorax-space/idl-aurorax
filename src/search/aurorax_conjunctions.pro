@@ -18,8 +18,6 @@ function __aurorax_derive_advanced_distances, $
   ground_count = ground_count, $
   space_count = space_count, $
   events_count = events_count
-  compile_opt idl2
-
   ; initialize values that aren't entered
   if (isa(ground_count) eq 0) then ground_count = 0
   if (isa(space_count) eq 0) then space_count = 0
@@ -66,8 +64,6 @@ function __aurorax_validate_advanced_distances, distance, $
   ground_count = ground_count, $
   space_count = space_count, $
   events_count = events_count
-  compile_opt idl2
-
   ; initialize values that aren't entered
   if (isa(ground_count) eq 0) then ground_count = 0
   if (isa(space_count) eq 0) then space_count = 0
@@ -124,8 +120,6 @@ function aurorax_create_advanced_distances_hash, $
   ground_count = ground_count, $
   space_count = space_count, $
   events_count = events_count
-  compile_opt idl2
-
   ; initialize values that aren't entered
   if (isa(ground_count) eq 0) then ground_count = 0
   if (isa(space_count) eq 0) then space_count = 0
@@ -147,9 +141,9 @@ end
 
 ;+
 ; :Description:
-;       Search the AuroraX platform for conjunctions using the supplied filter criteria. 
+;       Search the AuroraX platform for conjunctions using the supplied filter criteria.
 ;       This function returns the found conjunctions, as a search response struct.
-; 
+;
 ;       The 'start_ts' and 'end_ts' parameters are to be timestamps in a variety of formats. The
 ;       following are examples of what is allowed:
 ;
@@ -243,8 +237,6 @@ function aurorax_conjunction_search, start_ts, $
   geographic = ct_geo, $
   quiet = q, $
   dryrun = dr
-  compile_opt idl2
-
   ; set verbosity
   verbose = 1
   if (isa(q) eq 1) then verbose = 0

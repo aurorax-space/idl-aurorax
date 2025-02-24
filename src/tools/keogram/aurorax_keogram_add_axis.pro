@@ -45,8 +45,6 @@
 ;       keo = aurorax_keogram_add_axis(keo, skymap, /geo, /elev, altitude_km=110)
 ;+
 function aurorax_keogram_add_axis, keogram_struct, skymap, altitude_km = altitude_km, geo = geo, mag = mag, elev = elev
-  compile_opt idl2
-
   if keyword_set(geo) and not keyword_set(altitude_km) then begin
     print, '[aurorax_keogram_add_axis] Error: Using ''/geo'' or ''/mag'' requires passing in ''altitude_km''.'
     return, !null

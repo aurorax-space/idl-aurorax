@@ -37,8 +37,6 @@
 ;       prepped_skymap = aurorax_prep_skymaps(list(aurorax_ucalgary_read(d.dataset, d.filenames)))
 ;+
 function aurorax_mosaic_prep_skymap, skymap_list, altitude_km
-  compile_opt idl2
-
   if typename(skymap_list) ne 'LIST' then begin
     print, '[aurorax_mosaic_prep_skymap] Error: Input skymaps must be stored in a list. Recieved type: ' + typename(skymap_list)
     return, !null

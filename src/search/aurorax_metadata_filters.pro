@@ -71,9 +71,7 @@ function aurorax_create_metadata_filter_expression, $
   operator_between = between_kw, $
   operator_in = in_kw, $
   operator_not_in = not_in_kw
-  compile_opt idl2
-
-  ; set operator
+    ; set operator
   operator = ''
   if keyword_set(eq_kw) then operator = '='
   if keyword_set(ne_kw) then operator = '!='
@@ -137,11 +135,7 @@ end
 ;       metadata_filters = aurorax_create_metadata_filter(expressions,/OPERATOR_AND)
 ;+
 function aurorax_create_metadata_filter, expressions, operator_and = and_kw, operator_or = or_kw
-  compile_opt idl2
-
-  ; initialize expressions
-  if (isa(expressions) eq 0) then expressions = list()
-
+    
   ; set operator
   if keyword_set(and_kw) then begin
     operator = 'AND'

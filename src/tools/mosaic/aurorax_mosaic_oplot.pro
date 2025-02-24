@@ -56,8 +56,6 @@ pro aurorax_mosaic_oplot, $
   symbol = symbol, $
   symsize = symsize, $
   mag = mag
-  compile_opt idl2
-
   device, get_decomposed = old_decomp
   device, decomposed = 1
 

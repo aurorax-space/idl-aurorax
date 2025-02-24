@@ -31,8 +31,6 @@
 ;       dataset = aurorax_get_dataset("THEMIS_ASI_RAW")
 ;+
 function aurorax_get_dataset, name
-  compile_opt idl2
-
   ; set params
   param_str = '?name=' + name
 

@@ -47,8 +47,6 @@ function aurorax_calibrate_trex_nir, $
   cal_rayleighs = cal_rayleighs, $
   exposure_length_sec = exposure_length_sec, $
   no_dark_subtract = no_dark_subtract
-  compile_opt idl2
-
   ; Init
   calibrated_images = images
 

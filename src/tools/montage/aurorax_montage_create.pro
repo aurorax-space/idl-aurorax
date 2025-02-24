@@ -59,8 +59,6 @@ pro aurorax_montage_create, $
   dimensions = dimensions, $
   location = location, $
   no_timestamps = no_timestamps
-  compile_opt idl2
-
   ; Get the number of channels of image data
   images_shape = size(images, /dimensions)
   if n_elements(images_shape) eq 2 then begin

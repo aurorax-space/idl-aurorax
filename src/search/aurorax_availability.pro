@@ -15,7 +15,7 @@
 ; -------------------------------------------------------------
 
 function __aurorax_retrieve_availability, start_date, end_date, program, platform, instrument_type, source_type, url_path
-  compile_opt idl2, hidden
+  compile_opt hidden
 
   ; convert dates to ISO format
   start_iso_dt = __aurorax_datetime_parser(start_date, /interpret_as_start)
@@ -97,8 +97,6 @@ function aurorax_ephemeris_availability, start_date, $
   platform = platform, $
   instrument_type = instrument_type, $
   source_type = source_type
-  compile_opt idl2
-
   ; retrieve availability and return
   data = __aurorax_retrieve_availability(start_date, end_date, program, platform, instrument_type, source_type, 'api/v1/availability/ephemeris')
   return, data
@@ -141,8 +139,6 @@ function aurorax_data_products_availability, start_date, $
   platform = platform, $
   instrument_type = instrument_type, $
   source_type = source_type
-  compile_opt idl2
-
   ; retrieve availability information and return
   data = __aurorax_retrieve_availability(start_date, end_date, program, platform, instrument_type, source_type, 'api/v1/availability/data_products')
   return, data

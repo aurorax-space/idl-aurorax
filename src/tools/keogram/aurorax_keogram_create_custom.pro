@@ -15,7 +15,7 @@
 ; -------------------------------------------------------------
 
 function __indices_in_polygon, vertices, image_shape
-  compile_opt idl2, hidden
+  compile_opt hidden
 
   ; Function to obtain all indices of an array/image, within the
   ; polygon defined by input list of ordered vertices.
@@ -52,7 +52,7 @@ function __indices_in_polygon, vertices, image_shape
 end
 
 function __haversine_distances, target_lat, target_lon, lat_array, lon_array
-  compile_opt idl2, hidden
+  compile_opt hidden
 
   ; Computes the distance on the globe between target lat/lon,
   ; and all points defined by lat/lon arrays.
@@ -76,7 +76,7 @@ function __haversine_distances, target_lat, target_lon, lat_array, lon_array
 end
 
 function __convert_lonlat_to_ccd, lon_locs, lat_locs, skymap, altitude_km, time_stamp = time_stamp, mag = mag
-  compile_opt idl2, hidden
+  compile_opt hidden
 
   ; Converts a set of lat lon points to CCD coordinates
   ; using a skymap.
@@ -180,10 +180,11 @@ end
 
 ;+
 ; :Description:
-;       Create a keogram from a custom slice of image data.
-;
 ;       Create a keogram by slicing image data along a custom contour
 ;       defined by lats/lons or CCD coordinates.
+;       
+;       This function returns a custom keogram structure containing keogram
+;       data and temporal axis
 ;
 ; :Parameters:
 ;       images: in, required, Array
@@ -196,6 +197,8 @@ end
 ;         the x locations, in desired coordinate system, to slice keogram along
 ;       y_locs: in, required, Array
 ;         the y locations, in desired coordinate system, to slice keogram along
+;
+; :Keywords:
 ;       width: in, optional, Integer
 ;         the width of the keogram slice, in pixel units, optional (defaults to 2)
 ;       skymap: in, optional, Any
@@ -204,20 +207,16 @@ end
 ;         the altitude of the image data for georeferencing, optional
 ;       metric: in, optional, String
 ;         the metric to use to compute each keogram pixel "median" (default), "mean", or "sum", optional
-;
-; :Keywords:
 ;       show_preview: in, optional, Boolean
 ;         plot a preview of the keogram slice on top of the first image frame
 ;
 ; :Returns:
 ;       Struct
-;         custom keogram structure containing keogram data and temporal axis
 ;
 ; :Examples:
 ;       ccd_keo = aurorax_keogram_create_custom(img, time_stamp, "ccd", x_arr, y_arr, width=5, metric="sum", /show_preview)
 ;       geo_keo = aurorax_keogram_create_custom(img, time_stamp, "geo", longitudes, latitudes, skymap=skymap, altitude_km=113)
 ;+
-;-------------------------------------------------------------
 function aurorax_keogram_create_custom, $
   images, $
   time_stamp, $
@@ -229,8 +228,6 @@ function aurorax_keogram_create_custom, $
   skymap = skymap, $
   altitude_km = altitude_km, $
   metric = metric
-  compile_opt idl2
-
   ; check that coord system is valid
   coord_options = ['ccd', 'geo', 'mag']
   if where(coordinate_system eq coord_options, /null) eq !null then begin

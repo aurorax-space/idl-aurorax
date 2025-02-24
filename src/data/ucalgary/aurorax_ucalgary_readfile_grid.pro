@@ -21,7 +21,7 @@ pro __aurorax_ucalgary_readfile_grid, $
   meta, $
   first_frame = first_frame, $
   verbose = verbose
-  compile_opt idl2, hidden
+  compile_opt hidden
 
   if not isa(verbose) then verbose = 1
 

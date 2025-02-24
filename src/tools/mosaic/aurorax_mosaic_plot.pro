@@ -52,8 +52,6 @@ pro aurorax_mosaic_plot, $
   intensity_scales = intensity_scales, $
   colortable = colortable, $
   elevation_increment = elevation_increment
-  compile_opt idl2
-
   __DEFAULT_SCALE_MIN = 0
   __DEFAULT_SCALE_MAX = 20000
   device, get_decomposed = original_decomp

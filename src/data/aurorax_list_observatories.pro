@@ -37,8 +37,6 @@
 ;       observatories = aurorax_list_observatories('trex_rgb', uid='gill')
 ;+
 function aurorax_list_observatories, instrument_array, uid = uid
-  compile_opt idl2
-
   ; set params
   param_str = '?instrument_array=' + instrument_array
   if (isa(uid) eq 1) then begin

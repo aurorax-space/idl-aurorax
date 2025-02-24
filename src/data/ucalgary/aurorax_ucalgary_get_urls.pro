@@ -43,8 +43,6 @@
 ;       u = aurorax_ucalgary_get_urls('TREX_RGB_RAW_NOMINAL','2022-01-01T06:00:00','2022-01-01T06:00:00')
 ;+
 function aurorax_ucalgary_get_urls, dataset_name, start_ts, end_ts, site_uid = site_uid, device_uid = device_uid
-  compile_opt idl2
-
   ; set required params
   param_str = '?name=' + dataset_name
   param_str += '&start=' + start_ts

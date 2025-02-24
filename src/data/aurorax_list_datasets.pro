@@ -20,16 +20,10 @@
 ;       short+long descriptions, and DOI details. Optional parameters are
 ;       used to filter for certain matching datasets.
 ;
-; :Parameters:
-;       instrument_array: in, required, String
-;         The instrument array to list observatories for. Valid values are: themis_asi, rego,
-;         trex_rgb, trex_nir, trex_blue, and trex_spectrograph. Value is case insensitive.
-;
 ; :Keywords:
-;       uid: in, optional, String
-;         Supply a observatory unique identifier used for filtering (usually 4-letter site
-;         code). If that UID is found in the available observatories received from the API, it
-;         will be included in the results. This parameter is optional.
+;       name: in, required, String
+;         The dataset name to filter on. This is a partial match, which is
+;         case insensitive.
 ;
 ; :Returns:
 ;       List(Structure)
@@ -38,13 +32,11 @@
 ;       datasets = aurorax_list_datasets('themis_asi')
 ;       datasets = aurorax_list_datasets('trex_rgb', uid='atha')
 ;+
-function aurorax_list_datasets, instrument_array, uid = uid
-  compile_opt idl2
-
+function aurorax_list_datasets, name = name
   ; set params
-  param_str = '?name=' + instrument_array
-  if keyword_set(uid) then begin
-    param_str += '&uid=' + uid
+  param_str = '' 
+  if keyword_set(name) then begin
+    param_str += '?name=' + name.toLower()
   endif
 
   ; set up request

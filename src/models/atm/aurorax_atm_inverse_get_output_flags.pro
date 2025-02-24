@@ -38,8 +38,6 @@
 ;       aurorax_atm_inverse_get_output_flags(/SET_ALL_TRUE)
 ;+
 function aurorax_atm_inverse_get_output_flags, set_all_true = set_all_true
-  compile_opt idl2
-
   ; create hash
   output_flags = hash()
   output_flags['altitudes'] = 0

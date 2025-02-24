@@ -63,8 +63,6 @@ function aurorax_list_sources, $
   format_full_record = format_full_record, $
   format_identifier_only = format_identifier_only, $
   include_stats = include_stats
-  compile_opt idl2
-
   ; set format
   format = 'basic_info'
   if keyword_set(format_full_record) then format = 'full_record'

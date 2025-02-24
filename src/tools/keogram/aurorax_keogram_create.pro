@@ -39,8 +39,6 @@ function aurorax_keogram_create, $
   images, $
   time_stamp, $
   axis = axis
-  compile_opt idl2
-
   if not isa(images, /array) then begin
     print, '[aurorax_keogram_create] Error: ''images'' must be an array.'
     return, !null

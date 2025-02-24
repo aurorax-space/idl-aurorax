@@ -15,7 +15,7 @@
 ; -------------------------------------------------------------
 
 function __aurorax_request_get_status, request_type, request_id
-  compile_opt idl2, hidden
+  compile_opt hidden
 
   ; set up request
   req = obj_new('IDLnetUrl')
@@ -36,7 +36,7 @@ function __aurorax_request_get_status, request_type, request_id
 end
 
 function __aurorax_request_wait_for_data, request_type, request_id, poll_interval, verbose
-  compile_opt idl2, hidden
+  compile_opt hidden
 
   while (1) do begin
     ; get status
@@ -58,7 +58,7 @@ function __aurorax_request_wait_for_data, request_type, request_id, poll_interva
 end
 
 function __aurorax_request_get_data, request_type, request_id
-  compile_opt idl2, hidden
+  compile_opt hidden
 
   ; set up request
   req = obj_new('IDLnetUrl')

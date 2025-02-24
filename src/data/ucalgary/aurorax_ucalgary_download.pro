@@ -15,7 +15,7 @@
 ; -------------------------------------------------------------
 
 function __get_download_path
-  compile_opt idl2, hidden
+  compile_opt hidden
 
   ; check if the environment variable has been set
   download_path = getenv('AURORAX_ROOT_DATA_DIR')
@@ -27,7 +27,7 @@ function __get_download_path
 end
 
 function __extract_content_length, req
-  compile_opt idl2, hidden
+  compile_opt hidden
 
   ; init
   content_length = 0
@@ -95,8 +95,6 @@ function aurorax_ucalgary_download, $
   download_path = download_path, $
   overwrite = overwrite, $
   quiet = quiet
-  compile_opt idl2
-
   ; init
   time0 = systime(1)
   total_bytes = 0

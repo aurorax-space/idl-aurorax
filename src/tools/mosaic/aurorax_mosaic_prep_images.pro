@@ -15,7 +15,7 @@
 ; -------------------------------------------------------------
 
 function __determine_cadence, timestamp_arr
-  compile_opt idl2, hidden
+  compile_opt hidden
 
   ; ;;
   ; Determines the cadence using a list of timestamps
@@ -69,7 +69,7 @@ function __determine_cadence, timestamp_arr
 end
 
 function __get_julday, time_stamp
-  compile_opt idl2, hidden
+  compile_opt hidden
 
   ; ;;
   ; Splits a timestamp string into a struct with value of julian day
@@ -119,8 +119,6 @@ end
 ;       prepped_data = aurorax_prep_images(list(aurorax_ucalgary_read(d.dataset, d.filenames)))
 ;+
 function aurorax_mosaic_prep_images, image_list
-  compile_opt idl2
-
   ; Verify that image_list is indeed a list, not array
   if (typename(image_list) ne 'LIST') then begin
     print, '[aurorax_mosaic_prep_images] Error: image_list must be a list, i.e. ''list(img_data_1, img_data_2, ...)''.'

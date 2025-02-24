@@ -14,44 +14,36 @@
 ; limitations under the License.
 ; -------------------------------------------------------------
 
-; -------------------------------------------------------------
 ;+
-; NAME:
-;       AURORAX_PREP_GRID_IMAGE
-;
-; PURPOSE:
+; :Description:
 ;       Prepare a grid file array to be plotted.
 ;
-; EXPLANATION:
 ;       Takes a grid array, and converts it to RGBA format, masking
 ;       all empty cells with max transparency, so that it can be plotted
 ;       overtop of a map.
 ;
-; CALLING SEQUENCE:
-;       aurorax_prep_grid_image(grid, fill_val, scale=[s_min, s_max], color_table=3)
+; :Parameters:
+;       grid: in, required, Array
+;         The grid array to prepare. Usually a result of reading a grid file
+;         and obtaining grid data from said file.
+;       fill_value: in, required, Float
+;         The fill value that was used to fill grid cells containing no data.
+;         Usually obtained from the grid file's metadata.
 ;
-; PARAMETERS:
-;       grid            The grid array to prepare. Usually a result of reading a grid file
-;                       and obtaining grid data from said file.
-;       fill_val        The fill value that was used to fill grid cells containing no data.
-;                       Usually obtained from the grid file's metadata.
-;       scale           A two-element array specifying the minimum and maximum values to
-;                       scale data between, optional (defaults to data min/max).
-;       color_table     An integer specifying the IDL rgb colortable to use for preparing
-;                       single-channel data, optional (defaults to 0, gray).
+; :Keywords:
+;       scale: in, optional, Array
+;         A two-element array specifying the minimum and maximum values to
+;         scale data between, optional (defaults to data min/max).
+;       color_table: in, optional, Integer
+;         An integer specifying the IDL rgb color table to use for preparing
+;         single-channel data, optional (defaults to 0, gray).
 ;
-; KEYWORDS:
+; :Returns:
+;       Array
 ;
-; OUTPUT
-;       the prepared RGBA grid
-;
-; OUTPUT TYPE:
-;       array
-;
-; EXAMPLES:
+; :Examples:
 ;       rgba_grid = aurorax_prep_grid_image(grid, -999.0, scale=[0, 5000], color_table=3)
 ;+
-;-------------------------------------------------------------
 function aurorax_prep_grid_image, grid, fill_value, color_table = color_table, scale = scale
   compile_opt idl2
 

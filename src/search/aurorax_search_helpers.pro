@@ -15,12 +15,12 @@
 ; -------------------------------------------------------------
 
 function __aurorax_version
-  compile_opt idl2, hidden
+  compile_opt hidden
   return, '1.4.0'
 end
 
 pro __aurorax_message, msg
-  compile_opt idl2, hidden
+  compile_opt hidden
 
   ; set datetime string
   dt_str = systime()
@@ -30,7 +30,7 @@ pro __aurorax_message, msg
 end
 
 function __aurorax_humanize_bytes, bytes
-  compile_opt idl2, hidden
+  compile_opt hidden
 
   ; figure out which of bytes, kilobytes, megabytes, or gigabytes; and then convert it
   if (bytes ge long64(1024) ^ long64(3)) then begin
@@ -51,7 +51,7 @@ function __aurorax_humanize_bytes, bytes
 end
 
 function __aurorax_datetime_parser, input_str, interpret_as_start = start_kw, interpret_as_end = end_kw
-  compile_opt idl2, hidden
+  compile_opt hidden
 
   ; input of a datetime string of various formats, output is a full datetime
   ; string in the YYYY-MM-DDTHH:MM:SS format that will be used by the AuroraX
@@ -140,7 +140,7 @@ function __aurorax_datetime_parser, input_str, interpret_as_start = start_kw, in
 end
 
 function __aurorax_extract_request_id_from_response_headers, headers, url_add_length
-  compile_opt idl2, hidden
+  compile_opt hidden
 
   ; init
   request_id = ''
@@ -158,7 +158,7 @@ function __aurorax_extract_request_id_from_response_headers, headers, url_add_le
 end
 
 function __aurorax_time2string, time
-  compile_opt idl3, hidden
+  compile_opt hidden
 
   ; seconds
   tempTime = double(time)
@@ -175,7 +175,7 @@ function __aurorax_time2string, time
 end
 
 function __aurorax_ephemeris_convert_location_nans, data
-  compile_opt idl2, hidden
+  compile_opt hidden
 
   ; process ephemeris data
   converted_data = data.data ; this is used if there is no data
@@ -221,52 +221,45 @@ function __aurorax_ephemeris_convert_location_nans, data
   return, converted_struct
 end
 
-; -------------------------------------------------------------
 ;+
-; NAME:
-;       AURORAX_CREATE_CRITERIA_BLOCK
+; :Description:
+;   Create conjunction search criteria block.
 ;
-; PURPOSE:
-;       Create conjunction search criteria block
+; :Keywords:
+;     programs: in, optional, List
+;         programs for this criteria block
+;     platforms: in, optional, List
+;         platforms for this criteria block
+;     instrument_types: in, optional, List
+;         instrument types for this criteria block
+;     hemisphere: in, optional, List
+;         hemisphere values for this criteria block (valid values are 'northern' and/or 'southern')
+;     metadata_filters: in, optional, Has
+;         metadata filters to filter for
+;     ground: in, optional, Boolean
+;         create a "ground" criteria block
+;     space: in, optional, Boolean
+;         create a "space" criteria block
+;     events: in, optional, Boolean
+;         create an "events" criteria block
 ;
-; EXPLANATION:
-;       The AuroraX conjunction search takes in sets of ground, space,
-;       and/or events "criteria blocks". These are objects describing
-;       the items to search for conjunction between. This function is
-;       meant to be an easy way to create a criteria block object
-;       for use in a subsequent conjunction search.
+; :Returns:
+;     Struct
 ;
-; CALLING SEQUENCE:
-;       aurorax_create_criteria_block
-;
-; PARAMETERS:
-;       programs           programs for this criteria block, list(string), optional
-;       platforms          platforms for this criteria block, list(string), optional
-;       instrument_types   instrument types for this criteria block, list(string), optional
-;       hemisphere         hemisphere values for this criteria block, list(string),
-;                          optional (valid values are 'northern' and/or 'southern')
-;       metadata_filters   metadata filters to filter for, hash, optional
-;
-; KEYWORDS:
-;       /GROUND            create a "ground" criteria block
-;       /SPACE             create a "space" criteria block
-;       /EVENTS            create a "events" criteria block
-;
-; OUTPUT:
-;       the criteria block
-;
-; OUTPUT TYPE:
-;       a struct
-;
-; EXAMPLES:
-;       expression = aurorax_create_metadata_filter_expression('calgary_apa_ml_v1',list('classified as APA'),/OPERATOR_IN)
-;       expression = aurorax_create_metadata_filter_expression('calgary_apa_ml_v1_confidence',95,/OPERATOR_GE)
-;       expression = aurorax_create_metadata_filter_expression('tii_on','true',/OPERATOR_IN)
-;       expression = aurorax_create_metadata_filter_expression('tii_quality_vixh','0,2',/OPERATOR_BETWEEN)
-;+
-;-------------------------------------------------------------
-function aurorax_create_criteria_block, programs = programs, platforms = platforms, instrument_types = instrument_types, hemisphere = hemisphere, metadata_filters = metadata_filters, ground = ground_kw, space = space_kw, events = events_kw
-  compile_opt idl2
+; :Examples:
+;     expression = aurorax_create_metadata_filter_expression('calgary_apa_ml_v1', list('classified as APA'), /OPERATOR_IN)
+;     expression = aurorax_create_metadata_filter_expression('calgary_apa_ml_v1_confidence', 95, /OPERATOR_GE)
+;     expression = aurorax_create_metadata_filter_expression('tii_on', 'true', /OPERATOR_IN)
+;     expression = aurorax_create_metadata_filter_expression('tii_quality_vixh', '0,2', /OPERATOR_BETWEEN)
+;-
+function aurorax_create_criteria_block, programs = programs, $
+  platforms = platforms, $
+  instrument_types = instrument_types, $
+  hemisphere = hemisphere, $
+  metadata_filters = metadata_filters, $
+  ground = ground_kw, $
+  space = space_kw, $
+  events = events_kw
   ; create the object
   if (keyword_set(ground_kw) or keyword_set(events_kw)) then begin
     obj = {programs: list(), platforms: list(), instrument_types: list(), ephemeris_metadata_filters: hash()}

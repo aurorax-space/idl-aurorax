@@ -103,8 +103,6 @@ function aurorax_atm_forward, $
   atm_model_version = atm_model_version, $
   custom_spectrum = custom_spectrum, $
   no_cache = no_cache
-  compile_opt idl2
-
   ; set keyword flags
   no_cache_flag = 0
   if keyword_set(no_cache) then no_cache_flag = 1

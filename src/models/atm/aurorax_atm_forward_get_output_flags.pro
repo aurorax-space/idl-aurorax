@@ -43,8 +43,6 @@
 function aurorax_atm_forward_get_output_flags, $
   set_all_true = set_all_true, $
   enable_only_height_integrated_rayleighs = enable_only_height_integrated_rayleighs
-  compile_opt idl2
-
   ; create hash
   output_flags = hash()
   output_flags['altitudes'] = 0

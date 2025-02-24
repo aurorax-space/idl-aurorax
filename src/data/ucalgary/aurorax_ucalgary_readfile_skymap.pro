@@ -15,7 +15,7 @@
 ; -------------------------------------------------------------
 
 function __aurorax_ucalgary_readfile_skymap, file_list, quiet_flag = quiet_flag
-  compile_opt idl2, hidden
+  compile_opt hidden
 
   ; init
   skymaps = list()

@@ -38,8 +38,6 @@
 ;       aurorax_open_conjunctions_in_swarmaurora, response.request_id
 ;+
 pro aurorax_open_conjunctions_in_swarmaurora, request_id, xsize = xsize, ysize = ysize, clipboard = clipboard_kw, print_url = url_kw
-  compile_opt idl2
-
   ; init
   max_conjunctions = 5000
   url = 'https://swarm-aurora.com/conjunctionFinder/?aurorax_request_id=' + request_id
@@ -98,7 +96,6 @@ end
 ;       aurorax_save_swarmaurora_custom_import_file, response.request_id
 ;+
 pro aurorax_save_swarmaurora_custom_import_file, request_id, filename = filename
-  compile_opt idl2
   ; set filename
   cd, current = cwd
   if (isa(filename) eq 0) then filename = cwd + '\swarmaurora_custom_import_' + request_id + '.json'
@@ -153,8 +150,12 @@ end
 ;       response = aurorax_conjunction_search(start_ts, end_ts, distance, ground=ground, space=space)
 ;       aurorax_open_conjunctions_in_aurorax, response.request_id
 ;+
-pro aurorax_open_conjunctions_in_aurorax, request_id, xsize = xsize, ysize = ysize, clipboard = clipboard_kw, print_url = url_kw, expert = expert_kw
-  compile_opt idl2
+pro aurorax_open_conjunctions_in_aurorax, request_id, $
+  xsize = xsize, $
+  ysize = ysize, $
+  clipboard = clipboard_kw, $
+  print_url = url_kw, $
+  expert = expert_kw
   ; init
   max_conjunctions = 5000
   url = 'https://aurorax.space/conjunctionSearch/standard?requestID=' + request_id

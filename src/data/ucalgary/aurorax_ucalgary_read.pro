@@ -15,7 +15,7 @@
 ; -------------------------------------------------------------
 
 function __reorient_asi_images, dataset_name, data
-  compile_opt idl2, hidden
+  compile_opt hidden
 
   ; NOTE:
   ; flip horizontally --> reverse(data[*,*,0],1) -- subscript index = 1
@@ -48,7 +48,7 @@ function __reorient_asi_images, dataset_name, data
 end
 
 function __reorient_skymaps, dataset_name, skymap
-  compile_opt idl2, hidden
+  compile_opt hidden
 
   ; NOTE:
   ; flip horizontally --> reverse(data[*,*,0],1) -- subscript index = 1
@@ -73,7 +73,7 @@ function __reorient_skymaps, dataset_name, skymap
 end
 
 function __reorient_calibration, dataset_name, cal
-  compile_opt idl2, hidden
+  compile_opt hidden
 
   ; NOTE:
   ; flip horizontally --> reverse(data[*,*,0],1) -- subscript index = 1
@@ -120,8 +120,6 @@ end
 ;       help,data
 ;+
 function aurorax_ucalgary_read, dataset, file_list, first_record = first_record, no_metadata = no_metadata, quiet = quiet
-  compile_opt idl2
-
   ; init
   timestamp_list = list()
   metadata_list = list()
@@ -187,7 +185,7 @@ function aurorax_ucalgary_read, dataset, file_list, first_record = first_record,
       __aurorax_ucalgary_readfile_asi, file_list, img, meta, count = n_frames, first_frame = first_record, no_metadata = no_metadata
     endelse
 
-    ; set the data 
+    ; set the data
     data = img
     data = __reorient_asi_images(dataset.name, data)
 

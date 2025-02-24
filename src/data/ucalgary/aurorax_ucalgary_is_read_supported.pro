@@ -39,8 +39,6 @@
 ;       supported = aurorax_ucalgary_is_read_supported('THEMIS_ASI_DAILY_KEOGRAM_JPG')
 ;+
 function aurorax_ucalgary_is_read_supported, dataset_name
-  compile_opt idl2
-
   ; check for grid data first
   if dataset_name.contains('_GRID_') eq 1 then return, 1
 
