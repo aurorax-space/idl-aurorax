@@ -59,3 +59,5 @@
 @aurorax_atm_forward
 @aurorax_atm_inverse_get_output_flags
 @aurorax_atm_inverse
+
+@aurorax_check_version

@@ -6,6 +6,7 @@ Version 1.4.0
 - changes for parameters for `aurorax_list_observatories()` function
   - the `name` parameter is now required, and not a keyword. New name for the input is `instrument_array`.
   - addition of `uid` optional keyword
+- added `aurorax_check_version()` function
 
 
 Version 1.3.1

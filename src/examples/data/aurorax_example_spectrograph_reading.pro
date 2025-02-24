@@ -14,7 +14,7 @@
 ; limitations under the License.
 ; -------------------------------------------------------------
 
-pro spectrograph_example
+pro aurorax_example_spectrograph_reading
   ; download an hour of TREx Spectrograph data
   ;
   ; using the aurorax_list_datasets() function, we figured out that

@@ -17,12 +17,7 @@
 function __get_download_path
   compile_opt hidden
 
-  ; check if the environment variable has been set
-  download_path = getenv('AURORAX_ROOT_DATA_DIR')
-  if not keyword_set(def_root) then begin
-    ; env var not set, use home directory then
-    download_path = (file_search('~', /expand_tilde))[0] + path_sep() + 'idlaurorax_data'
-  endif
+  download_path = (file_search('~', /expand_tilde))[0] + path_sep() + 'idlaurorax_data'
   return, download_path
 end
 
@@ -137,6 +132,14 @@ function aurorax_ucalgary_download, $
       ; make destination dir
       file_mkdir, file_dirname(output_filename)
 
+      ; retrieve file
+      req = obj_new('IDLnetUrl')
+      req.setProperty, url_scheme = 'https'
+      req.setProperty, url_port = 443
+      req.setProperty, url_host = 'data.phys.ucalgary.ca'
+      req.setProperty, url_path = url.replace('https://data.phys.ucalgary.ca/', '')
+      req.setProperty, headers = 'User-Agent: idl-aurorax/' + __aurorax_version()
+
       ; if the url object throws an error it will be caught here
       catch, error_status
       if (error_status ne 0) then begin
@@ -148,13 +151,7 @@ function aurorax_ucalgary_download, $
         continue
       endif
 
-      ; retrieve file
-      req = obj_new('IDLnetUrl')
-      req.setProperty, url_scheme = 'https'
-      req.setProperty, url_port = 443
-      req.setProperty, url_host = 'data.phys.ucalgary.ca'
-      req.setProperty, url_path = url.replace('https://data.phys.ucalgary.ca/', '')
-      req.setProperty, headers = 'User-Agent: idl-aurorax/' + __aurorax_version()
+      ; do request
       output = req.get(filename = output_filename)
       if (quiet_flag eq 0) then print, '[aurorax_download] Successfully downloaded ' + url
 
