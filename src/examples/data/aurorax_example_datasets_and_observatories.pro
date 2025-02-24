@@ -48,6 +48,11 @@ pro aurorax_example_datasets_and_observatories
   help, datasets[0]
   print, ''
 
+  ; get a specific dataset
+  dataset = aurorax_get_dataset('TREX_RGB_RAW_NOMINAL')
+  help, dataset
+  print, ''
+
   ; Explore observatories
   ; ------------------------
   ;
