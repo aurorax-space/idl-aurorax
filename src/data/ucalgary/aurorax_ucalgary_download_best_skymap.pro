@@ -119,6 +119,14 @@ function aurorax_ucalgary_download_best_skymap, $
     ; make destination dir
     file_mkdir, file_dirname(output_filename)
 
+    ; retrieve file
+    req = obj_new('IDLnetUrl')
+    req.setProperty, url_scheme = 'https'
+    req.setProperty, url_port = 443
+    req.setProperty, url_host = 'data.phys.ucalgary.ca'
+    req.setProperty, url_path = url.replace('https://data.phys.ucalgary.ca/', '')
+    req.setProperty, headers = 'User-Agent: idl-aurorax/' + __aurorax_version()
+
     ; if the url object throws an error it will be caught here
     catch, error_status
     if (error_status ne 0) then begin
@@ -130,13 +138,7 @@ function aurorax_ucalgary_download_best_skymap, $
       return, !null
     endif
 
-    ; retrieve file
-    req = obj_new('IDLnetUrl')
-    req.setProperty, url_scheme = 'https'
-    req.setProperty, url_port = 443
-    req.setProperty, url_host = 'data.phys.ucalgary.ca'
-    req.setProperty, url_path = url.replace('https://data.phys.ucalgary.ca/', '')
-    req.setProperty, headers = 'User-Agent: idl-aurorax/' + __aurorax_version()
+    ; do request
     output = req.get(filename = output_filename)
     if (quiet_flag eq 0) then print, '[aurorax_download] Successfully downloaded ' + url
 

@@ -14,11 +14,6 @@
 ; limitations under the License.
 ; -------------------------------------------------------------
 
-function __aurorax_version
-  compile_opt hidden
-  return, '1.4.0'
-end
-
 pro __aurorax_message, msg
   compile_opt hidden
 
@@ -225,16 +220,23 @@ end
 ; :Description:
 ;   Create conjunction search criteria block.
 ;
+;   Supported keywords for /GROUND criteria blocks: programs, platforms, instrument_types, metadata_filters
+;   Supported keywords for /SPACE criteria blocks: programs, platforms, hemispheres, metadata_filters
+;   Supported keywords for /EVENTS criteria blocks: platforms, instrument_types, metadata_filters
+;   Supported keywords for /CUSTOM criteria blocks: locations
+;
 ; :Keywords:
-;     programs: in, optional, List
+;     programs: in, optional, List or Array
 ;         programs for this criteria block
-;     platforms: in, optional, List
+;     platforms: in, optional, List or Array
 ;         platforms for this criteria block
-;     instrument_types: in, optional, List
+;     instrument_types: in, optional, List or Array
 ;         instrument types for this criteria block
-;     hemisphere: in, optional, List
+;     hemisphere: in, optional, List or Array
 ;         hemisphere values for this criteria block (valid values are 'northern' and/or 'southern')
-;     metadata_filters: in, optional, Has
+;     locations: in, optional, List
+;         list of 2-element arrays representing custom locations; order is [latitude, longitude].
+;     metadata_filters: in, optional, Hash
 ;         metadata filters to filter for
 ;     ground: in, optional, Boolean
 ;         create a "ground" criteria block
@@ -242,43 +244,282 @@ end
 ;         create a "space" criteria block
 ;     events: in, optional, Boolean
 ;         create an "events" criteria block
+;     custom: in, optional, Boolean
+;         create a "custom locations" criteria block
 ;
 ; :Returns:
 ;     Struct
 ;
 ; :Examples:
-;     expression = aurorax_create_metadata_filter_expression('calgary_apa_ml_v1', list('classified as APA'), /OPERATOR_IN)
-;     expression = aurorax_create_metadata_filter_expression('calgary_apa_ml_v1_confidence', 95, /OPERATOR_GE)
-;     expression = aurorax_create_metadata_filter_expression('tii_on', 'true', /OPERATOR_IN)
-;     expression = aurorax_create_metadata_filter_expression('tii_quality_vixh', '0,2', /OPERATOR_BETWEEN)
+;     cb = aurorax_create_criteria_block(programs = ['themis-asi'], /ground)
+;     cb = aurorax_create_criteria_block(programs = ['swarm'], hemisphere = ['northern'], /space)
+;     cb = aurorax_create_criteria_block(instrument_types = ['substorm onset'], /events)
+;     cb = aurorax_create_criteria_block(locations = list([51.04, -114.07]), /custom)
 ;-
 function aurorax_create_criteria_block, programs = programs, $
   platforms = platforms, $
   instrument_types = instrument_types, $
   hemisphere = hemisphere, $
+  locations = locations, $
   metadata_filters = metadata_filters, $
   ground = ground_kw, $
   space = space_kw, $
-  events = events_kw
+  events = events_kw, $
+  custom = custom_kw
   ; create the object
-  if (keyword_set(ground_kw) or keyword_set(events_kw)) then begin
+  if (keyword_set(ground_kw)) then begin
+    ; ground criteria block
     obj = {programs: list(), platforms: list(), instrument_types: list(), ephemeris_metadata_filters: hash()}
     if (isa(programs) eq 1) then obj.programs = list(programs, /extract)
     if (isa(platforms) eq 1) then obj.platforms = list(platforms, /extract)
     if (isa(instrument_types) eq 1) then obj.instrument_types = list(instrument_types, /extract)
     if (isa(metadata_filters) eq 1) then obj.ephemeris_metadata_filters = hash(metadata_filters)
   endif else if (keyword_set(space_kw)) then begin
-    obj = {programs: list(), platforms: list(), instrument_types: list(), hemisphere: list(), ephemeris_metadata_filters: hash()}
+    ; space criteria block
+    obj = {programs: list(), platforms: list(), instrument_types: list('footprint'), hemisphere: list(), ephemeris_metadata_filters: hash()}
+    if (isa(programs) eq 1) then obj.programs = list(programs, /extract)
+    if (isa(platforms) eq 1) then obj.platforms = list(platforms, /extract)
+    if (isa(hemisphere) eq 1) then obj.hemisphere = list(hemisphere, /extract)
+    if (isa(metadata_filters) eq 1) then obj.ephemeris_metadata_filters = hash(metadata_filters)
+  endif else if (keyword_set(events_kw)) then begin
+    ; events criteria block
+    obj = {programs: list('events'), platforms: list(), instrument_types: list(), ephemeris_metadata_filters: hash()}
     if (isa(programs) eq 1) then obj.programs = list(programs, /extract)
     if (isa(platforms) eq 1) then obj.platforms = list(platforms, /extract)
     if (isa(instrument_types) eq 1) then obj.instrument_types = list(instrument_types, /extract)
-    if (isa(hemisphere) eq 1) then obj.hemisphere = list(hemisphere, /extract)
     if (isa(metadata_filters) eq 1) then obj.ephemeris_metadata_filters = hash(metadata_filters)
+  endif else if (keyword_set(custom_kw)) then begin
+    ; custom locations criteria block
+    obj = {locations: list()}
+    if (isa(locations) eq 1) then begin
+      compiled_location_hashes = list()
+      for i = 0, n_elements(locations) - 1 do begin
+        this_location_hash = {lat: locations[i, 0], lon: locations[i, 1]}
+        compiled_location_hashes.add, this_location_hash
+      endfor
+      obj.locations = compiled_location_hashes
+    endif
   endif else begin
-    print, 'Error: no keyword used, not sure what type of criteria block this should be. Please use one of /GROUND, /SPACE, or /EVENTS when calling this function'
+    print, 'Error: no valid keyword used, unknown type of criteria block to create. Please use one of ' + $
+      '/GROUND, /SPACE, /EVENTS, or /CUSTOM when calling this function.'
     return, !null
   endelse
 
   ; return
   return, obj
+end
+
+;+
+; :Description:
+;   Get a template response format for conjunction, ephemeris, or data product searches.
+;
+; :Keywords:
+;     true: in, optional, Boolean
+;         set all values in template as 'true'
+;     false: in, optional, Boolean
+;         set all values in template as 'false'
+;     conjunctions: in, optional, Boolean
+;         return the template for a conjunction search
+;     ephemeris: in, optional, Boolean
+;         return the template for an ephemeris search
+;     data_products: in, optional, Boolean
+;         return the template for a data products search
+;
+; :Returns:
+;     Hash
+;
+; :Examples:
+;   t = aurorax_create_response_format_template(/conjunctions)
+;   t = aurorax_create_response_format_template(/ephemeris)
+;   t = aurorax_create_response_format_template(/data_products)
+;   t = aurorax_create_response_format_template(/conjunctions, /false)
+;-
+function aurorax_create_response_format_template, $
+  true = true_kw, $
+  false = false_kw, $
+  conjunctions = conjunctions_kw, $
+  ephemeris = ephemeris_kw, $
+  data_products = data_products_kw
+  ; set default value
+  default = boolean(1)
+  if (keyword_set(true_kw)) then default = boolean(1)
+  if (keyword_set(false_kw)) then default = boolean(0)
+
+  ; set template
+  if (keyword_set(data_products_kw)) then begin
+    template = { $
+      start_ts: default, $
+      end_ts: default, $
+      data_source: { $
+        identifier: default, $
+        program: default, $
+        platform: default, $
+        instrument_type: default, $
+        source_type: default, $
+        display_name: default, $
+        ephemeris_metadata_schema: { $
+          field_name: default, $
+          description: default, $
+          data_type: default, $
+          allowed_values: default, $
+          additional_description: default}, $
+        data_product_metadata_schema: { $
+          field_name: default, $
+          description: default, $
+          data_type: default, $
+          allowed_values: default, $
+          additional_description: default}, $
+        owner: default, $
+        maintainers: default, $
+        metadata: default}, $
+      url: default, $
+      data_product_type: default, $
+      metadata: default}
+  endif else if (keyword_set(ephemeris_kw)) then begin
+    template = { $
+      data_source: { $
+        identifier: default, $
+        program: default, $
+        platform: default, $
+        instrument_type: default, $
+        source_type: default, $
+        display_name: default, $
+        ephemeris_metadata_schema: { $
+          field_name: default, $
+          description: default, $
+          data_type: default, $
+          allowed_values: default, $
+          additional_description: default}, $
+        data_product_metadata_schema: { $
+          field_name: default, $
+          description: default, $
+          data_type: default, $
+          allowed_values: default, $
+          additional_description: default}, $
+        owner: default, $
+        maintainers: default, $
+        metadata: default}, $
+      epoch: default, $
+      location_geo: {lat: default, lon: default}, $
+      location_gsm: {lat: default, lon: default}, $
+      nbtrace: {lat: default, lon: default}, $
+      sbtrace: {lat: default, lon: default}, $
+      metadata: default}
+  endif else if (keyword_set(conjunctions_kw)) then begin
+    template = { $
+      conjunction_type: default, $
+      start_ts: default, $
+      end_ts: default, $
+      min_distance: default, $
+      max_distance: default, $
+      closest_epoch: default, $
+      farthest_epoch: default, $
+      data_sources: { $
+        identifier: default, $
+        program: default, $
+        platform: default, $
+        instrument_type: default, $
+        source_type: default, $
+        display_name: default, $
+        ephemeris_metadata_schema: { $
+          field_name: default, $
+          description: default, $
+          data_type: default, $
+          allowed_values: default, $
+          additional_description: default}, $
+        data_product_metadata_schema: { $
+          field_name: default, $
+          description: default, $
+          data_type: default, $
+          allowed_values: default, $
+          additional_description: default}, $
+        owner: default, $
+        maintainers: default, $
+        metadata: default}, $
+      events: { $
+        conjunction_type: default, $
+        e1_source: { $
+          identifier: default, $
+          program: default, $
+          platform: default, $
+          instrument_type: default, $
+          source_type: default, $
+          display_name: default, $
+          ephemeris_metadata_schema: { $
+            field_name: default, $
+            description: default, $
+            data_type: default, $
+            allowed_values: default, $
+            additional_description: default}, $
+          data_product_metadata_schema: { $
+            field_name: default, $
+            description: default, $
+            data_type: default, $
+            allowed_values: default, $
+            additional_description: default}, $
+          owner: default, $
+          maintainers: default, $
+          metadata: default}, $
+        e2_source: { $
+          identifier: default, $
+          program: default, $
+          platform: default, $
+          instrument_type: default, $
+          source_type: default, $
+          display_name: default, $
+          ephemeris_metadata_schema: { $
+            field_name: default, $
+            description: default, $
+            data_type: default, $
+            allowed_values: default, $
+            additional_description: default}, $
+          data_product_metadata_schema: { $
+            field_name: default, $
+            description: default, $
+            data_type: default, $
+            allowed_values: default, $
+            additional_description: default}, $
+          owner: default, $
+          maintainers: default, $
+          metadata: default}, $
+        start_ts: default, $
+        end_ts: default, $
+        min_distance: default, $
+        max_distance: default, $
+        generated_e1_ephemeris_query: { $
+          request_id: default, $
+          data_sources: { $
+            programs: default, $
+            platforms: default, $
+            instrument_types: default, $
+            ephemeris_metadata_filters: { $
+              logicalOperator: default, $
+              expressions: { $
+                key: default, $
+                operator: default, $
+                values: default}}}, $
+          start_ts: default, $
+          end_ts: default}, $
+        generated_e2_ephemeris_query: { $
+          request_id: default, $
+          data_sources: { $
+            programs: default, $
+            platforms: default, $
+            instrument_types: default, $
+            ephemeris_metadata_filters: { $
+              logicalOperator: default, $
+              expressions: { $
+                key: default, $
+                operator: default, $
+                values: default}}}, $
+          start_ts: default, $
+          end_ts: default}}}
+  endif else begin
+    print, '[aurorax_create_response_format_template] Error: Invalid usage. Calls to this function must have ' + $
+      'one of /conjunctions, /ephemeris, or /data_products, and this call is missing one of these keywords.'
+    template = !null
+  endelse
+
+  ; return
+  return, template
 end
