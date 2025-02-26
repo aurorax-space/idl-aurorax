@@ -14,11 +14,6 @@
 ; limitations under the License.
 ; -------------------------------------------------------------
 
-function __aurorax_version
-  compile_opt hidden
-  return, '1.4.0'
-end
-
 ;+
 ; :Description:
 ;       Check if there is a new version available.

@@ -116,7 +116,8 @@ end
 ; :Parameters:
 ;       expressions: in, required, List
 ;         the expressions to use for this metadata filter (use
-;         aurorax_create_metadata_filter_expressions() function to create the expression(s))
+;         aurorax_create_metadata_filter_expressions() function to
+;         create the expression(s))
 ;
 ; :Keywords:
 ;       operator_and: in, optional, Boolean

@@ -21,28 +21,22 @@
 ;       used to filter for certain matching datasets.
 ;
 ; :Keywords:
-;       name: in, optional, String
-;         The dataset name to filter on. This is used for partial matches too, and is
+;       name: in, required, String
+;         The dataset name to filter on. This is a partial match, which is
 ;         case insensitive.
-;       level: in, optional, String
-;         Supply a level string for filtering. Valid strings are: L0, L1, L1A, L2, L3. Value
-;         is case insensitive.
 ;
 ; :Returns:
 ;       List(Structure)
 ;
 ; :Examples:
 ;       datasets = aurorax_list_datasets('themis_asi')
-;       datasets = aurorax_list_datasets('trex')
+;       datasets = aurorax_list_datasets('trex_rgb', uid='atha')
 ;+
-function aurorax_list_datasets, name = name, level = level
+function aurorax_list_datasets, name = name
   ; set params
-  param_str = '?'
+  param_str = '' 
   if keyword_set(name) then begin
-    param_str += 'name=' + name.toLower()
-  endif
-  if keyword_set(level) then begin
-    param_str += '&level=' + level.toLower()
+    param_str += '?name=' + name.toLower()
   endif
 
   ; set up request

@@ -26,6 +26,6 @@ pro aurorax_example_montage_themis
   ; scale the image data
   scaled_img = bytscl(img, min = 2000, max = 12000)
 
-  ; Create a montage, using 10 as a frame step, effectively making the montage at a 30-sec cadence
+  ; Create a montage, using 10 as a frame steo, effectively making the montage at a 30-sec cadence
   aurorax_montage_create, scaled_img, ts, 5, 2, colortable = 0, frame_step = 10, dimensions = [800, 320]
 end

@@ -7,7 +7,6 @@ Version 1.4.0
   - the `name` parameter is now required, and not a keyword. New name for the input is `instrument_array`.
   - addition of `uid` optional keyword
 - added `aurorax_check_version()` function
-- added `level` parameter to `aurorax_list_datasets()` function
 
 
 Version 1.3.1

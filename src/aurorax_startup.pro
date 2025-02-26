@@ -14,10 +14,17 @@
 ; limitations under the License.
 ; -------------------------------------------------------------
 
-; top level
-@aurorax_version
+@aurorax_search_helpers
+@aurorax_calibrate_helpers
+@aurorax_requests
+@aurorax_metadata_filters
+@aurorax_availability
+@aurorax_conjunctions
+@aurorax_data_products
+@aurorax_ephemeris
+@aurorax_sources
+@aurorax_open_externally
 
-; data
 @aurorax_list_datasets
 @aurorax_get_dataset
 @aurorax_list_observatories
@@ -32,25 +39,6 @@
 @aurorax_ucalgary_read
 @aurorax_ucalgary_is_read_supported
 
-; search
-@aurorax_search_helpers
-@aurorax_calibrate_helpers
-@aurorax_requests
-@aurorax_metadata_filters
-@aurorax_availability
-@aurorax_conjunctions
-@aurorax_data_products
-@aurorax_ephemeris
-@aurorax_sources
-@aurorax_open_externally
-
-; models
-@aurorax_atm_forward_get_output_flags
-@aurorax_atm_forward
-@aurorax_atm_inverse_get_output_flags
-@aurorax_atm_inverse
-
-; tools
 @aurorax_bounding_box_extract_metric
 @aurorax_ccd_contour
 @aurorax_calibrate_rego
@@ -66,3 +54,10 @@
 @aurorax_mosaic_prep_skymap
 @aurorax_get_decomposed_color
 @aurorax_movie
+
+@aurorax_atm_forward_get_output_flags
+@aurorax_atm_forward
+@aurorax_atm_inverse_get_output_flags
+@aurorax_atm_inverse
+
+@aurorax_check_version
