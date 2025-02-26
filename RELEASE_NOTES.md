@@ -1,6 +1,7 @@
 Version 1.4.0
 -------------------------
 
+- many updates to example procedures (additions, updates, added content/explanations)
 - added `aurorax_get_dataset()` function
 - preparations for adding support for TREx Spectrograph L1 data
 - changes for parameters for `aurorax_list_observatories()` function
@@ -9,8 +10,8 @@ Version 1.4.0
 - added `aurorax_check_version()` function
 - added `level` parameter to `aurorax_list_datasets()` function
 - added support for performing conjunction searches with custom locations
-- added support using a response format when performing conjunction, ephemeris, and data product searches
-- added the `aurorax_create_response_format_template()` function
+- added the `aurorax_create_response_format_template()` function- added support using a response format when performing conjunction, ephemeris, and data product searches
+- added search description methods `aurorax_conjunction_describe()`, `aurorax_ephemeris_describe()`, and `aurorax_data_product_describe()`; example procedures updated to include them
 
 
 Version 1.3.1

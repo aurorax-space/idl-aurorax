@@ -154,17 +154,17 @@ function aurorax_ephemeris_search, $
 
   ; make request
   if (verbose eq 1) then __aurorax_message, 'Sending search request ...'
-  output = req.put(post_str, /buffer, /string_array, /post)
+  r = __aurorax_perform_api_request('post', 'aurorax_conjunction_search', req, post_str = post_str, /expect_empty)
 
   ; get status code and get response headers
-  req.getProperty, response_code = status_code, response_header = response_headers
+  r.req.getProperty, response_code = status_code, response_header = response_headers
 
   ; cleanup this request
   obj_destroy, req
 
   ; check status code
   if (status_code ne 202) then begin
-    if (verbose eq 1) then __aurorax_message, 'Error submitting search request: ' + output
+    if (verbose eq 1) then __aurorax_message, 'Error submitting search request: ' + r.output
     return, list()
   endif
   if (verbose eq 1) then __aurorax_message, 'Search request accepted'
@@ -190,8 +190,8 @@ function aurorax_ephemeris_search, $
   endif
 
   ; get data
-  data = __aurorax_request_get_data('ephemeris', request_id, response_format = response_format, print_header = 'aurorax_ephemeris_search')
-  if (data eq !null) then return, !null
+  response = __aurorax_request_get_data('ephemeris', request_id, response_format = response_format, print_header = 'aurorax_ephemeris_search')
+  if (response eq !null) then return, !null
   if (verbose eq 1) then __aurorax_message, 'Data downloaded, search completed'
 
   ; post process data
@@ -204,11 +204,11 @@ function aurorax_ephemeris_search, $
   endif
   if (keyword_set(response_format)) then begin
     ; response format specified, so we return a hash instead
-    data = hash(data, /lowercase, /extract)
-    data = __aurorax_ephemeris_convert_hash_location_nans(data)
+    response = hash(response, /lowercase, /extract)
+    response = __aurorax_ephemeris_convert_hash_location_nans(response)
   endif else begin
     ; convert location nans
-    data = __aurorax_ephemeris_convert_struct_location_nans(data)
+    response = __aurorax_ephemeris_convert_struct_location_nans(response)
   endelse
 
   ; get elapsed time
@@ -217,14 +217,14 @@ function aurorax_ephemeris_search, $
 
   ; return
   if (verbose eq 1) then __aurorax_message, 'Search completed, found ' + strtrim(status.search_result.result_count, 2) + ' records in ' + duration_str
-  return, data
+  return, response
 end
 
 ;+
 ; :Description:
-;       Describe a conjunction search query.
+;       Describe an ephemeris search query.
 ;
-;       This function returns the description string for the conjunction search.
+;       This function returns the description string for the ephemeris search.
 ;       The 'start_ts' and 'end_ts' parameters are to be timestamps in a variety of formats. The
 ;       following are examples of what is allowed:
 ;

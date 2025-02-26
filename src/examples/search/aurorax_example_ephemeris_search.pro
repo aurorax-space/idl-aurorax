@@ -93,7 +93,8 @@ pro aurorax_example_ephemeris_search1
   ;
   ; perform search
   print, '[Simple example] Starting search ...'
-  response = aurorax_ephemeris_search('2019-01-01T00:00', $
+  response = aurorax_ephemeris_search( $
+    '2019-01-01T00:00', $
     '2019-01-01T23:59', $
     programs = ['swarm'], $
     platforms = ['swarma'], $
@@ -119,7 +120,7 @@ pro aurorax_example_ephemeris_search2
   platforms = ['swarma']
   instrument_types = ['footprint']
 
-  ; set metadata filters
+  ; set metadata filter
   expressions = list(aurorax_create_metadata_filter_expression('nbtrace_region', 'north polar cap', /operator_eq))
   metadata_filters = aurorax_create_metadata_filter(expressions)
 
