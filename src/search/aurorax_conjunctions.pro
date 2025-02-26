@@ -430,15 +430,14 @@ function aurorax_conjunction_search, $
 
   ; get data
   response = __aurorax_request_get_data('conjunctions', request_id, response_format = response_format, print_header = 'aurorax_conjunction_search')
-  if (response eq !null) then return, !null
   if (verbose eq 1) then __aurorax_message, 'Data downloaded, search completed'
 
   ; post-process data (ie. change 'start' to 'start_ts', and '_end' to 'end_ts')
   if (verbose eq 1) then begin
     if (keyword_set(response_format)) then begin
-      __aurorax_message, 'Post-processing data into hash'
+      __aurorax_message, 'Post-processing data into Hash'
     endif else begin
-      __aurorax_message, 'Post-processing data into struct'
+      __aurorax_message, 'Post-processing data into Struct'
     endelse
   endif
   data_adjusted = list()

@@ -169,30 +169,7 @@ function __aurorax_time2string, time
   return, result
 end
 
-function __aurorax_ephemeris_convert_hash_location_nans, data
-  ; locations with no data in them come back from the API as empty objects (ie. nbtrace={}), which
-  ; are missing the lat and lon keys that are usually there. So to make the response more consistent,
-  ; we overwrite these empty hashes with a hash of null values but with the anticipated keys
-  for i = 0, n_elements(data['data']) - 1 do begin
-    if (data['data', i].hasKey('nbtrace') eq 1) then begin
-      if (n_elements(data['data', i, 'nbtrace']) eq 0) then data['data', i, 'nbtrace'] = hash('lat', !null, 'lon', !null)
-    endif
-    if (data['data', i].hasKey('sbtrace') eq 1) then begin
-      if (n_elements(data['data', i, 'sbtrace']) eq 0) then data['data', i, 'sbtrace'] = hash('lat', !null, 'lon', !null)
-    endif
-    if (data['data', i].hasKey('location_geo') eq 1) then begin
-      if (n_elements(data['data', i, 'location_geo']) eq 0) then data['data', i, 'location_geo'] = hash('lat', !null, 'lon', !null)
-    endif
-    if (data['data', i].hasKey('location_gsm') eq 1) then begin
-      if (n_elements(data['data', i, 'location_gsm']) eq 0) then data['data', i, 'location_gsm'] = hash('lat', !null, 'lon', !null)
-    endif
-  endfor
-
-  ; return
-  return, data
-end
-
-function __aurorax_ephemeris_convert_struct_location_nans, data
+function __aurorax_ephemeris_convert_location_nans, data
   compile_opt hidden
 
   ; process ephemeris data

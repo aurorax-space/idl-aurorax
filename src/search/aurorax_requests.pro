@@ -157,15 +157,6 @@ function __aurorax_request_get_data, request_type, request_id, response_format =
   req.setProperty, url_host = 'api.aurorax.space'
   req.setProperty, url_path = 'api/v1/' + request_type + '/requests/' + request_id + '/data'
 
-  ; ; check for error
-  ; catch, error_status
-  ; if (error_status ne 0) then begin
-  ; catch, /cancel
-
-  ; ; bail out
-  ; return, {req: req, output: '', error_message: error_message, status_code: response_code}
-  ; endif
-
   ; do request
   if (keyword_set(response_format) and response_format ne !null and n_elements(response_format) ne 0) then begin
     ; is a request that has a response format, so we need to make sure it's in the
@@ -187,12 +178,6 @@ function __aurorax_request_get_data, request_type, request_id, response_format =
 
     ; do post
     r = __aurorax_perform_api_request('post', print_header, req, post_str = post_str)
-
-    ; check error condition
-    if (r.status_code ne 200) then begin
-      ; error occurred, but should have already been handled by the API request catch, so we bail out
-      return, !null
-    endif
     output = r.output
   endif else begin
     ; set the headers
