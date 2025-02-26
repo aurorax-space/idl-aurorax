@@ -15,6 +15,14 @@
 ; -------------------------------------------------------------
 
 pro aurorax_example_atm_forward_custom_spectrum
+  ; -----------------------------
+  ; TREx-ATM Forward Calculation with custom spectrum supplied
+  ; -----------------------------
+  ;
+  ; Building off the basic TREx-ATM forward example, we can also perform calculations by supplying a custom
+  ; spectrum. Below, we'll do this using some example spectrum data. Note that the energy and flux arrays must
+  ; be the same length, and energy and flux values are expected to be floats in eV and 1/cm2/sr/eV, respectively.
+
   ; set up request
   ;
   ; we'll ask for the basic information, just the height-integrated rayleighs values,
@@ -42,7 +50,6 @@ pro aurorax_example_atm_forward_custom_spectrum
     2264.96, 2381.09, 2503.17, 2631.51, 2766.43, 2908.27, 3057.38, 3214.13, 3378.93, 3552.17, 3734.29, 3925.75, 4127.03, 4338.63, $
     4561.07, 4794.92, 5040.76, 5299.21, 5570.91, 5856.53, 6156.80, 6472.47, 6804.32, 7153.18, 7519.93, 7905.49, 8310.81, 8736.92, $
     9184.87, 9655.7]
-
   custom_spectrum_flux = [ $
     14237.8, 19932.9, 25628.1, 31323.2, 37018.3, 42713.4, 48408.6, 54103.7, 59798.8, 65493.9, 71189.1, 76884.2, 82579.3, 88274.4, $
     93969.6, 99664.7, 105360.0, 111055.0, 116750.0, 122577.0, 128775.0, 135378.0, 142319.0, 149616.0, 157287.0, 165351.0, 173829.0, $
@@ -77,5 +84,10 @@ pro aurorax_example_atm_forward_custom_spectrum
   print, '  135.6nm: ' + strcompress(string(data.data.height_integrated_rayleighs_1356))
 
   ; plot the 5577 emission
-  plot, data.data.emission_5577, data.data.altitudes, xtitle = '557.7nm emission (Rayleighs)', ytitle = 'Altitude (meters)', title = '557.7nm Emission output'
+  plot, $
+    data.data.emission_5577, $
+    data.data.altitudes, $
+    xtitle = '557.7nm emission (Rayleighs)', $
+    ytitle = 'Altitude (meters)', $
+    title = '557.7nm Emission output'
 end

@@ -65,8 +65,14 @@ function __aurorax_perform_api_request, request_type, print_header, req, post_st
     ; cleanup
     file_delete, temp_filename, /allow_nonexistent
 
+    ; check if the usual Python API error message format exists, if so, then use it
+    if (strpos(error_message, '"detail":') ne -1) then begin
+      error_message = json_parse(error_message)
+      error_message = error_message['detail']
+    endif
+
     ; evaluate error code
-    print, '[' + print_header + '] Error performing search'
+    print, '[' + print_header + '] Error performing request'
     print, '  API status code: ' + string(response_code, format = '(I0)')
     print, '  API error message: ' + error_message.toString()
 

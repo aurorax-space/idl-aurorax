@@ -33,7 +33,7 @@ pro aurorax_example_data_products_search
   ;
   ; Let's have a look at a basic data product search. Let's get data product records for all TREx RGB instruments
   ; for a day.
-  ; aurorax_example_data_products_search1
+  aurorax_example_data_products_search1
 
   ; ---------------------
   ; Search with metadata filters
@@ -50,7 +50,7 @@ pro aurorax_example_data_products_search
   ;
   ; Let's look at a simple example where we search for data product data filtering for specifically daily keograms for
   ; the TREx RGBs.
-  ; aurorax_example_data_products_search2
+  aurorax_example_data_products_search2
 
   ; ---------------------
   ; Describe the data products search as an SQL-like statement
@@ -58,7 +58,7 @@ pro aurorax_example_data_products_search
   ;
   ; To help understand the query a bit more, you can also 'describe' the search as an SQL-like statement. Let's look
   ; at a simple example of this.
-  ; aurorax_example_data_products_search3
+  aurorax_example_data_products_search3
 
   ; ---------------------
   ; Configure the response data
