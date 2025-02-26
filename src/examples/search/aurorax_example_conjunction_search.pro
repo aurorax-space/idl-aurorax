@@ -55,11 +55,10 @@ pro aurorax_example_conjunction_search
   ; metadata filters, and a modal will pop up. All metadata filters for the selected data sources are displayed in
   ; the modal.
   ;
-  ; Now that we understand the metadata filter keys and values a bit more, let's dive into some examples. We'll start
-  ; with a simple example below, where we search for conjunctions filtering for when spacecrafts are in the north polar
-  ; cap. The regions available to choose from are all directly pulled from SSCWeb. Almost all data used by AuroraX for
-  ; spacecrafts is from SSCWeb without any alterations, only organization in the AuroraX database to enable the search
-  ; engine to function.
+  ; Now that we understand the metadata filter keys and values a bit more, let's start with a simple example. We will
+  ; search for conjunctions and filter when spacecrafts are in the north polar cap. The regions available to choose
+  ; from are all directly pulled from SSCWeb. Almost all data used by AuroraX for spacecrafts is from SSCWeb without
+  ; any alterations, only organization in the AuroraX database to enable the search engine to function.
   ;
   ; If you're interested in interacting with the ML-derived metadata for ground-based instruments, have a look at the
   ; crib sheet at https://github.com/aurorax-space/idl-aurorax/blob/main/src/examples/search/aurorax_example_ephemeris_search_ml.pro
@@ -185,7 +184,10 @@ pro aurorax_example_conjunction_search1
   space = list(aurorax_create_criteria_block(programs = ['swarm'], /space))
 
   ; perform search
+  print, '[Simple example] Starting search ...'
   r = aurorax_conjunction_search(start_dt, end_dt, distance, ground = ground, space = space, /nbtrace)
+  print, '[Simple example] Found ' + string(n_elements(r.data), format = '(I0)') + ' conjunctions'
+  print, ''
 
   ; show data
   help, r

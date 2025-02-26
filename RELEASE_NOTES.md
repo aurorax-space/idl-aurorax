@@ -8,6 +8,9 @@ Version 1.4.0
   - addition of `uid` optional keyword
 - added `aurorax_check_version()` function
 - added `level` parameter to `aurorax_list_datasets()` function
+- added support for performing conjunction searches with custom locations
+- added support using a response format when performing conjunction, ephemeris, and data product searches
+- added the `aurorax_create_response_format_template()` function
 
 
 Version 1.3.1
