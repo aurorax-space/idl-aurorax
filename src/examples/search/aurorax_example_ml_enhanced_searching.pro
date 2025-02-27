@@ -49,7 +49,7 @@ pro aurorax_example_ml_enhanced_searching
   ; period.
   ;
   ; More information about this model can be found at https://docs.aurorax.space/ml/models/ucalgary_apa/
-  ; aurorax_example_ml_enhanced_searching1
+  aurorax_example_ml_enhanced_searching1
 
   ; ----------------------------------
   ; Conjunction search - UCalgary cloud model
@@ -64,7 +64,7 @@ pro aurorax_example_ml_enhanced_searching
   ; period.
   ;
   ; More information about this model can be found at https://docs.aurorax.space/ml/models/ucalgary_cloud/
-  ; aurorax_example_ml_enhanced_searching2
+  aurorax_example_ml_enhanced_searching2
 
   ; ----------------------------------
   ; Conjunction search - Oslo Aurora THEMIS (OATH) model
@@ -87,7 +87,7 @@ pro aurorax_example_ml_enhanced_searching
   ;
   ; More information about the AuroraX utilization of this model can be found at
   ; https://docs.aurorax.space/ml/models/clausen_oath/
-  ; aurorax_example_ml_enhanced_searching3
+  aurorax_example_ml_enhanced_searching3
 
   ; ----------------------------------
   ; Ephemeris search
