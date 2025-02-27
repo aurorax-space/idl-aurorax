@@ -12,6 +12,7 @@ Version 1.4.0
 - added support for performing conjunction searches with custom locations
 - added the `aurorax_create_response_format_template()` function- added support using a response format when performing conjunction, ephemeris, and data product searches
 - added search description methods `aurorax_conjunction_describe()`, `aurorax_ephemeris_describe()`, and `aurorax_data_product_describe()`; example procedures updated to include them
+- improvement to conjunction/ephemeris/data product searching to handle incorrect metadata filter expression operators
 
 
 Version 1.3.1
