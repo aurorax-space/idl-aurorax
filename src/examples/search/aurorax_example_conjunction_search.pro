@@ -334,7 +334,7 @@ pro aurorax_example_conjunction_search6
 
   ; perform search
   print, '[Custom locations example] Starting search ...'
-  r = aurorax_conjunction_search(start_dt, end_dt, distance, space = space, custom = custom, /nbtrace, /quiet)
+  r = aurorax_conjunction_search(start_dt, end_dt, distance, space = space, custom_locations = custom, /nbtrace, /quiet)
   print, '[Custom locations example] Found ' + string(n_elements(r.data), format = '(I0)') + ' conjunctions'
   print, ''
 end

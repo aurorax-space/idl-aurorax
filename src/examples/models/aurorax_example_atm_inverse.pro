@@ -16,7 +16,7 @@
 
 pro aurorax_example_atm_inverse
   ; --------------------------------
-  ; Introduction
+  ; TREx ATM inverse calculations
   ; --------------------------------
   ;
   ; Using ATM you can also perform inversion calculations to derive various outputs using emission

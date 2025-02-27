@@ -16,7 +16,7 @@
 
 pro aurorax_example_atm_forward
   ; --------------------------------
-  ; Introduction
+  ; TREx ATM forward calculations
   ; --------------------------------
   ;
   ; TREx-ATM is a time-dependent Aurora Transport Model (ATM), designed to leverage and support TREx optical

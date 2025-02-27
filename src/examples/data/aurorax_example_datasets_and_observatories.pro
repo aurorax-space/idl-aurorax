@@ -15,6 +15,7 @@
 ; -------------------------------------------------------------
 
 pro aurorax_example_datasets_and_observatories
+  ; ------------------------
   ; Explore datasets
   ; ------------------------
   ;
@@ -53,6 +54,7 @@ pro aurorax_example_datasets_and_observatories
   help, dataset
   print, ''
 
+  ; ------------------------
   ; Explore observatories
   ; ------------------------
   ;
