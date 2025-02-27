@@ -59,6 +59,9 @@ pro aurorax_montage_create, $
   dimensions = dimensions, $
   location = location, $
   no_timestamps = no_timestamps
+  ; Init
+  if not keyword_set(frame_step) then frame_step = 1
+
   ; Get the number of channels of image data
   images_shape = size(images, /dimensions)
   if n_elements(images_shape) eq 2 then begin
@@ -78,13 +81,10 @@ pro aurorax_montage_create, $
     goto, error_jump
   endelse
 
-  if not keyword_set(frame_step) then frame_step = 1
-
   ; Make sure requested montage size fits number of images provided
   n_img = (size(images, /dimensions))[-1]
   n_ts = n_elements(timestamps)
   n_montage_img = n_cols * n_rows
-
   if (n_img ne n_ts) then begin
     print, '[aurorax_montage_create] Error: Number of images provided does not match number of timestamps provided.'
     goto, error_jump

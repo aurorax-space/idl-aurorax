@@ -86,9 +86,9 @@ end
 ;
 ; :Parameters:
 ;       start_ts: in, required, String
-;           start timestamp, string (different formats allowed, see below)
+;           start timestamp, string (different formats allowed, see above)
 ;       end_ts: in, required, String
-;           end timestamp, string (different formats allowed, see below)
+;           end timestamp, string (different formats allowed, see above)
 ;
 ; :Keywords:
 ;       programs: in, optional, List
@@ -129,6 +129,7 @@ function aurorax_ephemeris_search, $
   platforms = platforms, $
   instrument_types = instrument_types, $
   metadata_filters = metadata_filters, $
+  response_format = response_format, $
   poll_interval = pi, $
   quiet = q, $
   dryrun = dr
@@ -145,26 +146,8 @@ function aurorax_ephemeris_search, $
   if (isa(dr) eq 1) then dry_run = 1
   if (verbose eq 1 and dry_run eq 1) then __aurorax_message, 'Executing in dry-run mode'
 
-  ; get ISO datetime strings
-  if (verbose eq 1) then __aurorax_message, 'Parsing start and end timestamps'
-  start_iso_dt = __aurorax_datetime_parser(start_ts, /interpret_as_start)
-  end_iso_dt = __aurorax_datetime_parser(end_ts, /interpret_as_end)
-  if (start_iso_dt eq '' or end_iso_dt eq '') then return, list()
-
-  ; create data sources struct
-  if (verbose eq 1) then __aurorax_message, 'Creating request struct'
-  data_sources_struct = {programs: list(), platforms: list(), instrument_types: list(), ephemeris_metadata_filters: hash()}
-  if (isa(programs) eq 1) then data_sources_struct.programs = list(programs, /extract)
-  if (isa(platforms) eq 1) then data_sources_struct.platforms = list(platforms, /extract)
-  if (isa(instrument_types) eq 1) then data_sources_struct.instrument_types = list(instrument_types, /extract)
-  if (isa(metadata_filters) eq 1) then data_sources_struct.ephemeris_metadata_filters = hash(metadata_filters)
-
-  ; create post struct and serialize into a string
-  post_struct = {data_sources: data_sources_struct, start: start_iso_dt, end_ts: end_iso_dt}
-  post_str = json_serialize(post_struct, /lowercase)
-  post_str = post_str.replace('LOGICAL_OPERATOR', 'logical_operator') ; because of a bug in json_serialize where it doesn't lowercase nested hashes
-  post_str = post_str.replace('EXPRESSIONS', 'expressions') ; because of a bug in json_serialize where it doesn't lowercase nested hashes
-  post_str = post_str.replace('end_ts', 'end') ; because 'end' isn't a valid struct tag name
+  ; create post string
+  post_str = __aurorax_ephemeris_create_post_str(verbose, start_ts, end_ts, programs, platforms, instrument_types, metadata_filters)
 
   ; stop here if in dry-run mode
   if (dry_run eq 1) then begin
@@ -212,7 +195,13 @@ function aurorax_ephemeris_search, $
   if (verbose eq 1) then __aurorax_message, 'Data is now available'
 
   ; humanize size of data to download
-  if (verbose eq 1) then __aurorax_message, 'Downloading ' + __aurorax_humanize_bytes(status.search_result.file_size) + ' of data ...'
+  if (verbose eq 1) then begin
+    if (keyword_set(response_format)) then begin
+      __aurorax_message, 'Downloading up to ' + __aurorax_humanize_bytes(status.search_result.file_size) + ' of data ...'
+    endif else begin
+      __aurorax_message, 'Downloading ' + __aurorax_humanize_bytes(status.search_result.file_size) + ' of data ...'
+    endelse
+  endif
 
   ; get data
   response = __aurorax_request_get_data('ephemeris', request_id, response_format = response_format, print_header = 'aurorax_ephemeris_search')

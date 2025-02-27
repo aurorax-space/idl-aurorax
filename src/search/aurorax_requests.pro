@@ -153,7 +153,7 @@ function __aurorax_request_wait_for_data, request_type, request_id, poll_interva
   return, status
 end
 
-function __aurorax_request_get_data, request_type, request_id
+function __aurorax_request_get_data, request_type, request_id, response_format = response_format, print_header = print_header
   compile_opt hidden
 
   ; set up request
@@ -162,7 +162,6 @@ function __aurorax_request_get_data, request_type, request_id
   req.setProperty, url_port = 443
   req.setProperty, url_host = 'api.aurorax.space'
   req.setProperty, url_path = 'api/v1/' + request_type + '/requests/' + request_id + '/data'
-  req.setProperty, headers = 'User-Agent: idl-aurorax/' + __aurorax_version()
 
   ; do request
   if (keyword_set(response_format) and response_format ne !null and n_elements(response_format) ne 0) then begin
