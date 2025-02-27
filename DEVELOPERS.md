@@ -13,14 +13,6 @@ This software is set up to be developed using Windows. In order to get your Wind
     ./developer_setup.ps1
     ```
 
-## Generating the documentation
-
-The docs are presently an alpha state item. To build them:
-
-```idl
-idldoc,root='path\to\idl-aurorax\src',output='path\to\idl-aurorax\docs'
-```
-
 ## Preparing a new distributable package
 
 When a new release is ready for deployment, there are a few tasks that need to be done.
