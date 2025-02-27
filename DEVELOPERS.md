@@ -6,12 +6,6 @@ This software is set up to be developed using Windows. In order to get your Wind
 
 1. Ensure Git is installed
 2. Clone the repository
-3. Set up dependencies
-
-    ```
-    cd <path to cloned repo>
-    ./developer_setup.ps1
-    ```
 
 ## Preparing a new distributable package
 
