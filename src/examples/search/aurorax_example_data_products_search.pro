@@ -173,7 +173,8 @@ pro aurorax_example_data_products_search4
     end_ts, $
     programs = programs, $
     instrument_types = instrument_types, $
-    response_format = response_format)
+    response_format = response_format, $
+    /quiet)
   print, '[Response format example] Found ' + string(n_elements(r['data']), format = '(I0)') + ' data product records'
   print, ''
 end

@@ -210,7 +210,7 @@ pro aurorax_example_advanced_metadata_filter_searching3
   print, '[Multiple expressions example - part B] Found ' + string(n_elements(r.data), format = '(I0)') + ' conjunctions'
   print, ''
 
-  ; Horray, we found some conjunctions!
+  ; Great, we found some conjunctions!
   ;
   ; Remember with most conjunction searches, you can view the results directly in Swarm-Aurora using the
   ; `aurorax_open_conjunctions_in_swarmaurora` function. More info can be found in the conjunction searching

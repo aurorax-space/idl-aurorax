@@ -21,6 +21,20 @@ function __aurorax_ephemeris_create_post_str, verbose, start_ts, end_ts, program
   end_iso_dt = __aurorax_datetime_parser(end_ts, /interpret_as_end)
   if (start_iso_dt eq '' or end_iso_dt eq '') then return, list()
 
+  ; check all metadata filter expression operators
+  ;
+  ; NOTE: if there are multiple values and the operator is '=', it needs to be changed
+  ; to be 'in'.
+  if (keyword_set(metadata_filters)) then begin
+    for i = 0, n_elements(metadata_filters.expressions) - 1 do begin
+      this_expr = metadata_filters.expressions[i]
+      if (n_elements(this_expr['values']) gt 1 and this_expr['operator'] eq '=') then begin
+        ; has multiple values but operator is '=', change it to 'in'
+        metadata_filters.expressions[i, 'operator'] = 'in'
+      endif
+    endfor
+  endif
+
   ; create data sources struct
   if (verbose eq 1) then __aurorax_message, 'Creating request struct'
   data_sources_struct = {programs: list(), platforms: list(), instrument_types: list(), ephemeris_metadata_filters: hash()}

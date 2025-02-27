@@ -216,6 +216,44 @@ function __aurorax_conjunctions_create_post_str, $
   if keyword_set(ct_sbtrace) then conjunction_types.add, 'sbtrace'
   if keyword_set(ct_geo) then conjunction_types.add, 'geographic'
 
+  ; check all metadata filter expression operators
+  ;
+  ; NOTE: if there are multiple values and the operator is '=', it needs to be changed
+  ; to be 'in'.
+  for i = 0, n_elements(ground) - 1 do begin
+    if (ground[i].ephemeris_metadata_filters.hasKey('EXPRESSIONS')) then begin
+      for j = 0, n_elements(ground[i].ephemeris_metadata_filters['EXPRESSIONS']) - 1 do begin
+        this_expr = ground[i].ephemeris_metadata_filters['EXPRESSIONS', j]
+        if (n_elements(this_expr['values']) gt 1 and this_expr['operator'] eq '=') then begin
+          ; has multiple values but operator is '=', change it to 'in'
+          ground[i].ephemeris_metadata_filters['EXPRESSIONS', j, 'operator'] = 'in'
+        endif
+      endfor
+    endif
+  endfor
+  for i = 0, n_elements(space) - 1 do begin
+    if (space[i].ephemeris_metadata_filters.hasKey('EXPRESSIONS')) then begin
+      for j = 0, n_elements(space[i].ephemeris_metadata_filters['EXPRESSIONS']) - 1 do begin
+        this_expr = space[i].ephemeris_metadata_filters['EXPRESSIONS', j]
+        if (n_elements(this_expr['values']) gt 1 and this_expr['operator'] eq '=') then begin
+          ; has multiple values but operator is '=', change it to 'in'
+          space[i].ephemeris_metadata_filters['EXPRESSIONS', j, 'operator'] = 'in'
+        endif
+      endfor
+    endif
+  endfor
+  for i = 0, n_elements(events) - 1 do begin
+    if (events[i].ephemeris_metadata_filters.hasKey('EXPRESSIONS')) then begin
+      for j = 0, n_elements(events[i].ephemeris_metadata_filters['EXPRESSIONS']) - 1 do begin
+        this_expr = events[i].ephemeris_metadata_filters['EXPRESSIONS', j]
+        if (n_elements(this_expr['values']) gt 1 and this_expr['operator'] eq '=') then begin
+          ; has multiple values but operator is '=', change it to 'in'
+          events[i].ephemeris_metadata_filters['EXPRESSIONS', j, 'operator'] = 'in'
+        endif
+      endfor
+    endif
+  endfor
+
   ; create data sources struct
   if (verbose eq 1) then __aurorax_message, 'Creating request struct'
   post_struct = {start: start_iso_dt, $

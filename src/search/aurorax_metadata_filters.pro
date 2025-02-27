@@ -71,7 +71,7 @@ function aurorax_create_metadata_filter_expression, $
   operator_between = between_kw, $
   operator_in = in_kw, $
   operator_not_in = not_in_kw
-    ; set operator
+  ; set operator
   operator = ''
   if keyword_set(eq_kw) then operator = '='
   if keyword_set(ne_kw) then operator = '!='
@@ -84,7 +84,7 @@ function aurorax_create_metadata_filter_expression, $
   if keyword_set(not_in_kw) then operator = 'not in'
   if (operator eq '') then begin
     print, 'Error: must supply one of the operator keywords, please add one and try again'
-    return, hash()
+    return, !null
   endif
 
   ; if the values is a number, convert it to a string
@@ -134,7 +134,6 @@ end
 ;       metadata_filters = aurorax_create_metadata_filter(expressions,/OPERATOR_AND)
 ;+
 function aurorax_create_metadata_filter, expressions, operator_and = and_kw, operator_or = or_kw
-    
   ; set operator
   if keyword_set(and_kw) then begin
     operator = 'AND'
