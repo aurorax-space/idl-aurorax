@@ -139,6 +139,127 @@ function aurorax_create_advanced_distances_hash, $
   return, distances
 end
 
+function __aurorax_conjunctions_create_post_str, $
+  verbose, $
+  start_ts, $
+  end_ts, $
+  distance, $
+  ct_nbtrace, $
+  ct_sbtrace, $
+  ct_geo, $
+  ground, $
+  space, $
+  events, $
+  custom_locations
+  ; get ISO datetime strings
+  if (verbose eq 1) then __aurorax_message, 'Parsing start and end timestamps'
+  start_iso_dt = __aurorax_datetime_parser(start_ts, /interpret_as_start)
+  end_iso_dt = __aurorax_datetime_parser(end_ts, /interpret_as_end)
+  if (start_iso_dt eq '' or end_iso_dt eq '') then return, list()
+
+  ; check criteria block count validity
+  criteria_block_count = n_elements(ground) + n_elements(space) + n_elements(events) + n_elements(custom_locations)
+  if (criteria_block_count gt 10) then begin
+    __aurorax_message, 'Error: too many criteria blocks, max of 10 is allowed and ' + string(criteria_block_count, format = '(I0)') + $
+      ' have been supplied. Please reduce the count and try again.'
+    return, list()
+  endif
+
+  ; set distance
+  if (isa(distance, /integer) eq 1 or isa(distance, /float) eq 1) then begin
+    ; entered distance is a single number, use that to generate all the max distance pairings
+    distances_hash = aurorax_create_advanced_distances_hash(distance, $
+      ground_count = n_elements(ground), $
+      space_count = n_elements(space), $
+      events_count = n_elements(events), $
+      custom_count = n_elements(custom_locations))
+  endif else if (isa(distance, 'HASH') eq 1) then begin
+    ; entered distance is the correct object type, make sure it has all the correct pairings
+    distances_valid = __aurorax_validate_advanced_distances(distance, $
+      ground_count = n_elements(ground), $
+      space_count = n_elements(space), $
+      events_count = n_elements(events), $
+      custom_count = n_elements(custom_locations))
+    if (distances_valid eq 1) then begin
+      distances_hash = distance
+    endif else begin
+      __aurorax_message, 'Error: distances object is not valid, update your distances object ' + $
+        'and try again (in most cases, the object is missing pairings)'
+      return, list()
+    endelse
+  endif
+
+  ; set conjunction types
+  conjunction_types = list()
+  if keyword_set(ct_nbtrace) then conjunction_types.add, 'nbtrace'
+  if keyword_set(ct_sbtrace) then conjunction_types.add, 'sbtrace'
+  if keyword_set(ct_geo) then conjunction_types.add, 'geographic'
+
+  ; check all metadata filter expression operators
+  ;
+  ; NOTE: if there are multiple values and the operator is '=', it needs to be changed
+  ; to be 'in'.
+  for i = 0, n_elements(ground) - 1 do begin
+    if (ground[i].ephemeris_metadata_filters.hasKey('EXPRESSIONS')) then begin
+      for j = 0, n_elements(ground[i].ephemeris_metadata_filters['EXPRESSIONS']) - 1 do begin
+        this_expr = ground[i].ephemeris_metadata_filters['EXPRESSIONS', j]
+        if (n_elements(this_expr['values']) gt 1 and this_expr['operator'] eq '=') then begin
+          ; has multiple values but operator is '=', change it to 'in'
+          ground[i].ephemeris_metadata_filters['EXPRESSIONS', j, 'operator'] = 'in'
+        endif
+      endfor
+    endif
+  endfor
+  for i = 0, n_elements(space) - 1 do begin
+    if (space[i].ephemeris_metadata_filters.hasKey('EXPRESSIONS')) then begin
+      for j = 0, n_elements(space[i].ephemeris_metadata_filters['EXPRESSIONS']) - 1 do begin
+        this_expr = space[i].ephemeris_metadata_filters['EXPRESSIONS', j]
+        if (n_elements(this_expr['values']) gt 1 and this_expr['operator'] eq '=') then begin
+          ; has multiple values but operator is '=', change it to 'in'
+          space[i].ephemeris_metadata_filters['EXPRESSIONS', j, 'operator'] = 'in'
+        endif
+      endfor
+    endif
+  endfor
+  for i = 0, n_elements(events) - 1 do begin
+    if (events[i].ephemeris_metadata_filters.hasKey('EXPRESSIONS')) then begin
+      for j = 0, n_elements(events[i].ephemeris_metadata_filters['EXPRESSIONS']) - 1 do begin
+        this_expr = events[i].ephemeris_metadata_filters['EXPRESSIONS', j]
+        if (n_elements(this_expr['values']) gt 1 and this_expr['operator'] eq '=') then begin
+          ; has multiple values but operator is '=', change it to 'in'
+          events[i].ephemeris_metadata_filters['EXPRESSIONS', j, 'operator'] = 'in'
+        endif
+      endfor
+    endif
+  endfor
+
+  ; create data sources struct
+  if (verbose eq 1) then __aurorax_message, 'Creating request struct'
+  post_struct = {start: start_iso_dt, $
+    end_ts: end_iso_dt, $
+    ground: list(), $
+    space: list(), $
+    events: list(), $
+    adhoc: list(), $
+    conjunction_types: list(), $
+    max_distances: distances_hash}
+  if (isa(ground) eq 1) then post_struct.ground = ground
+  if (isa(space) eq 1) then post_struct.space = space
+  if (isa(events) eq 1) then post_struct.events = events
+  if (isa(custom_locations) eq 1) then post_struct.adhoc = custom_locations
+  post_struct.conjunction_types = conjunction_types
+  post_struct.max_distances = distances_hash
+
+  ; serialize into a string
+  post_str = json_serialize(post_struct, /lowercase)
+  post_str = post_str.replace('LOGICAL_OPERATOR', 'logical_operator') ; because of a bug in json_serialize where it doesn't lowercase nested hashes
+  post_str = post_str.replace('EXPRESSIONS', 'expressions') ; because of a bug in json_serialize where it doesn't lowercase nested hashes
+  post_str = post_str.replace('end_ts', 'end') ; because 'end' isn't a valid struct tag name
+
+  ; return
+  return, post_str
+end
+
 ;+
 ; :Description:
 ;       Search the AuroraX platform for conjunctions using the supplied filter criteria.

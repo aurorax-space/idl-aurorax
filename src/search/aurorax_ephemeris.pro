@@ -14,6 +14,46 @@
 ; limitations under the License.
 ; -------------------------------------------------------------
 
+function __aurorax_ephemeris_create_post_str, verbose, start_ts, end_ts, programs, platforms, instrument_types, metadata_filters
+  ; get ISO datetime strings
+  if (verbose eq 1) then __aurorax_message, 'Parsing start and end timestamps'
+  start_iso_dt = __aurorax_datetime_parser(start_ts, /interpret_as_start)
+  end_iso_dt = __aurorax_datetime_parser(end_ts, /interpret_as_end)
+  if (start_iso_dt eq '' or end_iso_dt eq '') then return, list()
+
+  ; check all metadata filter expression operators
+  ;
+  ; NOTE: if there are multiple values and the operator is '=', it needs to be changed
+  ; to be 'in'.
+  if (keyword_set(metadata_filters)) then begin
+    for i = 0, n_elements(metadata_filters.expressions) - 1 do begin
+      this_expr = metadata_filters.expressions[i]
+      if (n_elements(this_expr['values']) gt 1 and this_expr['operator'] eq '=') then begin
+        ; has multiple values but operator is '=', change it to 'in'
+        metadata_filters.expressions[i, 'operator'] = 'in'
+      endif
+    endfor
+  endif
+
+  ; create data sources struct
+  if (verbose eq 1) then __aurorax_message, 'Creating request struct'
+  data_sources_struct = {programs: list(), platforms: list(), instrument_types: list(), ephemeris_metadata_filters: hash()}
+  if (isa(programs) eq 1) then data_sources_struct.programs = list(programs, /extract)
+  if (isa(platforms) eq 1) then data_sources_struct.platforms = list(platforms, /extract)
+  if (isa(instrument_types) eq 1) then data_sources_struct.instrument_types = list(instrument_types, /extract)
+  if (isa(metadata_filters) eq 1) then data_sources_struct.ephemeris_metadata_filters = hash(metadata_filters)
+
+  ; create post struct and serialize into a string
+  post_struct = {data_sources: data_sources_struct, start: start_iso_dt, end_ts: end_iso_dt}
+  post_str = json_serialize(post_struct, /lowercase)
+  post_str = post_str.replace('LOGICAL_OPERATOR', 'logical_operator') ; because of a bug in json_serialize where it doesn't lowercase nested hashes
+  post_str = post_str.replace('EXPRESSIONS', 'expressions') ; because of a bug in json_serialize where it doesn't lowercase nested hashes
+  post_str = post_str.replace('end_ts', 'end') ; because 'end' isn't a valid struct tag name
+
+  ; return
+  return, post_str
+end
+
 ;+
 ; :Description:
 ;       Search for ephemeris records in the AuroraX Search Engine, with
@@ -145,17 +185,17 @@ function aurorax_ephemeris_search, $
 
   ; make request
   if (verbose eq 1) then __aurorax_message, 'Sending search request ...'
-  output = req.put(post_str, /buffer, /string_array, /post)
+  r = __aurorax_perform_api_request('post', 'aurorax_conjunction_search', req, post_str = post_str, /expect_empty)
 
   ; get status code and get response headers
-  req.getProperty, response_code = status_code, response_header = response_headers
+  r.req.getProperty, response_code = status_code, response_header = response_headers
 
   ; cleanup this request
   obj_destroy, req
 
   ; check status code
   if (status_code ne 202) then begin
-    if (verbose eq 1) then __aurorax_message, 'Error submitting search request: ' + output
+    if (verbose eq 1) then __aurorax_message, 'Error submitting search request: ' + r.output
     return, list()
   endif
   if (verbose eq 1) then __aurorax_message, 'Search request accepted'
@@ -175,11 +215,26 @@ function aurorax_ephemeris_search, $
   if (verbose eq 1) then __aurorax_message, 'Downloading ' + __aurorax_humanize_bytes(status.search_result.file_size) + ' of data ...'
 
   ; get data
-  data = __aurorax_request_get_data('ephemeris', request_id)
+  response = __aurorax_request_get_data('ephemeris', request_id, response_format = response_format, print_header = 'aurorax_ephemeris_search')
+  if (response eq !null) then return, !null
   if (verbose eq 1) then __aurorax_message, 'Data downloaded, search completed'
 
-  ; convert location nans
-  data = __aurorax_ephemeris_convert_location_nans(data)
+  ; post process data
+  if (verbose eq 1) then begin
+    if (keyword_set(response_format)) then begin
+      __aurorax_message, 'Post-processing data into hash'
+    endif else begin
+      __aurorax_message, 'Post-processing data into struct'
+    endelse
+  endif
+  if (keyword_set(response_format)) then begin
+    ; response format specified, so we return a hash instead
+    response = hash(response, /lowercase, /extract)
+    response = __aurorax_ephemeris_convert_hash_location_nans(response)
+  endif else begin
+    ; convert location nans
+    response = __aurorax_ephemeris_convert_struct_location_nans(response)
+  endelse
 
   ; get elapsed time
   toc_ts = toc()
@@ -187,5 +242,90 @@ function aurorax_ephemeris_search, $
 
   ; return
   if (verbose eq 1) then __aurorax_message, 'Search completed, found ' + strtrim(status.search_result.result_count, 2) + ' records in ' + duration_str
-  return, data
+  return, response
+end
+
+;+
+; :Description:
+;       Describe an ephemeris search query.
+;
+;       This function returns the description string for the ephemeris search.
+;       The 'start_ts' and 'end_ts' parameters are to be timestamps in a variety of formats. The
+;       following are examples of what is allowed:
+;
+;       The following are all interpreted as '2020-01-01T00:00:00':
+;         start_ts = '2020'
+;         start_ts = '202001'
+;         start_ts = '20200101'
+;         start_ts = '2020010100'
+;         start_ts = '202001010000'
+;         start_ts = '2020-01-01'
+;         start_ts = '2020/01/01T00:00'
+;         start_ts = '2020-01-01 00:00'
+;
+;       The following are all interpreted as '2020-12-31T23:59:59':
+;         end_ts = '2020'
+;         end_ts = '202012'
+;         end_ts = '20201231'
+;         end_ts = '2020123123'
+;         end_ts = '202012312359'
+;         end_ts = '2020-12-31'
+;         end_ts = '2020/12/31T23'
+;         end_ts = '2020-12-31 23'
+;
+; :Parameters:
+;       start_ts: in, required, String
+;           start timestamp, string (different formats allowed, see above)
+;       end_ts: in, required, String
+;           end timestamp, string (different formats allowed, see above)
+;
+; :Keywords:
+;       programs: in, optional, List
+;           programs to filter for
+;       platforms: in, optional, List
+;           platforms to filter for
+;       instrument_types: in, optional, List
+;           instrument types to filter for
+;       metadata_filters: in, optional, Hash
+;           metadata filters to filter for
+;
+; :Returns:
+;       String
+;
+; :Examples:
+;       ; simple example
+;       start_ts = '2019-01-01T00:00:00'
+;       end_ts = '2019-01-03T23:59:59'
+;       programs = ['themis-asi']
+;       description = aurorax_ephemeris_describe(start_ts,end_ts,programs=programs)
+;+
+function aurorax_ephemeris_describe, $
+  start_ts, $
+  end_ts, $
+  programs = programs, $
+  platforms = platforms, $
+  instrument_types = instrument_types, $
+  metadata_filters = metadata_filters
+  ; init
+  verbose = 0
+
+  ; create post string
+  post_str = __aurorax_ephemeris_create_post_str(verbose, start_ts, end_ts, programs, platforms, instrument_types, metadata_filters)
+
+  ; set up request
+  req = obj_new('IDLnetUrl')
+  req.setProperty, url_scheme = 'https'
+  req.setProperty, url_port = 443
+  req.setProperty, url_host = 'api.aurorax.space'
+  req.setProperty, url_path = 'api/v1/utils/describe/query/ephemeris'
+  req.setProperty, headers = ['Content-Type: application/json', 'User-Agent: idl-aurorax/' + __aurorax_version()]
+
+  ; make request
+  output = req.put(post_str, /buffer, /string_array, /post)
+
+  ; cleanup this request
+  obj_destroy, req
+
+  ; return
+  return, output
 end

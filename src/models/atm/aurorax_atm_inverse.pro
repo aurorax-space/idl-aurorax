@@ -115,17 +115,19 @@ function aurorax_atm_inverse, $
   req.setProperty, headers = ['Content-Type: application/json', 'User-Agent: idl-aurorax/' + __aurorax_version()]
 
   ; make request
-  output = req.put(post_str, /buffer, /string_array, /post)
+  r = __aurorax_perform_api_request('post', 'aurorax_atm_forward', req, post_str = post_str, /expect_empty)
+  if (r.status_code ne 200) then return, !null
+  output = r.output
 
   ; get status code and get response headers
-  req.getProperty, response_code = status_code, response_header = response_headers
+  r.req.getProperty, response_code = status_code
 
   ; cleanup this request
   obj_destroy, req
 
   ; check status code
   if (status_code ne 200) then begin
-    print, '[aurorax_atm_inverse] Error performing calculatoin: ' + output
+    print, '[aurorax_atm_inverse] Error performing calculation: ' + output
     return, !null
   endif
 
