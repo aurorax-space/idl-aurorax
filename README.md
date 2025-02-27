@@ -66,7 +66,10 @@ If you used `ipm` to install idl-aurorax, you can update it using:
 
 ```idl
 IDL> ipm,/update,'idl-aurorax'
-IDL> .reset
+IDL> .full_reset
+
+; if not in your startup file, run this:
+IDL> .run aurorax_startup
 ```
 
 If you installed the code manually, you can download the latest Zip file and overwrite the existing files. Then, add any new `.run` commands to your startup file as defined in the "Installation" section above.
