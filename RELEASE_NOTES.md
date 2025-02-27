@@ -1,3 +1,10 @@
+Version 1.5.0
+-------------------------
+- added AACGM as dependency
+- changed initialization process (refer to README)
+- changed `aurorax_check_version()` function to return a struct instead of an integer
+
+
 Version 1.4.0
 -------------------------
 

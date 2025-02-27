@@ -33,7 +33,7 @@ end
 ;         Do not output any print statements
 ;
 ; :Returns:
-;       Int
+;       Struct
 
 ; :Examples:
 ;       aurorax_check_version
@@ -100,17 +100,25 @@ function aurorax_check_version, quiet = quiet
   endif
 
   ; print
-  if (quiet_flag ne 1) then begin
-    if (new_version_available eq 0) then begin
-      print, '[aurorax_check_version] No new version is available. Your version, ' + curr_version + ', is the ', $
-        'latest. More information can be found at https://github.com/aurorax-space/idl-aurorax/releases'
-    endif else begin
-      print, '[aurorax_check_version] New version is available! Version ' + latest_version + ' can be installed (', $
-        'currently have ' + curr_version + '). Upgrade information can be found at ', $
-        'https://github.com/aurorax-space/idl-aurorax?tab=readme-ov-file#updating'
-    endelse
-  endif
+  message = ''
+  if (new_version_available eq 0) then begin
+    message = '[aurorax_check_version] No new version is available. Your version, ' + curr_version + ', is the ' + $
+      'latest. More information can be found at https://github.com/aurorax-space/idl-aurorax/releases'
+    if (quiet_flag ne 1) then begin
+      print, message
+    endif
+  endif else begin
+    message = '[aurorax_check_version] New version is available! Version ' + latest_version + ' can be installed (' + $
+      'currently have ' + curr_version + '). Upgrade information can be found at ' + $
+      'https://github.com/aurorax-space/idl-aurorax?tab=readme-ov-file#updating'
+    if (quiet_flag ne 1) then begin
+      print, message
+    endif
+  endelse
+
+  ; construct return struct
+  return_struct = {new_version_available: new_version_available, curr_version: curr_version, latest_version: latest_version, message: message}
 
   ; return
-  return, new_version_available
+  return, return_struct
 end

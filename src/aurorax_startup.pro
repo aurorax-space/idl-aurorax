@@ -14,55 +14,80 @@
 ; limitations under the License.
 ; -------------------------------------------------------------
 
+; init
+print, '[idl-aurorax] Compiling routines'
+
+; aacgm
+setenv, 'AACGM_v2_DAT_PREFIX=' + !package_path + path_sep() + $
+  'libs' + path_sep() + 'aacgm' + path_sep() + 'coeffs' + path_sep() + 'aacgm_coeffs-14-'
+setenv, 'IGRF_COEFFS=' + !package_path + path_sep() + $
+  'libs' + path_sep() + 'aacgm' + path_sep() + 'magmodel_1590-2025.txt'
+.run genmag
+.run igrflib_v2
+.run aacgmlib_v2
+.run aacgm_v2
+.run time
+.run astalg
+.run mlt_v2
+
 ; top level
-@aurorax_version
+.run aurorax_version
 
 ; data
-@aurorax_list_datasets
-@aurorax_get_dataset
-@aurorax_list_observatories
-@aurorax_ucalgary_get_urls
-@aurorax_ucalgary_download
-@aurorax_ucalgary_download_best_skymap
-@aurorax_ucalgary_readfile_asi
-@aurorax_ucalgary_readfile_skymap
-@aurorax_ucalgary_readfile_calibration
-@aurorax_ucalgary_readfile_grid
-@aurorax_ucalgary_readfile_trex_spect_processed
-@aurorax_ucalgary_read
-@aurorax_ucalgary_is_read_supported
+.run aurorax_list_datasets
+.run aurorax_get_dataset
+.run aurorax_list_observatories
+.run aurorax_ucalgary_get_urls
+.run aurorax_ucalgary_download
+.run aurorax_ucalgary_download_best_skymap
+.run aurorax_ucalgary_readfile_asi
+.run aurorax_ucalgary_readfile_skymap
+.run aurorax_ucalgary_readfile_calibration
+.run aurorax_ucalgary_readfile_grid
+.run aurorax_ucalgary_readfile_trex_spect_processed
+.run aurorax_ucalgary_read
+.run aurorax_ucalgary_is_read_supported
 
 ; search
-@aurorax_search_helpers
-@aurorax_calibrate_helpers
-@aurorax_requests
-@aurorax_metadata_filters
-@aurorax_availability
-@aurorax_conjunctions
-@aurorax_data_products
-@aurorax_ephemeris
-@aurorax_sources
-@aurorax_open_externally
+.run aurorax_search_helpers
+.run aurorax_calibrate_helpers
+.run aurorax_requests
+.run aurorax_metadata_filters
+.run aurorax_availability
+.run aurorax_conjunctions
+.run aurorax_data_products
+.run aurorax_ephemeris
+.run aurorax_sources
+.run aurorax_open_externally
 
 ; models
-@aurorax_atm_forward_get_output_flags
-@aurorax_atm_forward
-@aurorax_atm_inverse_get_output_flags
-@aurorax_atm_inverse
+.run aurorax_atm_forward_get_output_flags
+.run aurorax_atm_forward
+.run aurorax_atm_inverse_get_output_flags
+.run aurorax_atm_inverse
 
 ; tools
-@aurorax_bounding_box_extract_metric
-@aurorax_ccd_contour
-@aurorax_calibrate_rego
-@aurorax_calibrate_trex_nir
-@aurorax_keogram_add_axis
-@aurorax_keogram_create_custom
-@aurorax_keogram_create
-@aurorax_keogram_plot
-@aurorax_montage_create
-@aurorax_mosaic_plot
-@aurorax_mosaic_oplot
-@aurorax_mosaic_prep_images
-@aurorax_mosaic_prep_skymap
-@aurorax_get_decomposed_color
-@aurorax_movie
+.run aurorax_bounding_box_extract_metric
+.run aurorax_ccd_contour
+.run aurorax_calibrate_rego
+.run aurorax_calibrate_trex_nir
+.run aurorax_keogram_add_axis
+.run aurorax_keogram_create_custom
+.run aurorax_keogram_create
+.run aurorax_keogram_plot
+.run aurorax_montage_create
+.run aurorax_mosaic_plot
+.run aurorax_mosaic_oplot
+.run aurorax_mosaic_prep_images
+.run aurorax_mosaic_prep_skymap
+.run aurorax_get_decomposed_color
+.run aurorax_movie
+
+; check if there's a new version available
+print, '[idl-aurorax] Checking for new version ...'
+version_info = aurorax_check_version(/quiet)
+version_info = hash(version_info, /lowercase)
+if (version_info['new_version_available'] eq 1) then print, '[idl-aurorax] ' + version_info['message'].replace('[aurorax_check_version] ', '')
+
+; finish
+print, '[idl-aurorax] Initialization complete'

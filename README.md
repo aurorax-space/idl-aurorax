@@ -22,7 +22,10 @@ For usage details, please visit the AuroraX documentation website, and the basic
 
 ## Installation
 
-Installation can be done two different ways: 1) using the `ipm` command (recommended), or 2) manually adding the files to your IDL path.
+Installation can be done two different ways:
+
+1) using the `ipm` command (recommended), or 
+2) manually adding the files to your IDL path.
 
 ### Using ipm (recommended)
 
@@ -38,8 +41,12 @@ Since IDL 8.7.1, there exists an IDL package manager called [ipm](https://www.l3
 
     ```
     [ open your startup.pro file and put the following in it ]
-    .run aurorax_startup
+    @aurorax_startup
     ```
+
+    > [!NOTE]
+    > This step was slightly changed in version 1.5.0.
+
 
 3. [OPTIONAL] If you added the above line to your startup file, you must reset your IDL session. Do this by either clicking the Reset button in the IDL editor or by typing `.reset` into the IDL command prompt.
 
@@ -64,12 +71,15 @@ Alternatively, you can install the idl-aurorax library manually by downloading t
 
 If you used `ipm` to install idl-aurorax, you can update it using:
 
+> [!WARNING]
+> The startup file contents needed to initialize the IDL-AuroraX library changed in version 1.5.0. If you are upgrading from 1.4.0 or below up to 1.5.0 or above, please ensure you change your startup file accordingly. See step 3 of the install process for what it should be now.
+
 ```idl
 IDL> ipm,/update,'idl-aurorax'
 IDL> .full_reset
 
 ; if not in your startup file, run this:
-IDL> .run aurorax_startup
+IDL> @aurorax_startup
 ```
 
 If you installed the code manually, you can download the latest Zip file and overwrite the existing files. Then, add any new `.run` commands to your startup file as defined in the "Installation" section above.

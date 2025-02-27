@@ -1,0 +1,48 @@
+
+How to cite:
+
+Shepherd, S. G. (2014), Altitude-adjusted corrected geomagnetic coordinates:
+Definition and functional approximations, J. Geophys. Res. Space Physics, 119,
+7501–7521, doi:10.1002/2014JA020264.
+
+v2.7 Changes
+
+Features:
+
++ 20241122 added AACGM-v2 coefficients derived using IGRF14 model.
+           added file magmodel_1590-2025.txt which contains GUFM1 and IGRF14
+                 coefficients
+           changed error message in aacgmlib_v2.pro for date/time out of bounds
+
++ 20241122 changed format of several IGRF_*DateTime functions to make them
+                   consistent with corresponding AACGM_v2_*DateTime functions.
+           NOTE: the calling format for the following functions has changed from
+
+        IGRF_SetDateTime, yr, mo, dy, hr, mt, sc, err=err
+        IGRF_SetNow, err=err
+        [yr,mo,dy,hr,mt,sc] = IGRF_GetDateTime()
+
+        to:
+        err = IGRF_SetDateTime(yr, mo, dy, hr, mt, sc)
+        err = IGRF_SetNow()
+        err = IGRF_GetDateTime(yr, month=mo, day=dy, hour=hr, minute=mt, sec=sc)
+
+          This change resulted in updates to a few functions in aacgmlib_v2.pro
+             - AACGM_v2_Trace()
+
+
++ 20241122 added functions to igrflib_v2.pro in order to perform conversions
+                 to and and from eccentric dipole coordinates, with
+                 corresponding MLT functions.
+
+           geod2ecdip    - convert from geodetic to eccentric dipole coordinates
+           ecdip2geod    - convert from eccentric dipole to geodetic coordinates
+           ecdip_mlt     - compute MLT of eccentric dipole longitude
+           inv_ecdip_mlt - compute eccentric dipole longitude of MLT
+           ecdip_mlt_ref - reference eccentric dipole longitude for MLT
+
+Bug fixes:
+
++ 20241122 fixed IGRF_GetDateTime() which was using the wrong common block
+                 structure.
+
