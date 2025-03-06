@@ -115,7 +115,7 @@ function aurorax_atm_inverse, $
   req.setProperty, headers = ['Content-Type: application/json', 'User-Agent: idl-aurorax/' + __aurorax_version()]
 
   ; make request
-  r = __aurorax_perform_api_request('post', 'aurorax_atm_forward', req, post_str = post_str, /expect_empty)
+  r = __aurorax_perform_api_request('post', 'aurorax_atm_forward', req, post_str = post_str)
   if (r.status_code ne 200) then return, !null
   output = r.output
 

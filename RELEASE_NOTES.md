@@ -5,9 +5,13 @@ Version 1.5.0
 - changed `aurorax_check_version()` function to return a struct instead of an integer
 
 
+Version 1.4.1
+-------------------------
+- bugfix for ATM forward and inverse functions
+
+
 Version 1.4.0
 -------------------------
-
 - added support for performing conjunction searches with custom locations
 - added the `aurorax_create_response_format_template()` function
 - added support for using a response format when performing conjunction, ephemeris, and data product searches
@@ -25,13 +29,11 @@ Version 1.4.0
 
 Version 1.3.1
 -------------------------
-
 - bugfix for plotting mosaics with a single site, while specifying a specific scaling min/max for that site
 
 
 Version 1.3.0
 -------------------------
-
 - changed serialization of null values in ephemeris location data to be float NaN values instead of '!NULL' strings
     - applied to location_geo, location_gsm, nbtrace, sbtrace
     - not applied to metadata
@@ -42,20 +44,17 @@ Version 1.3.0
 
 Version 1.2.0
 -------------------------
-
 - added support for TREx ATM forward and inverse calculations
 - bugfix for grid file metadata readings
 
 
 Version 1.1.0
 -------------------------
-
 - added support for grid files
 - bugfix to ephemeris search example
 
 
 Version 1.0.0
 -------------------------
-
 - addition of data access, reading, and analysis support functions
 
