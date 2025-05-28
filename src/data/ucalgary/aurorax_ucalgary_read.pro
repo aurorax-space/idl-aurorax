@@ -120,6 +120,9 @@ end
 ;       help,data
 ;+
 function aurorax_ucalgary_read, dataset, file_list, first_record = first_record, no_metadata = no_metadata, quiet = quiet
+  
+  test = 5
+  
   ; init
   timestamp_list = list()
   metadata_list = list()
