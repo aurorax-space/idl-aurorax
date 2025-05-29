@@ -16,15 +16,15 @@
 
 pro aurorax_example_plot_grid_file_5577
   ; First, download and read 5 minutes of grid data
-  d = aurorax_ucalgary_download('TREX_RGB5577_GRID_MOSV001', '2023-03-24T07:35:00', '2023-03-24T07:35:00')
-  grid_data = aurorax_ucalgary_read(d.dataset, d.filenames)
-
+  d = aurorax_ucalgary_download('TREX_RGB5577_GRID_MOSV001', '2023-03-24T07:34:00', '2023-03-24T07:36:00')
+  grid_data = aurorax_ucalgary_read(d.dataset, d.filenames, start_dt = '2023-03-24T07:35:00', end_dt = '2023-03-24T07:35:00', /first_record)
+  
   ; Grab the first frame and corresponding_timestamp
-  grid = grid_data.data.grid[*, *, 0]
-  timestamp = grid_data.metadata.timestamp[0]
-
+  grid = grid_data.data.grid
+  timestamp = grid_data.metadata.timestamp
+  print, timestamp
   ; The fill value used for cells with no data is stored in the metadata
-  fill_val = float(grid_data.metadata.file_meta[0].fill_value)
+  fill_val = float(grid_data.metadata.file_meta.fill_value)
 
   ; To plot the grid on top of a map, we need to make all cells that contain no data
   ; transparent. To do so, we simply conver the image array to an RGBA image, and set all
@@ -47,8 +47,8 @@ pro aurorax_example_plot_grid_file_5577
 
   ; Add some labels and a custom colorbar
   t = text(0.235, 0.875, 'TREx RGB - Derived 557.7 nm', font_size = 20, color = 'white', font_style = 1)
-  t = text(0.235, 0.165, '2023/03/24', font_size = 20, color = 'white', font_style = 1)
-  t = text(0.235, 0.105, '07:35:00 UT', font_size = 20, color = 'white', font_style = 1)
+  t = text(0.235, 0.165, strmid(timestamp, 0, 10), font_size = 20, color = 'white', font_style = 1)
+  t = text(0.235, 0.105, strmid(timestamp, 11, 12), font_size = 20, color = 'white', font_style = 1)
   cbar = colorbar(range = rayleighs_scale, orientation = 1, position = [0.7, 0.1, 0.71, 0.9], textpos = 1, tickdir = 1, font_style = 1, font_size = 10, $
     border_on = 1, color = 'white', rgb_table = 8, tickname = ['0 kR', '5 kR', '10 kR', '15 kR', '20 kR', '25+ kR'])
 end
