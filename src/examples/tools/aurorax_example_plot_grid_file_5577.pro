@@ -16,13 +16,13 @@
 
 pro aurorax_example_plot_grid_file_5577
   ; First, download and read 5 minutes of grid data
-  d = aurorax_ucalgary_download('TREX_RGB5577_GRID_MOSV001', '2023-03-24T07:34:00', '2023-03-24T07:36:00')
+  d = aurorax_ucalgary_download('TREX_RGB5577_GRID_MOSV001', '2023-03-24T07:30:00', '2023-03-24T07:40:00')
   grid_data = aurorax_ucalgary_read(d.dataset, d.filenames, start_dt = '2023-03-24T07:35:00', end_dt = '2023-03-24T07:35:00', /first_record)
   
   ; Grab the first frame and corresponding_timestamp
   grid = grid_data.data.grid
   timestamp = grid_data.metadata.timestamp
-  print, timestamp
+
   ; The fill value used for cells with no data is stored in the metadata
   fill_val = float(grid_data.metadata.file_meta.fill_value)
 

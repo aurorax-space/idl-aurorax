@@ -29,8 +29,6 @@ pro __aurorax_ucalgary_readfile_grid, $
 
   ; Convert scalar filename to length 1 array so we can 'iterate' regardless
   if isa(filename, /scalar) then filename = [filename]
-
-  print, filename
   
   ; If start_dt or end_dt were passed, we need to cut down the filenames accordingly
   if keyword_set(start_dt) or keyword_set(end_dt) then begin
@@ -129,6 +127,7 @@ pro __aurorax_ucalgary_readfile_grid, $
         
         if n_elements(grid_dims) eq 3 then begin
           if keyword_set(first_frame) then begin
+            n_frames = 1
             master_grid[*,*,frames_read_counter:frames_read_counter] = grid[*,*,0]
             master_confidence[*,*,frames_read_counter:frames_read_counter] = confidence[*,*,0]
           endif else begin
@@ -137,6 +136,7 @@ pro __aurorax_ucalgary_readfile_grid, $
           endelse
         endif else if n_elements(grid_dims) eq 4 then begin
           if keyword_set(first_frame) then begin
+            n_frames = 1
             master_grid[*,*,*,frames_read_counter:frames_read_counter] = grid[*,*,*,0]
             master_confidence[*,*,frames_read_counter:frames_read_counter] = confidence[*,*,0]
           endif else begin
@@ -148,22 +148,35 @@ pro __aurorax_ucalgary_readfile_grid, $
         endelse
           
     endif else begin
-
-      ; insert this file's data into the arrays
-      n_frames = (size(grid, /dimensions))[-1]
-
-      if n_elements(grid_dims) eq 3 then begin
-        master_grid[*,*,frames_read_counter:frames_read_counter+n_frames-1] = grid
-        master_confidence[*,*,frames_read_counter:frames_read_counter+n_frames-1] = confidence
-      endif else if n_elements(grid_dims) eq 4 then begin
-        master_grid[*,*,*,frames_read_counter:frames_read_counter+n_frames-1] = grid
-        master_confidence[*,*,frames_read_counter:frames_read_counter+n_frames-1] = confidence
+      
+      if keyword_set(first_frame) then begin
+        ; insert this file's data into the arrays
+        n_frames = 1
+        if n_elements(grid_dims) eq 3 then begin
+          master_grid[*,*,frames_read_counter:frames_read_counter+n_frames-1] = grid[*,*,0]
+          master_confidence[*,*,frames_read_counter:frames_read_counter+n_frames-1] = confidence[*,*,0]
+        endif else if n_elements(grid_dims) eq 4 then begin
+          master_grid[*,*,*,frames_read_counter:frames_read_counter+n_frames-1] = grid[*,*,*,0]
+          master_confidence[*,*,frames_read_counter:frames_read_counter+n_frames-1] = confidence[*,*,0]
+        endif else begin
+          print, '[aurorax_read] Error - Currently only 2 or 3 dimensional grids can be read in, found n_dims = '+strcompress(string(n_elements(grid_dims)),/remove_all)
+        endelse
       endif else begin
-        print, '[aurorax_read] Error - Currently only 2 or 3 dimensional grids can be read in, found n_dims = '+strcompress(string(n_elements(grid_dims)),/remove_all)
+        ; insert this file's data into the arrays
+        n_frames = (size(grid, /dimensions))[-1]
+        if n_elements(grid_dims) eq 3 then begin
+          master_grid[*,*,frames_read_counter:frames_read_counter+n_frames-1] = grid
+          master_confidence[*,*,frames_read_counter:frames_read_counter+n_frames-1] = confidence
+        endif else if n_elements(grid_dims) eq 4 then begin
+          master_grid[*,*,*,frames_read_counter:frames_read_counter+n_frames-1] = grid
+          master_confidence[*,*,frames_read_counter:frames_read_counter+n_frames-1] = confidence
+        endif else begin
+          print, '[aurorax_read] Error - Currently only 2 or 3 dimensional grids can be read in, found n_dims = '+strcompress(string(n_elements(grid_dims)),/remove_all)
+        endelse
       endelse
       
     endelse
-
+    
     ; update the number of frames we've read in
     frames_read_counter += n_frames
     
@@ -213,32 +226,14 @@ pro __aurorax_ucalgary_readfile_grid, $
 
       ; Converting hash to struct and then appending to frame meta list
       frame_meta_struct = frame_meta_hash.toStruct()
-
       master_frame_meta = [master_frame_meta, frame_meta_struct]
+      
+      ; break out of metadata reading after one frame if /first_frame is set
+      if keyword_set(first_frame) then break
     endfor
 
-    ; If first_frame_only keyword is set, slice all objects accordingly so that
-    ; only data and metadata corresponding to the first frame is returned
-    if keyword_set(first_frame) then begin
-      
-      ; Strip only the first frame from everything
-      master_grid_dims = size(master_grid, /dimensions) 
-      master_conf_dims = size(master_confidence, /dimensions)
-
-      if n_elements(master_grid_dims) eq 3 then master_grid = master_grid[*,*,0]
-      if n_elements(master_grid_dims) eq 4 then master_grid = master_grid[*,*,*,0]
-      if n_elements(master_conf_dims) eq 3 then master_confidence = master_confidence[*,*,0]
-      
-      ; Create data structure to return
-      data = {grid: master_grid, confidence: master_confidence}
-      
-      ; Create metadata structure to return
-      meta = {timestamp: timestamp[0], file_meta: file_meta, frame_meta: frame_meta_struct}
-      
-      ; Close file and skip to end of program
-      h5_close
-      goto, first_frame_jump
-    endif
+    ; If first_frame_only keyword is set, slice timestamp accordingly
+    if keyword_set(first_frame) then timestamp = timestamp[0]
 
     ; Append to master timestamp
     master_timestamp = [master_timestamp, timestamp]

@@ -21,8 +21,8 @@ pro aurorax_example_read_data
   ; set list of files to read
   f = d.filenames
 
-  ; read the data
-  data = aurorax_ucalgary_read(d.dataset, f)
+  ; read only some of the data using start_dt and end_dt
+  data = aurorax_ucalgary_read(d.dataset, f, start_dt = '2022-01-01T06:13:00', end_dt = '2022-01-01T06:40:00')
   help, data
 
   ; read the data quietly

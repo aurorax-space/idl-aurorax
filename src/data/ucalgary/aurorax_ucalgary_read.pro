@@ -253,7 +253,7 @@ function aurorax_ucalgary_read, dataset, file_list, start_dt=start_dt, end_dt=en
     __aurorax_ucalgary_readfile_grid, file_list, data, timestamp_list, metadata_list, start_dt = start_dt, end_dt = end_dt, first_frame = first_record
   endif else if (read_function eq 'trex_spect_processed') then begin
     ; read using trex spectrograph processed readfile
-    __aurorax_ucalgary_readfile_trex_spect_processed, file_list, data, timestamp_list, metadata_list, first_frame = first_record
+    __aurorax_ucalgary_readfile_trex_spect_processed, file_list, data, timestamp_list, metadata_list, start_dt = start_dt, end_dt = end_dt, first_frame = first_record
   endif
 
   ; put data into a struct

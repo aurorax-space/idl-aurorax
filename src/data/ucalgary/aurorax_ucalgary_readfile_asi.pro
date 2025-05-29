@@ -635,6 +635,8 @@ pro __aurorax_ucalgary_readfile_asi, $
   filename, $
   images, $
   metadata, $
+  start_dt = start_dt, $
+  end_dt = end_dt, $
   count = n_frames, $
   verbose = verbose, $
   very_verbose = very_verbose, $
@@ -736,7 +738,53 @@ pro __aurorax_ucalgary_readfile_asi, $
     n_files = n_elements(filenames)
   endelse
 
-  ; sort filenames
+  ; If start_dt or end_dt were passed, we need to cut down the filenames accordingly
+  if keyword_set(start_dt) or keyword_set(end_dt) then begin
+
+    if keyword_set(start_dt) then begin
+      start_yy = strmid(start_dt,0,4)
+      start_mm = strmid(start_dt,5,2)
+      start_dd = strmid(start_dt,8,2)
+      start_hr = strmid(start_dt,11,2)
+      start_mn = strmid(start_dt,14,2)
+    endif
+    if keyword_set(end_dt) then begin
+      end_yy = strmid(end_dt,0,4)
+      end_mm = strmid(end_dt,5,2)
+      end_dd = strmid(end_dt,8,2)
+      end_hr = strmid(end_dt,11,2)
+      end_mn = strmid(end_dt,14,2)
+    endif
+
+    hr_mn = []
+    foreach f, filename do begin
+      if n_elements(strsplit(f, start_yy+start_mm+start_dd+'_', /extract, /regex)) eq 1 then begin
+        hr_mn = [hr_mn, "nan"]
+      endif else begin
+        hr_mn = [hr_mn, strmid((strsplit(f, start_yy+start_mm+start_dd+'_', /extract, /regex))[-1], 0, 4)]
+      endelse
+    endforeach
+
+    start_dt_idx = where(hr_mn eq start_hr+start_mn, /null)
+    end_dt_idx = where(hr_mn eq end_hr+end_mn, /null)
+
+    ; Check that the start/end time range actually corresponds to the files passed in
+    if start_dt_idx eq !null then begin
+      print, '[aurorax_read] Error - start_dt does not correspond to any of the input filenames'
+      return
+    endif else if end_dt_idx eq !null then begin
+      print, '[aurorax_read] Error - end_dt does not correspond to any of the input filenames'
+      return
+    endif
+
+    ; if everything worked properly we can now slice out the filenames we actually want to read
+    filename = filename[start_dt_idx:end_dt_idx]
+
+  end
+  
+  n_files = n_elements(filename)
+
+; sort filenames
   if (n_elements(filenames) gt 1) then filenames = filenames[sort(filenames)]
   ; if (verbose gt 0) then print,'[aurorax_read] Reading ' + strcompress(fix(n_elements(filenames)),/remove_all) + ' files'
 
@@ -886,7 +934,7 @@ pro __aurorax_ucalgary_readfile_asi, $
     fail:
     if (isa(lun) eq 1) then free_lun, lun
   endfor
-
+  
   ; remove extra unused memory
   if (processing_mode eq 'pgm' and n_frames ge 0) then begin
     images = images[*, *, 0 : n_frames - 1]
