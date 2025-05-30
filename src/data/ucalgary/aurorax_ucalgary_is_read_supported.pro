@@ -61,7 +61,8 @@ function aurorax_ucalgary_is_read_supported, dataset_name
     'TREX_BLUE_CALIBRATION_RAYLEIGHS_IDLSAV', $
     'TREX_BLUE_CALIBRATION_FLATFIELD_IDLSAV', $
     'TREX_SPECT_RAW', $
-    'TREX_SPECT_PROCESSED_V1')
+    'TREX_SPECT_PROCESSED_V1', $
+    'TREX_SPECT_SKYMAP_IDLSAV')
 
   ; check
   supported = supported_datasets.where(dataset_name)

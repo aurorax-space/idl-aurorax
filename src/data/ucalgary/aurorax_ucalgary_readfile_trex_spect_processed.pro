@@ -177,8 +177,8 @@ pro __aurorax_ucalgary_readfile_trex_spect_processed, $
   endforeach
   
   ; Create metadata structure to return
-  meta = {timestamp: master_timestamp, wavelength: wavelength, file_meta: file_meta}
-  
+  meta = {wavelength: wavelength, file_meta: file_meta}
+  timestamp_list = master_timestamp
   ; Removing additional data frames if less frames read in than expected
   master_spectra_dims = size(master_spectra, /dimensions)
   if n_elements(master_spectra_dims) eq 3 then master_spectra = master_spectra[*,*,0:frames_read_counter-1]

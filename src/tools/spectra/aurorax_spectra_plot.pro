@@ -149,7 +149,7 @@ function aurorax_spectra_plot, $
   
   ; Pull out spectra, timestamps, wavelength from spect_data_objects
   spectra = spect_data.data.spectra
-  ts = spect_data.metadata.timestamp
+  ts = spect_data.timestamp
   wavelength = spect_data.metadata.wavelength
   
   if ~ keyword_set(xlim) then xlim = [min(wavelength, /nan), max(wavelength, /nan)]

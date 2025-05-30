@@ -68,17 +68,26 @@ function aurorax_keogram_add_axis, keogram_struct, skymap, altitude_km = altitud
   endif
 
   ; Check that skymap size matches keogram
-  if keogram_struct.axis eq 0 then begin
-    if (size(skymap.full_azimuth, /dimensions))[1] ne keo_height then begin
-      print, '[aurorax_keogram_add_axis] Error: Skymap size does not match size of'
-      return, !null
+  if keogram_struct.instrument_type eq 'asi' then begin
+    if keogram_struct.axis eq 0 then begin
+      if (size(skymap.full_azimuth, /dimensions))[1] ne keo_height then begin
+        print, '[aurorax_keogram_add_axis] Error: Skymap size does not match size of'
+        return, !null
+      endif
+    endif else begin
+      if (size(skymap.full_azimuth, /dimensions))[0] ne keo_height then begin
+        print, '[aurorax_keogram_add_axis] Error: Skymap size does not match size of'
+        return, !null
+      endif
+    endelse
+  endif else if keogram_struct.instrument_type eq 'spectrograph' then begin
+    if keogram_struct.axis eq 0 then begin
+      if (size(skymap.full_elevation, /dimensions))[0] ne keo_height then begin
+        print, '[aurorax_keogram_add_axis] Error: Skymap size does not match size of'
+        return, !null
+      endif
     endif
-  endif else begin
-    if (size(skymap.full_azimuth, /dimensions))[0] ne keo_height then begin
-      print, '[aurorax_keogram_add_axis] Error: Skymap size does not match size of'
-      return, !null
-    endif
-  endelse
+  endif
 
   ; Obtain keogram index in CCD coords
   slice_idx = keogram_struct.slice_idx
@@ -89,7 +98,14 @@ function aurorax_keogram_add_axis, keogram_struct, skymap, altitude_km = altitud
   lons = skymap.full_map_longitude
   lons[where(lons gt 180)] -= 360
   elevation = skymap.full_elevation
-
+  
+  ; Reform arrays for spectrograph so we can use the same indexing logic as for ASIs
+  if keogram_struct.instrument_type eq 'spectrograph' then begin
+    lats = reform(lats, [1, size(lats, /dimensions)])
+    lons = reform(lons, [1, size(lons, /dimensions)])
+    elevation = reform(elevation, [1, size(elevation, /dimensions)])
+  endif
+  
   ; grab ccd axis
   ccd_y = keogram_struct.ccd_y
 

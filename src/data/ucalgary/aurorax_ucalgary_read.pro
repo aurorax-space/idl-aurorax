@@ -67,6 +67,14 @@ function __reorient_skymaps, dataset_name, skymap
     skymap.full_map_latitude = reverse(skymap.full_map_latitude, 1)
     skymap.full_map_longitude = reverse(skymap.full_map_longitude, 1)
   endif
+  
+  if (dataset_name eq 'TREX_SPECT_SKYMAP_IDLSAV') then begin
+    ; flip single axis mapping variables in spectrograph skymaps as
+    ; they get read in a bit differently due to single dimension
+    skymap.full_elevation = reverse(skymap.full_elevation, 1)
+    skymap.full_map_latitude = reverse(skymap.full_map_latitude, 1)
+    skymap.full_map_longitude = reverse(skymap.full_map_longitude, 1)
+  endif
 
   ; return
   return, skymap
@@ -187,7 +195,8 @@ function aurorax_ucalgary_read, dataset, file_list, start_dt=start_dt, end_dt=en
     'THEMIS_ASI_SKYMAP_IDLSAV', $
     'TREX_NIR_SKYMAP_IDLSAV', $
     'TREX_RGB_SKYMAP_IDLSAV', $
-    'TREX_BLUE_SKYMAP_IDLSAV')
+    'TREX_BLUE_SKYMAP_IDLSAV', $
+    'TREX_SPECT_SKYMAP_IDLSAV')
   calibration_readfile_datasets = list( $
     'REGO_CALIBRATION_RAYLEIGHS_IDLSAV', $
     'REGO_CALIBRATION_FLATFIELD_IDLSAV', $

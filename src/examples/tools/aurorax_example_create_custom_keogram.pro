@@ -41,5 +41,5 @@ pro aurorax_example_create_custom_keogram
 
   ; Display the keogram, using aspect ratio to manually stretch the height, as the resuling
   ; keogram will be quite short, as we sampled 50 data points, giving a height of only 49 pixels
-  aurorax_keogram_plot, keo, title = 'Custom Keogram', location = [0, 0], dimensions = [1000, 400], aspect_ratio = 12
+  p = aurorax_keogram_plot(keo, title = 'Custom Keogram', location = [0, 0], dimensions = [1000, 400], aspect_ratio = 12)
 end
