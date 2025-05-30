@@ -67,6 +67,14 @@ function __reorient_skymaps, dataset_name, skymap
     skymap.full_map_latitude = reverse(skymap.full_map_latitude, 1)
     skymap.full_map_longitude = reverse(skymap.full_map_longitude, 1)
   endif
+  
+  if (dataset_name eq 'TREX_SPECT_SKYMAP_IDLSAV') then begin
+    ; flip single axis mapping variables in spectrograph skymaps as
+    ; they get read in a bit differently due to single dimension
+    skymap.full_elevation = reverse(skymap.full_elevation, 1)
+    skymap.full_map_latitude = reverse(skymap.full_map_latitude, 1)
+    skymap.full_map_longitude = reverse(skymap.full_map_longitude, 1)
+  endif
 
   ; return
   return, skymap
@@ -104,6 +112,10 @@ end
 ;         list of files on the local computer to read in (can also be a single filename string)
 ;
 ; :Keywords:
+;       START_DT: in, optional, String
+;         string giving the start timestamp to read data for (format: 'yyyy-mm-ddTHH:MM:SS')
+;       END_DT: in, optional, String
+;         string giving the end timestamp to read data for (format: 'yyyy-mm-ddTHH:MM:SS')
 ;       FIRST_RECORD: in, optional, Boolean
 ;         only read the first record/frame/image in each file
 ;       NO_METADATA: in, optional, Boolean
@@ -119,19 +131,51 @@ end
 ;       data = aurorax_ucalgary_read(d.dataset,f)
 ;       help,data
 ;+
-function aurorax_ucalgary_read, dataset, file_list, first_record = first_record, no_metadata = no_metadata, quiet = quiet
+function aurorax_ucalgary_read, dataset, file_list, start_dt=start_dt, end_dt=end_dt, first_record = first_record, no_metadata = no_metadata, quiet = quiet
   ; init
   timestamp_list = list()
   metadata_list = list()
   calibrated_data = ptr_new()
-
+  
   ; set keyword flags
   quiet_flag = 0
   if keyword_set(quiet) then quiet_flag = 1
 
   ; check if this dataset is supported for reading
   supported = aurorax_ucalgary_is_read_supported(dataset.name)
-
+  
+  ; check that start_dt/end_dt are valid if they are passed
+  if keyword_set(start_dt) then begin
+    ; ensure string type
+    if ~ isa(start_dt, /string) then begin
+      print, '[aurorax_read] Start timestamp of type '+typename(start_dt)+' is invalid, expected string'
+      return, !null
+    endif else if ~ isa(end_dt, /string) then begin
+        print, '[aurorax_read] End timestamp of type '+typename(end_dt)+' is invalid, expected string'
+        return, !null
+    endif
+    
+    ; ensure string format
+    if strlen(start_dt) eq 16 then start_dt += ':00'
+    if strlen(end_dt) eq 16 then end_dt += ':00'
+    if strlen(start_dt) ne strlen(end_dt) then begin
+      print, '[aurorax_read] Start and end timetsamp must have the same format'
+      print, strlen(start_dt)
+      print, strlen(end_dt)
+      return, !null
+    endif
+    if strlen(start_dt) ne 19 or strmid(start_dt,4,1) ne '-' or strmid(start_dt,7,1) ne '-' or $ 
+      strmid(start_dt,10,1) ne 'T' or strmid(start_dt,13,1) ne ':' or strmid(start_dt,16,1) ne ':' then begin
+      print, '[aurorax_read] Start timetsamp must have format "yyyy-mm-ddTHH:MM" or "yyyy-mm-ddTHH:MM:SS", received'+start_dt
+      return, !null
+    endif
+    if strlen(end_dt) ne 19 or strmid(end_dt,4,1) ne '-' or strmid(end_dt,7,1) ne '-' or $ 
+      strmid(end_dt,10,1) ne 'T' or strmid(end_dt,13,1) ne ':' or strmid(end_dt,16,1) ne ':' then begin
+      print, '[aurorax_read] End timetsamp must have format "yyyy-mm-ddTHH:MM" or "yyyy-mm-ddTHH:MM:SS", received'+end_dt
+      return, !null
+    endif
+  endif
+    
   if (supported eq 0) then begin
     print, '[aurorax_read] Dataset ''' + dataset.name + ''' not supported for reading'
     return, !null
@@ -151,7 +195,8 @@ function aurorax_ucalgary_read, dataset, file_list, first_record = first_record,
     'THEMIS_ASI_SKYMAP_IDLSAV', $
     'TREX_NIR_SKYMAP_IDLSAV', $
     'TREX_RGB_SKYMAP_IDLSAV', $
-    'TREX_BLUE_SKYMAP_IDLSAV')
+    'TREX_BLUE_SKYMAP_IDLSAV', $
+    'TREX_SPECT_SKYMAP_IDLSAV')
   calibration_readfile_datasets = list( $
     'REGO_CALIBRATION_RAYLEIGHS_IDLSAV', $
     'REGO_CALIBRATION_FLATFIELD_IDLSAV', $
@@ -180,15 +225,15 @@ function aurorax_ucalgary_read, dataset, file_list, first_record = first_record,
   if (read_function eq 'asi_images') then begin
     ; read using ASI readfile
     if (quiet_flag eq 0) then begin
-      __aurorax_ucalgary_readfile_asi, file_list, img, meta, count = n_frames, first_frame = first_record, no_metadata = no_metadata, /verbose, /show_datarate
+      __aurorax_ucalgary_readfile_asi, file_list, img, meta, start_dt = start_dt, end_dt = end_dt, count = n_frames, first_frame = first_record, no_metadata = no_metadata, /verbose, /show_datarate
     endif else begin
-      __aurorax_ucalgary_readfile_asi, file_list, img, meta, count = n_frames, first_frame = first_record, no_metadata = no_metadata
+      __aurorax_ucalgary_readfile_asi, file_list, img, meta, start_dt = start_dt, end_dt = end_dt, count = n_frames, first_frame = first_record, no_metadata = no_metadata
     endelse
 
     ; set the data
     data = img
     data = __reorient_asi_images(dataset.name, data)
-
+    
     ; set the timestamps
     for i = 0, n_elements(meta) - 1 do begin
       timestamp_list.add, meta[i].exposure_start_string
@@ -197,12 +242,16 @@ function aurorax_ucalgary_read, dataset, file_list, first_record = first_record,
     ; set metadata list
     metadata_list = meta
   endif else if (read_function eq 'skymap') then begin
+    if keyword_set(start_dt) then print, '[aurorax_read] Keyword start_dt is not valid for reading skymaps, ignoring.'
+    if keyword_set(end_dt) then print, '[aurorax_read] Keyword end_dt is not valid for reading skymaps, ignoring.'
     ; read using skymap readfile
     data = __aurorax_ucalgary_readfile_skymap(file_list, quiet_flag = quiet_flag)
     for i = 0, n_elements(data) - 1 do begin
       data[i] = __reorient_skymaps(dataset.name, data[i])
     endfor
   endif else if (read_function eq 'calibration') then begin
+    if keyword_set(start_dt) then print, '[aurorax_read] Keyword start_dt is not valid for reading calibration files, ignoring.'
+    if keyword_set(end_dt) then print, '[aurorax_read] Keyword end_dt is not valid for reading calibration files, ignoring.'
     ; read using calibration readfile
     data = __aurorax_ucalgary_readfile_calibration(file_list, quiet_flag = quiet_flag)
     for i = 0, n_elements(data) - 1 do begin
@@ -210,10 +259,10 @@ function aurorax_ucalgary_read, dataset, file_list, first_record = first_record,
     endfor
   endif else if (read_function eq 'grid') then begin
     ; read using grid readfile
-    __aurorax_ucalgary_readfile_grid, file_list, data, timestamp_list, metadata_list, first_frame = first_record
+    __aurorax_ucalgary_readfile_grid, file_list, data, timestamp_list, metadata_list, start_dt = start_dt, end_dt = end_dt, first_frame = first_record
   endif else if (read_function eq 'trex_spect_processed') then begin
     ; read using trex spectrograph processed readfile
-    __aurorax_ucalgary_readfile_trex_spect_processed, file_list, data, timestamp_list, metadata_list, first_frame = first_record
+    __aurorax_ucalgary_readfile_trex_spect_processed, file_list, data, timestamp_list, metadata_list, start_dt = start_dt, end_dt = end_dt, first_frame = first_record
   endif
 
   ; put data into a struct

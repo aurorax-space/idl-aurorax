@@ -21,13 +21,15 @@ pro aurorax_example_spectrograph_reading
   ; the dataset names we want to use
   d = aurorax_ucalgary_download('TREX_SPECT_RAW', '2019-01-01T06:00:00', '2019-01-01T06:59:59', site_uid = 'luck')
   f = d.filenames
-  data = aurorax_ucalgary_read(d.dataset, f)
-  help, data
+  
+  data = aurorax_ucalgary_read(d.dataset, f, /first_record, start_dt = '2019-01-01T06:20:00', end_dt = '2019-01-01T06:40:00')
+  help, data.data
   data = aurorax_ucalgary_read(d.dataset, f[0], /quiet)
-  help, data
-
+  help, data.data
+  
   d = aurorax_ucalgary_download('TREX_SPECT_PROCESSED_V1', '2019-01-01T06:00:00', '2019-01-01T06:59:59', site_uid = 'luck')
   f = d.filenames
   data = aurorax_ucalgary_read(d.dataset, f)
-  help, data
+  help, data.data
+  
 end

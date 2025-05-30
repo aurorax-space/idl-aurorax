@@ -47,9 +47,9 @@
 ;         labels elevation angles on the y-axis (axis must exist in keogram structure)
 ;
 ; :Examples:
-;       aurorax_keogram_plot, keo, title="Geographic", /geo, location=[0,0], dimensions=[1000,400]
+;       p = aurorax_keogram_plot(keo, title="Geographic", /geo, location=[0,0], dimensions=[1000,400])
 ;+
-pro aurorax_keogram_plot, $
+function aurorax_keogram_plot, $
   keogram_struct, $
   geo = geo, $
   mag = mag, $
@@ -64,21 +64,21 @@ pro aurorax_keogram_plot, $
   axis_keywords = [keyword_set(geo), keyword_set(mag), keyword_set(elev)]
   if total(axis_keywords) gt 1 then begin
     print, '[aurorax_keogram_plot] Error: Only one of ''/geo'', ''/mag'', ''/elev'' may be set'
-    goto, error_jump
+    return, !null
   endif
 
   ; Make sure desired axis exists
   if keyword_set(geo) and where('GEO_Y' eq tag_names(keogram_struct), /null) eq !null then begin
     print, '[aurorax_keogram_plot] Error: Keyword ''/geo'' was set, but input keogram has no geographic axis. Use aurorax_keogram_add_axis().'
-    goto, error_jump
+    return, !null
   endif
   if keyword_set(mag) and where('MAG_Y' eq tag_names(keogram_struct), /null) eq !null then begin
     print, '[aurorax_keogram_plot] Error: Keyword ''/mag'' was set, but input keogram has no magnetic axis. Use aurorax_keogram_add_axis().'
-    goto, error_jump
+    return, !null
   endif
   if keyword_set(elev) and where('ELEV_Y' eq tag_names(keogram_struct), /null) eq !null then begin
     print, '[aurorax_keogram_plot] Error: Keyword ''/elev'' was set, but input keogram has no elevation axis. Use aurorax_keogram_add_axis().'
-    goto, error_jump
+    return, !null
   endif
 
   ; Select desired axis
@@ -119,10 +119,10 @@ pro aurorax_keogram_plot, $
   if not isa(y_tick_interval) then y_tick_interval = 50
 
   ; Create the plot
-  w = window(dimensions = dimensions, location = location)
+  w = window(dimensions = dimensions, location = location, margin=0)
 
   if not keyword_set(colortable) then colortable = 0
-  keo_image = image(keo_arr, /current, axis_style = 4, aspect_ratio = aspect, rgb_table = colortable)
+  keo_image = image(keo_arr, /current, axis_style = 4, aspect_ratio = aspect, rgb_table = colortable, margin=0.1)
   if keyword_set(title) and isa(title, /string) then keo_image.title = title
 
   ; Create the x axis (time)
@@ -160,5 +160,7 @@ pro aurorax_keogram_plot, $
   y_axis.title = y_title
 
   custom_keogram_jump:
-  error_jump:
+  
+  ; return function graphic
+  return, keo_image
 end

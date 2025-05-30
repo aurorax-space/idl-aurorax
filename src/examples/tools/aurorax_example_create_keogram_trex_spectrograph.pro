@@ -1,0 +1,87 @@
+; -------------------------------------------------------------
+; Copyright 2024 University of Calgary
+;
+; Licensed under the Apache License, Version 2.0 (the "License");
+; you may not use this file except in compliance with the License.
+; You may obtain a copy of the License at
+;
+; http://www.apache.org/licenses/LICENSE-2.0
+;
+; Unless required by applicable law or agreed to in writing, software
+; distributed under the License is distributed on an "AS IS" BASIS,
+; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+; See the License for the specific language governing permissions and
+; limitations under the License.
+; -------------------------------------------------------------
+
+pro aurorax_example_create_keogram_trex_spectrograph
+
+  ; First, read one hour of processed (L1) spectrograph data
+  d = aurorax_ucalgary_download('TREX_SPECT_PROCESSED_V1', '2021-02-16T09:00', '2021-02-16T09:59', site_uid = 'rabb')
+  spect_data = aurorax_ucalgary_read(d.dataset, d.filenames)
+  
+  ; To create a keogram for spectrograph data, we need to pull out the spectral data, the timestamps, and the wavelengths
+  spectra =  spect_data.data.spectra
+  timestamps = spect_data.timestamp
+  wavelengths= spect_data.metadata.wavelength
+  
+  ; Call the keogram create function, with some additional arguments. The /spectra keyword
+  ; tells the function that specrograph data is being passed in, which also requires a 
+  ; wavelength array to be supplied
+  keogram = aurorax_keogram_create(spectra, timestamps, /spectra, wavelength=wavelengths)
+  
+  ; Like any other keogram, f you wanted to further manipulate or manually plot the keogram
+  ; array, you can grab it like this:
+  keo_arr = keogram.data
+  
+  ; Plot with aurorax function
+  p = aurorax_keogram_plot(keogram, location = [0, 0], title = 'TREx Spectrograph Keogram - 557.7 nm', $
+                           dimensions = [1000, 400], aspect_ratio=0.35, x_tick_interval=40, colortable=8)
+                           
+
+  ; For the above keogram, we did not specify which emission to pull from the spectrograph data
+  ; in creating the keogram, and so the default 557.7 nm greenline emission was used.
+  
+  ; You might want to make several keograms of the different available spect_emission keyword options
+  ; which allow you to automatically create keograms for the HBeta, blueline, greenline, and redline emissions
+  
+  ; First, create a keogram of each emission
+  keo_hbeta = aurorax_keogram_create(spectra, timestamps, /spectra, wavelength=wavelengths, spect_emission='hbeta')
+  keo_blue = aurorax_keogram_create(spectra, timestamps, /spectra, wavelength=wavelengths, spect_emission='blue')
+  keo_green = aurorax_keogram_create(spectra, timestamps, /spectra, wavelength=wavelengths, spect_emission='green')
+  keo_red = aurorax_keogram_create(spectra, timestamps, /spectra, wavelength=wavelengths, spect_emission='red')
+  
+  ; Plot each keogram... You may want to add a colorbar, since these keograms are in units of Rayleighs
+  p_hbeta = aurorax_keogram_plot(keo_hbeta, location = [0, 200], title = '486.1 nm', $
+                           dimensions = [800, 400], aspect_ratio=0.35, x_tick_interval=40, colortable=0)
+  legend_tickval_str = strcompress(string(ulong(findgen(6, start=0, increment=max(keo_hbeta.data)/5.0))),/remove_all)
+  legend_hbeta = colorbar(target=p_hbeta, title='Intensity (Rayleighs)', position=[0.6,0.9,0.9,0.95], tickname=legend_tickval_str)
+  
+  p_blue = aurorax_keogram_plot(keo_blue, location = [850, 200], title = '427.8 nm', $
+                           dimensions = [800, 400], aspect_ratio=0.35, x_tick_interval=40, colortable=1)
+  legend_tickval_str = strcompress(string(ulong(findgen(6, start=0, increment=max(keo_blue.data)/5.0))),/remove_all)
+  legend_blue = colorbar(target=p_blue, title='Intensity (Rayleighs)', position=[0.6,0.9,0.9,0.95], tickname=legend_tickval_str)
+                           
+  p_green = aurorax_keogram_plot(keo_green, location = [0, 1000], title = '557.7 nm', $
+                           dimensions = [800, 400], aspect_ratio=0.35, x_tick_interval=40, colortable=8)
+  legend_tickval_str = strcompress(string(ulong(findgen(6, start=0, increment=max(keo_green.data)/5.0))),/remove_all)
+  legend_green = colorbar(target=p_green, title='Intensity (Rayleighs)', position=[0.6,0.9,0.9,0.95], tickname=legend_tickval_str)
+                           
+  p_red = aurorax_keogram_plot(keo_red, location = [850, 1000], title = '630.0 nm', $
+                           dimensions = [800, 400], aspect_ratio=0.35, x_tick_interval=40, colortable=3)
+  legend_tickval_str = strcompress(string(ulong(findgen(6, start=0, increment=max(keo_red.data)/5.0))),/remove_all)
+  legend_red = colorbar(target=p_red, title='Intensity (Rayleighs)', position=[0.6,0.9,0.9,0.95], tickname=legend_tickval_str)
+  
+  
+  ; As with an ASI image, you may want to georefernce the axis, which can be done as usual:
+  ; 
+  ; Download and read the corresponding skymap
+  d = aurorax_ucalgary_download_best_skymap('TREX_SPECT_SKYMAP_IDLSAV', 'rabb', '2021-02-16T09:00')
+  skymap_data = aurorax_ucalgary_read(d.dataset, d.filenames)
+  skymap = skymap_data.data[0]
+
+  ; Add geographic and elevation axes to the keogram object
+  keo_red = aurorax_keogram_add_axis(keo_red, skymap, /geo, /elev, altitude_km = 110)
+  p_red = aurorax_keogram_plot(keo_red, location = [900, 0], title = '630.0 nm (Georeferenced)', /geo, $
+                          dimensions = [1000, 500], aspect_ratio=0.35, x_tick_interval=40, colortable=3)
+end

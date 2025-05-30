@@ -95,11 +95,13 @@ function aurorax_ccd_contour, $
   if isa(constant_azimuth) then begin
     if not isa(constant_azimuth, /scalar) then begin
       print, '[aurorax_ccd_contour] Error: constant_azimuth must be a scalar.'
+      return, !null
     endif
 
     ; check that azimuth is valid
     if constant_azimuth lt 0 or constant_azimuth gt 360 then begin
       print, '[aurorax_ccd_contour] Error: constant_azimuth must be in the range (0,360).'
+      return, !null
     endif
     if constant_azimuth eq 360 then const_az = 0 else const_az = constant_azimuth
 
@@ -138,11 +140,13 @@ function aurorax_ccd_contour, $
   if isa(constant_elevation) then begin
     if not isa(constant_elevation, /scalar) then begin
       print, '[aurorax_ccd_contour] Error: constant_elevation must be a scalar.'
+      return, !null
     endif
 
     ; check that elevation is valid
     if constant_elevation lt 0 or constant_elevation gt 90 then begin
       print, '[aurorax_ccd_contour] Error: constant_elevation must be in the range (0,90).'
+      return, !null
     endif
 
     ; pull az and el arrays from skymap
@@ -190,11 +194,13 @@ function aurorax_ccd_contour, $
   if isa(constant_lat) then begin
     if not isa(constant_lat, /scalar) then begin
       print, '[aurorax_ccd_contour] Error: constant_lat must be a scalar.'
+      return, !null
     endif
 
     ; check that latitude is valid
     if constant_lat lt -90 or constant_lat gt 90 then begin
       print, '[aurorax_ccd_contour] Error: constant_lat must be in the range (-90,90).'
+      return, !null
     endif
 
     ; grab necessary data from skymap
@@ -219,11 +225,13 @@ function aurorax_ccd_contour, $
   if isa(constant_lon) then begin
     if not isa(constant_lon, /scalar) then begin
       print, '[aurorax_ccd_contour] Error: constant_lon must be a scalar.'
+      return, !null
     endif
 
     ; check that latitude is valid
     if constant_lon lt -180 or constant_lon gt 180 then begin
       print, '[aurorax_ccd_contour] Error: constant_lon must be in the range (-180,180).'
+      return, !null
     endif
 
     ; grab necessary data from skymap
@@ -243,7 +251,8 @@ function aurorax_ccd_contour, $
     result = [[x_list], [y_list]]
     if result eq !null then begin
       print, '[aurorax_ccd_contour] Error: could not obtain any CCD coordinates within provided skymap. Please ensure ' + $
-        'that valid coordinates for this skymap are being used.'
+             'that valid coordinates for this skymap are being used.'
+      return, !null
     endif else return, result
   endif
 
@@ -257,7 +266,8 @@ function aurorax_ccd_contour, $
     result = [[x_list], [y_list]]
     if result eq !null then begin
       print, '[aurorax_ccd_contour] Error: could not obtain any CCD coordinates within provided skymap. Please ensure ' + $
-        'that valid coordinates for this skymap are being used.'
+             'that valid coordinates for this skymap are being used.'
+      return, !null
     endif else return, result
   endif
 end

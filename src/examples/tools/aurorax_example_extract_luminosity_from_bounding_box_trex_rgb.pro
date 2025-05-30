@@ -20,7 +20,7 @@ pro aurorax_example_extract_luminosity_from_bounding_box_trex_rgb
 
   ; Read the image data
   image_data = aurorax_ucalgary_read(d.dataset, d.filenames)
-
+  
   ; Download best matching skymap for the given site and timestamp
   d = aurorax_ucalgary_download_best_skymap('TREX_RGB_SKYMAP_IDLSAV', 'gill', '2021-11-04T03:00:00')
 

@@ -41,6 +41,6 @@ pro aurorax_example_create_keogram_rego
   keo = aurorax_keogram_add_axis(keo, skymap, /geo, /elev, altitude_km = 115)
 
   ; Plot with aurorax function
-  aurorax_keogram_plot, keo, title = 'Geographic', /geo, location = [0, 0], dimensions = [1000, 400], colortable = 3
-  aurorax_keogram_plot, keo, title = 'Elevation', /elev, location = [0, 420], dimensions = [1000, 400], colortable = 3
+  p1 = aurorax_keogram_plot(keo, title = 'Geographic', /geo, location = [0, 0], dimensions = [1000, 400], colortable = 3)
+  p2 = aurorax_keogram_plot(keo, title = 'Elevation', /elev, location = [0, 420], dimensions = [1000, 400], colortable = 3)
 end

@@ -14,21 +14,77 @@
 ; limitations under the License.
 ; -------------------------------------------------------------
 
-pro __aurorax_ucalgary_readfile_trex_spect_processed, file_path, data, timestamp_list, meta, first_frame = first_frame, verbose = verbose
+pro __aurorax_ucalgary_readfile_trex_spect_processed, $
+  filename, $
+  data, $
+  timestamp_list, $
+  meta, $
+  start_dt = start_dt, $
+  end_dt = end_dt, $
+  first_frame = first_frame, $
+  verbose = verbose
   compile_opt hidden
 
   ; set verbose
   if not isa(verbose) then verbose = 1
+  
+  ; Convert scalar filename to length 1 array so we can 'iterate' regardless
+  if isa(filename, /scalar) then filename = [filename]
 
+  ; If start_dt or end_dt were passed, we need to cut down the filenames accordingly
+  if keyword_set(start_dt) or keyword_set(end_dt) then begin
+
+    if keyword_set(start_dt) then begin
+      start_yy = strmid(start_dt,0,4)
+      start_mm = strmid(start_dt,5,2)
+      start_dd = strmid(start_dt,8,2)
+      start_hr = strmid(start_dt,11,2)
+    endif
+    if keyword_set(end_dt) then begin
+      end_yy = strmid(end_dt,0,4)
+      end_mm = strmid(end_dt,5,2)
+      end_dd = strmid(end_dt,8,2)
+      end_hr = strmid(end_dt,11,2)
+    endif
+
+    hr_only = []
+    foreach f, filename do begin
+      if n_elements(strsplit(f, start_yy+start_mm+start_dd+'_', /extract, /regex)) eq 1 then begin
+        hr_only = [hr_only, "nan"]
+      endif else begin
+        hr_only = [hr_only, strmid((strsplit(f, start_yy+start_mm+start_dd+'_', /extract, /regex))[-1], 0, 2)]
+      endelse
+    endforeach
+
+    start_dt_idx = where(hr_only eq start_hr, /null)
+    end_dt_idx = where(hr_only eq end_hr, /null)
+    
+    
+    ; Check that the start/end time range actually corresponds to the files passed in
+    if start_dt_idx eq !null then begin
+      print, '[aurorax_read] Error - start_dt does not correspond to any of the input filenames'
+      return
+    endif else if end_dt_idx eq !null then begin
+      print, '[aurorax_read] Error - end_dt does not correspond to any of the input filenames'
+      return
+    endif
+
+    ; if everything worked properly we can now slice out the filenames we actually want to read
+    filename = filename[start_dt_idx:end_dt_idx]
+
+  end
+  filename = filename.toarray()
+
+  n_files = n_elements(filename)
+  if (n_files gt 1) then filename = filename[sort(filename)]
+  
   ; setting up master lists to hold data for multi-file reading
   master_timestamp = []
   master_file_meta = []
-  master_wavelength = []
+  frames_read_counter = 0ul
 
-  ; convert scalar filename to length 1 array so we can 'iterate' regardless
-  if isa(file_path, /scalar) then file_path = [file_path]
+  foreach f, filename, file_num do begin
 
-  foreach f, file_path do begin
     ; init
     if (verbose gt 0) then print, '[aurorax_read] Reading file: ' + f
 
@@ -42,13 +98,13 @@ pro __aurorax_ucalgary_readfile_trex_spect_processed, file_path, data, timestamp
     ;
     ; NOTE: only read it in if we don't already have it (since it doesn't
     ; change from one file to the next)
-    if (n_elements(master_wavelength) eq 0) then begin
+    if ~ isa(wavelength) then begin
       wavelength_dataset_id = h5d_open(data_group_id, 'wavelength')
-      master_wavelength = h5d_read(wavelength_dataset_id)
+      wavelength = h5d_read(wavelength_dataset_id)
     endif
 
     ; transposing the spectra data for proper IDL dimensionality
-    spectra = reverse(transpose(spectra, [1, 2, 0]), 2)
+    spectra = transpose(spectra, [1, 2, 0])
 
     ; the returned 'meta' variable will be an IDL structure that contains the
     ; file level metadata, the wavelength data, as well as the 'timestamp' and
@@ -73,36 +129,61 @@ pro __aurorax_ucalgary_readfile_trex_spect_processed, file_path, data, timestamp
       attribute = h5a_read(attribute_id)
       file_meta_hash[attribute_name] = attribute
     endfor
-    file_meta = file_meta_hash.toStruct()
-    master_file_meta = [master_file_meta, file_meta]
-
-    ; if first_frame_only keyword is set, slice all objects accordingly so that
-    ; only data and metadata corresponding to the first frame is returned
-    if keyword_set(first_frame) then begin
-      spectra = spectra[*, *, 0]
-      timestamp = timestamp[0]
-      file_meta = file_meta[0]
-    endif
+    
+    if ~ isa(file_meta) then file_meta = file_meta_hash.toStruct()
 
     ; append to spectra array
     master_shape = size(master_spectra, /dimensions)
-    spectra_shape = size(spectra, /dimensions)
-    new_nframes = master_shape[-1] + spectra_shape[-1]
-    if isa(master_spectra) then begin
-      master_spectra = reform([reform(master_spectra, master_spectra.length), $
-        reform(spectra, spectra.length)], [master_shape[0 : n_elements(master_shape) - 2], new_nframes])
+    spectra_dims = size(spectra, /dimensions)    
+    if file_num eq 0 then begin
+      
+      ; allocate memory for spectra data assuming 240 frames per file (will be trimmed at the end)
+      predicted_n_frames = 240 * n_files
+      master_spectra = make_array([spectra_dims[0:n_elements(spectra_dims)-2], predicted_n_frames], type=size(spectra, /type))
+      
+      ; insert the first file's data into the newly allocated arrays
+      n_frames = (size(spectra, /dimensions))[-1]
+      if keyword_set(first_frame) then begin
+        n_frames = 1
+        master_spectra[*,*,frames_read_counter:frames_read_counter] = spectra[*,*,0]
+      endif else begin
+        master_spectra[*,*,frames_read_counter:frames_read_counter+n_frames-1] = spectra
+      endelse
+      
     endif else begin
-      master_spectra = spectra
-    endelse
+      
+      if keyword_set(first_frame) then begin
+        ; insert this file's data into the arrays
+        n_frames = 1
+        master_spectra[*,*,frames_read_counter:frames_read_counter+n_frames-1] = spectra[*,*,0]
+      endif else begin
+        ; insert this file's data into the arrays
+        n_frames = (size(spectra, /dimensions))[-1]
+        master_spectra[*,*,frames_read_counter:frames_read_counter+n_frames-1] = spectra
+      endelse
 
+    endelse
+      
+    ; update the number of frames we've read in
+    frames_read_counter += n_frames
+    
+    if keyword_set(first_frame) then timestamp = timestamp[0]
+    
     ; append to timestamp
     master_timestamp = [master_timestamp, timestamp]
 
     ; close file
     h5_close
   endforeach
-
-  ; creating the meta struct that is to be returned
-  meta = {timestamp: master_timestamp, wavelength: master_wavelength, file_meta: master_file_meta}
+  
+  ; Create metadata structure to return
+  meta = {wavelength: wavelength, file_meta: file_meta}
+  timestamp_list = master_timestamp
+  ; Removing additional data frames if less frames read in than expected
+  master_spectra_dims = size(master_spectra, /dimensions)
+  if n_elements(master_spectra_dims) eq 3 then master_spectra = master_spectra[*,*,0:frames_read_counter-1]
+  
+  ; Create data structure to return
   data = {spectra: master_spectra}
+  
 end
