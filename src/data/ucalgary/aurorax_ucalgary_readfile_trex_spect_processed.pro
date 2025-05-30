@@ -104,7 +104,7 @@ pro __aurorax_ucalgary_readfile_trex_spect_processed, $
     endif
 
     ; transposing the spectra data for proper IDL dimensionality
-    spectra = reverse(transpose(spectra, [1, 2, 0]), 2)
+    spectra = transpose(spectra, [1, 2, 0])
 
     ; the returned 'meta' variable will be an IDL structure that contains the
     ; file level metadata, the wavelength data, as well as the 'timestamp' and

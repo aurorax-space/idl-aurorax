@@ -25,7 +25,7 @@ pro aurorax_example_plot_grid_file_8446
 
   ; The fill value used for cells with no data is stored in the metadata
   fill_val = float(grid_data.metadata.file_meta[0].fill_value)
-
+  
   ; To plot the grid on top of a map, we need to make all cells that contain no data
   ; transparent. To do so, we simply conver the image array to an RGBA image, and set all
   ; values where the array equals the fill value, to the maximum transparency. This is
