@@ -74,15 +74,21 @@ pro aurorax_mosaic_plot, $
     print, '[aurorax_mosaic_plot] Error: ''prepped_data'' must be either a hash (return value of aurorax_mosaic_prep_data) or a list/array of hashes.'
     goto, error_jump
   endif
-  
+
   ; Check that mosaic_dt is the proper format
-  if strlen(mosaic_dt) ne 19 or strmid(mosaic_dt,4,1) ne '-' or strmid(mosaic_dt,7,1) ne '-' or strmid(mosaic_dt,10,1) ne 'T' or strmid(mosaic_dt,13,1) ne ':' or strmid(mosaic_dt,16,1) ne ':' then begin
-    print, '[aurorax_mosaic_plot] Error: ensure that ''mosaic_dt'' is passed in with the proper format ''yyyy-mm-ddTHH:MM:SS'
-    goto, error_jump
-  endif else begin
+  if strlen(mosaic_dt) eq 19 and strmid(mosaic_dt,4,1) eq '-' and strmid(mosaic_dt,7,1) eq '-' and strmid(mosaic_dt,10,1) eq 'T' and strmid(mosaic_dt,13,1) eq ':' and strmid(mosaic_dt,16,1) eq ':' then begin
+   ; strip datetime to match metadata for searching later
+    formatted_mosaic_dt = strjoin(strsplit(mosaic_dt, 'T', /extract), ' ')
+    mosaic_dt_julday = julday(fix(strmid(mosaic_dt,5,2)), fix(strmid(mosaic_dt,8,2)), fix(strmid(mosaic_dt,0,4)), fix(strmid(mosaic_dt,11,2)), fix(strmid(mosaic_dt,14,2)), fix(strmid(mosaic_dt,17,2)))
+  endif else if strmid(mosaic_dt,4,1) eq '-' and strmid(mosaic_dt,7,1) eq '-' and strmid(mosaic_dt,10,1) eq 'T' and strmid(mosaic_dt,13,1) eq ':' and strmid(mosaic_dt,16,1) eq ':' and strmid(mosaic_dt,19,1) eq '.' then begin
     ; strip datetime to match metadata for searching later
     formatted_mosaic_dt = strjoin(strsplit(mosaic_dt, 'T', /extract), ' ')
+    mosaic_dt_julday = julday(fix(strmid(mosaic_dt,5,2)), fix(strmid(mosaic_dt,8,2)), fix(strmid(mosaic_dt,0,4)), fix(strmid(mosaic_dt,11,2)), fix(strmid(mosaic_dt,14,2)), float(strmid(mosaic_dt,17,5)))
+  endif else begin
+    print, '[aurorax_mosaic_plot] Error: ensure that ''mosaic_dt'' is passed in with the proper format ''yyyy-mm-ddTHH:MM:SS'' or ''yyyy-mm-ddTHH:MM:SS.MS'''
+    goto, error_jump
   endelse
+  
   ; Check type of prepped_skymaps
   if typename(prepped_skymaps) eq 'HASH' then begin
     prepped_skymaps = [prepped_skymaps]
@@ -257,10 +263,15 @@ pro aurorax_mosaic_plot, $
         width = ((data['images_dimensions'])[site])[0]
         height = ((data['images_dimensions'])[site])[1]
   
-        ; Grab the timestamp for this frame/site, and determine n_channels
-        frame_idx = where(data['timestamps'] eq formatted_mosaic_dt, /null)
-        if frame_idx eq !null then begin
-          print, '[aurorax_mosaic_plot] Warning: could not find timestamp '+mosaic_dt+ $
+        ; Grab the closest timestamp for this frame/site, and determine n_channels
+        tts = data['timestamps']
+        data_juldays = julday(fix(strmid(tts,5,2)), fix(strmid(tts,8,2)), fix(strmid(tts,0,4)), fix(strmid(tts,11,2)), fix(strmid(tts,14,2)), float(strmid(tts,17,5)))
+        diff_julday = min(abs(data_juldays-mosaic_dt_julday))
+        frame_idx = (where(abs(data_juldays-mosaic_dt_julday) eq diff_julday, /null))[0]
+
+        ; check that the found timestamp is reasonably close (within one minute) to the requested timestamp
+        if diff_julday gt (julday(1,1,1,1,1)-julday(1,1,1,1,0)) then begin
+          print, '[aurorax_mosaic_plot] Warning: could not find timestamp within 1 minute of '+mosaic_dt+ $
                  ' in data for site: '+site
           continue
         endif
@@ -294,10 +305,15 @@ pro aurorax_mosaic_plot, $
         ; set image dimensions
         height = ((data['images_dimensions'])[site])[0]
 
-        ; Grab the timestamp for this frame/site, and determine n_channels
-        frame_idx = where(data['timestamps'] eq formatted_mosaic_dt, /null)
-        if frame_idx eq !null then begin
-          print, '[aurorax_mosaic_plot] Warning: could not find timestamp '+mosaic_dt+ $
+        ; Grab the closest timestamp for this frame/site, and determine n_channels
+        tts = data['timestamps']
+        data_juldays = julday(fix(strmid(tts,5,2)), fix(strmid(tts,8,2)), fix(strmid(tts,0,4)), fix(strmid(tts,11,2)), fix(strmid(tts,14,2)), float(strmid(tts,17,5)))
+        diff_julday = min(abs(data_juldays-mosaic_dt_julday))
+        frame_idx = (where(abs(data_juldays-mosaic_dt_julday) eq diff_julday, /null))[0]
+        
+        ; check that the found timestamp is reasonably close (within one minute) to the requested timestamp
+        if diff_julday gt (julday(1,1,1,1,1)-julday(1,1,1,1,0)) then begin
+          print, '[aurorax_mosaic_plot] Warning: could not find timestamp within 1 minute of '+mosaic_dt+ $
                  ' in data for site: '+site
           continue
         endif

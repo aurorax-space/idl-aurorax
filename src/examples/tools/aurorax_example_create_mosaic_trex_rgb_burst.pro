@@ -14,7 +14,7 @@
 ; limitations under the License.
 ; -------------------------------------------------------------
 
-pro aurorax_example_create_mosaic_trex_rgb
+pro aurorax_example_create_mosaic_trex_rgb_burst
   ; Initialize list to hold image data and skymaps
   image_list = list()
   skymap_list = list()
@@ -23,10 +23,28 @@ pro aurorax_example_create_mosaic_trex_rgb
   date_time = '2023-02-24T06:15:00'
 
   ; Iterate through sites we want to included in the mosaic
-  foreach site, ['yknf', 'gill', 'rabb'] do begin
+  foreach site, ['gill', 'rabb'] do begin
     ; download and read image data for this site and add to list
-    d = aurorax_ucalgary_download('TREX_RGB_RAW_NOMINAL', date_time, date_time, site_uid = site)
+    d = aurorax_ucalgary_download('TREX_RGB_RAW_BURST', date_time, date_time, site_uid = site)
     image_data = aurorax_ucalgary_read(d.dataset, d.filenames)
+    
+    ; OPTIONALLY MANUALLY SPLIT BURST DATA INTO SMALLER CHUNKS
+    ; A single minute of burst data will be quite large (~3 Hz * 60 s = ~180 Frames)
+    ; If you are struggling/concerned with memory constraints, it is advised
+    ; to split up and only work with smaller chunks of burst data. This may or may
+    ; not be necessary depending on your available computational resources.
+
+    ; For the sake of this tutorial, let's slice out the first 25 frames. For consistency
+    ; we slice the image data, the metadata, and the timestamps identically. In this case
+    ; we will be preparing 25 frames / ~3 Hz = ~8.33 s of data. Beginning at the first frame
+    ; for our given timestamp, this means we will prepare mosaic data for ~ 06:15:00.00-06:15:08.33 UTC
+
+    ; Regardless, if you are only interested in a specific timeframe,
+    ; doing this will speed up data-processing
+    image_data.data = image_data.data[0:25]
+    image_data.timestamp = image_data.timestamp[0:25]
+    image_data.metadata = image_data.metadata[0:25]
+    
     image_list.add, image_data
 
     ; download and read the correct skymap for this site and add to list
@@ -40,7 +58,7 @@ pro aurorax_example_create_mosaic_trex_rgb
   altitude_km = 110
   prepped_images = aurorax_mosaic_prep_images(image_list)
   prepped_skymaps = aurorax_mosaic_prep_skymap(skymap_list, altitude_km)
-
+  
   ; Now, we need to create a direct graphics map that the data can be plotted
   ; onto. Using, the map_set procedure (see IDL docs for info), create the map
   ; however you'd like. Below is an example
@@ -73,7 +91,7 @@ pro aurorax_example_create_mosaic_trex_rgb
   ;
   ; Note that the mosaic plotting function in AuroraX will search for the timestamp in the prepared
   ; data that is *closest* and within one-minute to the requested timestamp.
-  mosaic_dt = '2023-02-24T06:15:00'
+  mosaic_dt = '2023-02-24T06:15:00.78'
 
   ; Plot some gridlines
   gridline_color = aurorax_get_decomposed_color([0, 0, 0])
@@ -85,7 +103,23 @@ pro aurorax_example_create_mosaic_trex_rgb
   aurorax_mosaic_plot, prepped_images, prepped_skymaps, mosaic_dt, intensity_scales = scale
 
   ; Plot some text on top
-  xyouts, 0.01, 0.9, 'TREx RGB', /normal, font = 1, charsize = 6
-  xyouts, 0.01, 0.085, strmid(image_data.timestamp[0], 0, 10), /normal, font = 1, charsize = 5
-  xyouts, 0.01, 0.01, strmid(image_data.timestamp[0], 11, 8) + ' UTC', /normal, font = 1, charsize = 5
+  xyouts, 0.01, 0.9, 'TREx RGB - Burst Mode', /normal, font = 1, charsize = 6
+  xyouts, 0.01, 0.085, strmid(mosaic_dt, 0, 10), /normal, font = 1, charsize = 5
+  xyouts, 0.01, 0.01, strmid(mosaic_dt, 11, 11) + ' UTC', /normal, font = 1, charsize = 5
 end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
