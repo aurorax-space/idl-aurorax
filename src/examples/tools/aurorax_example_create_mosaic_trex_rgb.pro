@@ -69,8 +69,8 @@ pro aurorax_example_create_mosaic_trex_rgb
   ; the same - alternatively, one can use a hash to scale images on a per-site basis
   scale = [10, 105]
 
-  ; Plot the first frame
-  image_idx = 0
+  ; Pick which time within the prepared data that you'd like to plot
+  mosaic_dt = '2023-02-24T06:15:00'
 
   ; Plot some gridlines
   gridline_color = aurorax_get_decomposed_color([0, 0, 0])
@@ -79,7 +79,7 @@ pro aurorax_example_create_mosaic_trex_rgb
   aurorax_mosaic_oplot, constant_lats = clats, constant_lons = clons, color = gridline_color, linestyle = 2, thick = 2
 
   ; Call the mosaic creation function to plot the mosaic in the current window
-  aurorax_mosaic_plot, prepped_images, prepped_skymaps, image_idx, intensity_scales = scale
+  aurorax_mosaic_plot, prepped_images, prepped_skymaps, mosaic_dt, intensity_scales = scale
 
   ; Plot some text on top
   xyouts, 0.01, 0.9, 'TREx RGB', /normal, font = 1, charsize = 6

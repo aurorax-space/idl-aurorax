@@ -118,13 +118,66 @@ end
 ; :Examples:
 ;       prepped_data = aurorax_prep_images(list(aurorax_ucalgary_read(d.dataset, d.filenames)))
 ;+
-function aurorax_mosaic_prep_images, image_list
+function aurorax_mosaic_prep_images, $
+  image_list, $
+  spect_emission = spect_emission, $
+  spect_band_signal = spect_band_signal, $
+  spect_band_bg = spect_band_bg
+  
   ; Verify that image_list is indeed a list, not array
   if (typename(image_list) ne 'LIST') then begin
     print, '[aurorax_mosaic_prep_images] Error: image_list must be a list, i.e. ''list(img_data_1, img_data_2, ...)''.'
     return, !null
   endif
+  
+  ; check that input emissions are valid
+  if keyword_set(spect_emission) and (keyword_set(spect_band_signal) or keyword_set(spect_band_bg))then begin
+    print, '[aurorax_spectra_get_intensity] Error: only one of ''spect_emission'' and ''spect_band_signal''/''spect_band_bg'' may be set'
+    return, !null
+  endif else if ~ keyword_set(spect_emission) and ~ keyword_set(spect_band_signal) then begin
+    spect_emission = 'green'
+  endif else if keyword_set(spect_emission) then begin
+    if ~ isa(spect_emission, /string) then begin
+      print, '[aurorax_spectra_get_intensity] Error: ''spect_emission'' must be a string'
+      return, !null
+    endif
+    if where(['hbeta', 'blue', 'green', 'red'] eq spect_emission, /null) eq !null then begin
+      print, '[aurorax_spectra_get_intensity] Error: input spect_emission='''+spect_emission+''' is not recognized... ' + $
+        'please select one of [''hbeta'', ''blue'', ''green'', ''red''], or pass in a manual wavelength range with ''spect_band_signal''
+      return, !null
+    endif
+  endif
 
+  ; available automatic selections
+  if isa(spect_emission) then begin
+    wavelength_range = (hash('green', [557.0 - 1.5, 557.0 + 1.5], $
+      'red', [630.0 - 1.5, 630.0 + 1.5], $
+      'blue', [427.8 - 3.0, 427.8 + 0.5], $
+      'hbeta', [486.1 - 1.5, 486.1 + 1.5]))[spect_emission]
+
+    wavelength_bg_range = (hash('green', [552.0 - 1.5, 552.0 + 1.5], $
+      'red', [625.0 - 1.5, 625.0 + 1.5], $
+      'blue', [430.0 - 1.0, 430.0 + 1.0], $
+      'hbeta', [480.0 - 1.0, 480.0 + 1.0]))[spect_emission]
+  endif else if isa(spect_band_signal) then begin
+    ; manually supplied wavelength range for integration
+    if n_elements(spect_band_signal) ne 2 or (~ isa(spect_band_signal, /float) and ~ isa(spect_band_signal, /int)) then begin
+      print, '[aurorax_spectra_get_intensity] Error: ''spect_band_signal'' must be a 2-element array of wavelengths'
+      return, !null
+    endif
+    wavelength_range = spect_band_signal
+
+    if isa(spect_band_bg) then begin
+      if n_elements(spect_band_bg) ne 2 or (~ isa(spect_band_bg, /float) and ~ isa(spect_band_bg, /int)) then begin
+        print, '[aurorax_spectra_get_intensity] Error: ''spect_band_bg'' must be a 2-element array of wavelengths'
+        return, !null
+      endif
+      wavelength_bg_range = spect_band_bg
+    endif else begin
+      wavelength_bg_range = !null
+    endelse
+  endif
+  
   ; Determine the number of expected frames
   ;
   ; NOTE: this is done to ensure that the eventual image arrays are all the
@@ -155,6 +208,8 @@ function aurorax_mosaic_prep_images, image_list
 
   ; for each site
   site_uid_list = []
+  data_type_list = []
+  final_datatype_list = []
   images_dict = hash()
   dimensions_dict = hash()
   foreach site_image_data, image_list do begin
@@ -164,8 +219,12 @@ function aurorax_mosaic_prep_images, image_list
     if where(tag_names(site_image_data.metadata[0]) eq 'SITE_UID', /null) ne !null then begin
       site_uid = site_image_data.metadata[0].site_uid
     endif else begin
-      print, '[aurorax_mosaic_prep_images] Error: Could not find SITE_UID when parsing metadata.'
-      return, !null
+      if where(tag_names(site_image_data.metadata.file_meta[0]) eq 'SITE_UID', /null) ne !null then begin
+        site_uid = site_image_data.metadata.file_meta[0].site_uid
+      endif else begin
+        print, '[aurorax_mosaic_prep_images] Error: Could not find SITE_UID when parsing metadata.'
+        return, !null
+      endelse
     endelse
 
     ; Determine number of channels of image data
@@ -174,41 +233,113 @@ function aurorax_mosaic_prep_images, image_list
     endif else begin
       n_channels = 1
     endelse
+    
+    int_w = !null
+    int_bg_w = !null
+    wavelength = !null
+    
+    ; Check if spect or asi data and keep track
+    if strpos(strlowcase(site_image_data.dataset.name), 'spect') ne -1 then begin
+      n_channels = 1
+      current_data_type = 'spect'
+      data_type_list = [data_type_list, current_data_type]
 
-    ; set image dimensions
-    if n_channels eq 1 then begin
-      height = (size(site_data, /dimensions))[1]
-      width = (size(site_data, /dimensions))[0]
+      ; extract wavelength from metadata and get integration indices
+      wavelength = site_image_data.metadata.wavelength
+      int_w = where(wavelength ge wavelength_range[0] and wavelength le wavelength_range[1])
+      if wavelength_bg_range ne !null then begin
+        int_bg_w = where(wavelength ge wavelength_bg_range[0] and wavelength le wavelength_bg_range[1])
+      endif
+      ; set spect dimensions
+      height = (size(site_data.spectra, /dimensions))[0]
+      if where(dimensions_dict.keys() eq site_uid, /null) ne !null then begin
+        dimensions_dict[site_uid+'_spect'] = [height]
+      endif else begin
+        dimensions_dict[site_uid] = [height]
+      endelse
     endif else begin
-      height = (size(site_data, /dimensions))[2]
-      width = (size(site_data, /dimensions))[1]
+      current_data_type = 'asi'
+      data_type_list = [data_type_list, current_data_type]
+      
+      ; set image dimensions
+      if n_channels eq 1 then begin
+        height = (size(site_data, /dimensions))[1]
+        width = (size(site_data, /dimensions))[0]
+      endif else begin
+        height = (size(site_data, /dimensions))[2]
+        width = (size(site_data, /dimensions))[1]
+      endelse
+      if where(dimensions_dict.keys() eq site_uid, /null) ne !null then begin
+        dimensions_dict[site_uid+'_asi'] = [width, height]
+      endif else begin
+        dimensions_dict[site_uid] = [width, height]
+      endelse
     endelse
-    dimensions_dict[site_uid] = [width, height]
-
+    
     ; We don't attempt to handle the same site being passed in for multiple networks
     if where(site_uid eq images_dict.keys(), /null) ne !null then begin
-      print, strupcase(site_uid), format = 'Same site between differing networks detected. Omitting additional %s data'
-      continue
+      ; We need to check if there is ASI and spect data from the same site, as that
+      ; is fine to go into the same mosaic
+      
+      d_keys = (images_dict.keys()).toarray()
+      if data_type_list[where(d_keys eq site_uid)] ne current_data_type then begin
+        site_uid += '_' + current_data_type
+      endif else begin
+        print, strupcase(site_uid), format = 'Same site between differing networks detected. Omitting additional %s data'
+        continue
+      endelse
     endif
 
     site_uid_list = [site_uid_list, site_uid]
-
+    final_datatype_list = [final_datatype_list, current_data_type]
+    
     ; initialize this site's image data variable
-    site_images = reform(make_array(n_channels, width, height, expected_num_frames, /double, value = !values.f_nan))
+    if current_data_type eq 'asi' then begin
+      site_images = reform(make_array(n_channels, width, height, expected_num_frames, /double, value = !values.f_nan))
+    endif else if current_data_type eq 'spect' then begin
+      site_images = reform(make_array(height, expected_num_frames, /double, value = !values.f_nan))
+    endif
 
     ; find the index in the data corresponding to each expected timestamp
     for i = 0, n_elements(expected_timestamps) - 1 do begin
       found_idx = where(((strsplit(site_image_data.timestamp, '.', /extract)).toarray())[*, 0] eq expected_timestamps[i], /null)
-
+      
+      if found_idx eq !null then begin
+        found_idx = where(strmid(((strsplit(site_image_data.timestamp, '.', /extract)).toarray())[*, 0],0,19) eq expected_timestamps[i], /null)
+      endif
+      
       ; didn't find the timestamp, just move on because there will be no data for this timestamp
       if found_idx eq !null then continue
-
+      
       ; Add data to array
-      if n_channels eq 1 then begin
-        site_images[*, *, i] = site_data[*, *, found_idx]
-      endif else begin
-        site_images[*, *, *, i] = site_data[*, *, *, found_idx]
-      endelse
+      if current_data_type eq 'asi' then begin
+        if n_channels eq 1 then begin
+          site_images[*, *, i] = site_data[*, *, found_idx]
+        endif else begin
+          site_images[*, *, *, i] = site_data[*, *, *, found_idx]
+        endelse
+      endif else if current_data_type eq 'spect' then begin
+        spectra = site_data.spectra[*,*,found_idx]
+        rayleighs_arr = make_array((size(spectra,/dimensions))[0], /double, value=!values.f_nan)
+        
+        ; iterate through each spectrograph bin
+        for spect_bin=0, n_elements(rayleighs_arr)-1 do begin
+          ; signal integration
+          rayleighs = int_tabulated(wavelength[int_w], reform(spectra[spect_bin,int_w]))
+          
+          ; background integration if specified
+          if int_bg_w ne !null then begin
+            rayleighs -= int_tabulated(wavelength[int_bg_w], reform(spectra[spect_bin,int_bg_w]))
+          endif
+          
+          ; in case of non-physical values
+          if ~finite(rayleighs) or rayleighs lt 0.0 then rayleighs = 0.0
+          
+          ; insert into keogram array
+          rayleighs_arr[spect_bin] = rayleighs
+        endfor
+        site_images[*, i] = rayleighs_arr
+      endif
     endfor
 
     ; insert this site's image data variable into image data hash
@@ -216,7 +347,7 @@ function aurorax_mosaic_prep_images, image_list
   endforeach
 
   ; cast into mosaic_data struct
-  prepped_data = hash('site_uid', site_uid_list, 'timestamps', expected_timestamps, 'images', images_dict, 'images_dimensions', dimensions_dict)
-
+  prepped_data = hash('site_uid', site_uid_list, 'timestamps', expected_timestamps, 'images', images_dict, 'images_dimensions', dimensions_dict, 'data_types', final_datatype_list)
+  
   return, prepped_data
 end

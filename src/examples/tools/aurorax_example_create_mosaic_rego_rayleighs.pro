@@ -93,8 +93,8 @@ pro aurorax_example_create_mosaic_rego_rayleighs
   ; Scale all data the same, since we're working with absolute intensity
   scale = [0, 5000]
 
-  ; Plot the first frame
-  image_idx = 0
+  ; Pick which time within the prepared data that you'd like to plot
+  mosaic_dt = '2018-01-14T04:48:15'
 
   ; Mask elevation below 10 degrees
   min_elevation = 10
@@ -109,7 +109,7 @@ pro aurorax_example_create_mosaic_rego_rayleighs
   aurorax_mosaic_oplot, constant_lats = clats, constant_lons = clons, color = gridline_color, linestyle = 2, thick = 2
 
   ; Call the mosaic creation function to plot the mosaic in the current window
-  aurorax_mosaic_plot, prepped_data, prepped_skymap, image_idx, intensity_scales = scale, colortable = ct, min_elevation = min_elevation
+  aurorax_mosaic_plot, prepped_data, prepped_skymap, mosaic_dt, intensity_scales = scale, colortable = ct, min_elevation = min_elevation
 
   ; Plot some text on top
   xyouts, 0.01, 0.9, 'REGO - Absolute Intensity', /normal, font = 1, charsize = 6

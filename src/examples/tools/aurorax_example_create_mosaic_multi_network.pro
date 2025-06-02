@@ -113,8 +113,8 @@ pro aurorax_example_create_mosaic_multi_network
     'fsmi', [3500, 14000], $
     'rank', [250, 1500]) ; REGO site
 
-  ; Plot the first frame
-  image_idx = 0
+  ; Pick the timestamp within the prep data you'd like to plot
+  mosaic_dt = '2023-02-24T06:15:00'
 
   ; Use grey colormap for themis and red colormap for REGO
   colortable = [3, 0]
@@ -126,7 +126,7 @@ pro aurorax_example_create_mosaic_multi_network
   aurorax_mosaic_oplot, constant_lats = clats, constant_lons = clons, color = gridline_color, linestyle = 2, thick = 2
 
   ; Call the mosaic creation function to plot the mosaic in the current window
-  aurorax_mosaic_plot, prepped_data, prepped_skymap, image_idx, min_elevation = [10, 5], intensity_scales = scale, colortable = colortable
+  aurorax_mosaic_plot, prepped_data, prepped_skymap, mosaic_dt, min_elevation = [10, 5], intensity_scales = scale, colortable = colortable
 
   ; Plot some text on top
   xyouts, 0.01, 0.9, 'THEMIS ASI', /normal, font = 1, charsize = 5

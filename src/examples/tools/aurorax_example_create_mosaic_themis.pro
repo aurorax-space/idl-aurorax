@@ -72,8 +72,8 @@ pro aurorax_example_create_mosaic_themis
     'talo', [2000, 10000], $
     'tpas', [2500, 10000])
 
-  ; Plot the first frame
-  image_idx = 0
+  ; Pick which time within the prepared data that you'd like to plot
+  mosaic_dt = '2021-11-04T09:30:00'
 
   ; Use grey colormap for themis
   ct = 0
@@ -85,7 +85,7 @@ pro aurorax_example_create_mosaic_themis
   aurorax_mosaic_oplot, constant_lats = clats, constant_lons = clons, color = gridline_color, linestyle = 2, thick = 2
 
   ; Call the mosaic creation function to plot the mosaic in the current window
-  aurorax_mosaic_plot, prepped_data, prepped_skymap, image_idx, intensity_scales = scale, colortable = ct
+  aurorax_mosaic_plot, prepped_data, prepped_skymap, mosaic_dt, intensity_scales = scale, colortable = ct
 
   ; Plot some text on top
   xyouts, 0.01, 0.9, 'THEMIS ASI', /normal, font = 1, charsize = 6

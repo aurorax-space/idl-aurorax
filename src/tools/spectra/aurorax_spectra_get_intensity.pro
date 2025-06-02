@@ -57,7 +57,7 @@ function aurorax_spectra_get_intensity, $
   wavelength = spect_data.metadata.wavelength
   
   ; check that input emissions are valid
-  if keyword_set(spect_emission) and (keyword_set(spect_band_signal) or keyword_set(spect_band_bg_))then begin
+  if keyword_set(spect_emission) and (keyword_set(spect_band_signal) or keyword_set(spect_band_bg))then begin
     print, '[aurorax_spectra_get_intensity] Error: only one of ''spect_emission'' and ''spect_band_signal''/''spect_band_bg'' may be set'
     return, !null
   endif else if ~ keyword_set(spect_emission) and ~ keyword_set(spect_band_signal) then begin
@@ -73,10 +73,6 @@ function aurorax_spectra_get_intensity, $
       return, !null
     endif
   endif
-  
-  
-  
-  
   
   ; available automatic selections
   if isa(spect_emission) then begin
