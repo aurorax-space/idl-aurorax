@@ -363,11 +363,11 @@ function __aurorax_asi_png_readfile, $
     image_data = image_data[*, *, *, 0 : n_frames - 1]
     meta_data = meta_data[0 : n_frames - 1]
   endif
-
+  
   ; cleanup untarred files
   if (no_untar_cleanup eq 0) then __aurorax_asi_png_cleanup_tar_files, cleanup_list, verbose = verbose
   return, 0
-
+  
   ; on error, remove extra unused memory, cleanup files, and return
   ioerror:
   print, '[aurorax_read] Error - could not process PNG file'
@@ -795,7 +795,7 @@ pro __aurorax_ucalgary_readfile_asi, $
   endif else begin
     n_start = (n_chunk * n_files) < 2400
   endelse
-
+  
   ; for each file
   total_expected_frames = 0
   for i = 0, n_files - 1 do begin
@@ -807,9 +807,8 @@ pro __aurorax_ucalgary_readfile_asi, $
     if (stregex(strupcase(filenames[i]), '.*\PNG') eq 0) or (stregex(strupcase(filenames[i]), '.*\H5') eq 0) then begin
       if (stregex(strupcase(filenames[i]), '.*\PNG') eq 0) then begin
         ; file is a PNG (either tarred or not)
-
         processing_mode = 'png'
-        ret = __aurorax_asi_png_readfile(filenames[i], file_images, file_metadata, file_dimension_details, file_nframes, file_total_bytes, untar_extract_supported, idl_version_full_support, untar_dir = untar_dir, no_untar_cleanup = no_untar_cleanup, verbose = verbose, no_metadata = no_metadata, first_frame = first_frame)
+        ret = __aurorax_asi_png_readfile(filenames[i], file_images, file_metadata, file_dimension_details, file_nframes, file_total_bytes, untar_extract_supported, idl_version_full_support, untar_dir = untar_dir, no_untar_cleanup = 1, verbose = verbose, no_metadata = no_metadata, first_frame = first_frame)
       endif else begin
         ; file is an h5
         processing_mode = 'h5'
@@ -818,17 +817,24 @@ pro __aurorax_ucalgary_readfile_asi, $
         if (verbose ge 2) then print, '[aurorax_read]  Reading frame: ' + string(n_frames)
         ret = __aurorax_asi_h5_readfile(filenames[i], file_images, file_metadata, file_dimension_details, file_nframes, file_total_bytes, verbose = verbose, no_metadata = no_metadata, minimal_metadata = minimal_metadata, first_frame = first_frame)
       endelse
-
+      
       ; set images and metadata array
       if (first_call eq 1) then begin
         ; pre-allocate images if it's the first call and we'll be reading more than one file
         if (n_files gt 1) then begin
           ; more than one file will be read, pre-allocate array for all images anticipated to be read in
-          total_expected_frames = n_files * 20 ; array will be trimmed at end
+          
+          ; workaround for burst data
+          if strpos(filenames[0], 'burst') ne -1 then begin
+            total_expected_frames = n_files * 180 ; array will be trimmed at end
+          endif else begin
+            total_expected_frames = n_files * 20 ; array will be trimmed at end
+          endelse
           images = make_array([file_dimension_details[0], file_dimension_details[1], file_dimension_details[2], total_expected_frames], /uint, /nozero)
 
           ; insert images
           images[0, 0, 0, 0] = file_images[*, *, *, *]
+
           metadata = file_metadata
         endif else begin
           ; first call, keep the same images and metadata
