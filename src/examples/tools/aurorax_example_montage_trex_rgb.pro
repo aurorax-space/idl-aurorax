@@ -24,5 +24,5 @@ pro aurorax_example_montage_trex_rgb
   ts = image_data.timestamp
 
   ; Create a montage, using 20 as a frame steo, effectively making the montage at a 1-minute cadence
-  aurorax_montage_create, img, ts, 5, 2, frame_step = 20
+  im = aurorax_montage_create(img, ts, 5, 2, frame_step = 20)
 end

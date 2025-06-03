@@ -47,7 +47,7 @@
 ; :Examples:
 ;       aurorax_montage_create, images, timestamps, 5, 5, colortable=7, timestamps_fontsize=16
 ;+
-pro aurorax_montage_create, $
+function aurorax_montage_create, $
   images, $
   timestamps, $
   n_cols, $
@@ -66,11 +66,11 @@ pro aurorax_montage_create, $
   images_shape = size(images, /dimensions)
   if n_elements(images_shape) eq 2 then begin
     print, '[aurorax_montage_create] Error: ''images'' must contain multiple frames.'
-    goto, error_jump
+    return, !null
   endif else if n_elements(images_shape) eq 3 then begin
     if images_shape[0] eq 3 then begin
       print, '[aurorax_montage_create] Error: ''images'' must contain multiple frames.'
-      goto, error_jump
+      return, !null
     endif
     n_channels = 1
   endif else if n_elements(images_shape) eq 4 then begin
@@ -78,7 +78,7 @@ pro aurorax_montage_create, $
   endif else begin
     print, '[aurorax_montage_create] Error: Unable to determine number of channels based on the supplied images. ' + $
       'Make sure you are supplying a [cols,rows,images] or [channels,cols,rows,images] sized array.'
-    goto, error_jump
+    return, !null
   endelse
 
   ; Make sure requested montage size fits number of images provided
@@ -87,11 +87,11 @@ pro aurorax_montage_create, $
   n_montage_img = n_cols * n_rows
   if (n_img ne n_ts) then begin
     print, '[aurorax_montage_create] Error: Number of images provided does not match number of timestamps provided.'
-    goto, error_jump
+    return, !null
   endif
   if (floor(n_ts / float(frame_step)) lt n_montage_img) then begin
     print, '[aurorax_montage_create] Error: Not enough images provided to create desired montage.'
-    goto, error_jump
+    return, !null
   endif
 
   ; set default values
@@ -132,5 +132,6 @@ pro aurorax_montage_create, $
     montage_frame_num += 1
     if montage_frame_num - 1 eq n_montage_img then break
   endfor
-  error_jump:
+  
+  return, im
 end
