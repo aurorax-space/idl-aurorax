@@ -286,5 +286,5 @@ function aurorax_keogram_create, $
   ut_decimal = ut_decimal.toArray()
 
   ; Return keogram structure
-    return, {data: keo_arr, ccd_y: ccd_y, slice_idx: keo_idx, timestamp: time_stamp, ut_decimal: ut_decimal, axis: axis, instrument_type: instrument_type}
+  return, {data: keo_arr, ccd_y: ccd_y, slice_idx: keo_idx, timestamp: time_stamp, ut_decimal: ut_decimal, axis: axis, instrument_type: instrument_type}
 end

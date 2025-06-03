@@ -43,4 +43,43 @@ pro aurorax_example_create_keogram_rego
   ; Plot with aurorax function
   p1 = aurorax_keogram_plot(keo, title = 'Geographic', /geo, location = [0, 0], dimensions = [1000, 400], colortable = 3)
   p2 = aurorax_keogram_plot(keo, title = 'Elevation', /elev, location = [0, 420], dimensions = [1000, 400], colortable = 3)
+  
+  ;  === Dealing with missing data ===
+  ;
+  ; When a keogram is created with aurorax_keogram_create() it will, by default, only include timetamps
+  ; for which data exists. You may want to indicate missing data in the keogram, and this can be easily
+  ; achieved using the aurorax_keogram_inject_nans() function.
+  ;
+  ; As an example, the below code creates a keogram for a different date with some missing data, and
+  ; then calls the aurorax_keogram_inject_nans() function before plotting.
+
+  ; Download and read some more REGO image data
+  d = aurorax_ucalgary_download('REGO_RAW', '2018-02-19T03:30:00', '2018-02-19T04:29:00', site_uid = 'gill')
+  image_data = aurorax_ucalgary_read(d.dataset, d.filenames)
+  img = bytscl(image_data.data, 400, 900)
+  time_stamp = image_data.timestamp
+
+  ; Create keogram object
+  keo = aurorax_keogram_create(img, time_stamp)
+  original_shape = size(keo.data, /dimensions)
+
+  ; Now call the aurorax_keogram_inject_nans()
+  ;
+  ; Note that by default, this function will determine the cadence of the image
+  ; data automatically to determine where the missing data is, but a cadence keyword
+  ; is also available to manually supply a cadence
+  keo = aurorax_keogram_inject_nans(keo)
+  new_shape = size(keo.data, /dimensions)
+
+  ; Plot the keogram with missing data indicated as you normally would
+  p3 = aurorax_keogram_plot(keo, title = 'Keogram with Missing Data', location = [850, 0], dimensions = [1000, 400], colortable = 3)
+
+  ; Inspecting the shape reveals that indeed there was missing data, which
+  ; has been filled using the aurorax_keogram_inject_nans() function
+  print
+  print, "Original Keogram Shape:"
+  print, original_shape
+  print
+  print, "Keogram Shape after aurorax_keogram_inject_nans():"
+  print, new_shape
 end

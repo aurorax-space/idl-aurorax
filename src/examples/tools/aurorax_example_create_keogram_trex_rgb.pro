@@ -41,6 +41,46 @@ pro aurorax_example_create_keogram_trex_rgb
   keo = aurorax_keogram_add_axis(keo, skymap, /geo, /elev, altitude_km = 110)
 
   ; Plot with aurorax function
-  p1 = aurorax_keogram_plot(keo, title = 'Geographic', /geo, location = [0, 0], dimensions = [1000, 400])
-  p2 = aurorax_keogram_plot(keo, title = 'Elevation', /elev, location = [0, 420], dimensions = [1000, 400])
+  p1 = aurorax_keogram_plot(keo, title = 'Geographic', /geo, location = [0, 0], dimensions = [800, 400])
+  p2 = aurorax_keogram_plot(keo, title = 'Elevation', /elev, location = [0, 420], dimensions = [800, 400])
+
+
+  ;  === Dealing with missing data ===
+  ;
+  ; When a keogram is created with aurorax_keogram_create() it will, by default, only include timetamps
+  ; for which data exists. You may want to indicate missing data in the keogram, and this can be easily
+  ; achieved using the aurorax_keogram_inject_nans() function.
+  ;
+  ; As an example, the below code creates a keogram for a different date with some missing data, and
+  ; then calls the aurorax_keogram_inject_nans() function before plotting.
+
+  ; Download and read some more TREx RGB image data
+  d = aurorax_ucalgary_download('TREX_RGB_RAW_NOMINAL', '2022-03-12T10:00:00', '2022-03-12T10:59:59', site_uid = 'gill')
+  image_data = aurorax_ucalgary_read(d.dataset, d.filenames)
+  img = image_data.data
+  time_stamp = image_data.timestamp
+
+  ; Create keogram object
+  keo = aurorax_keogram_create(img, time_stamp)
+  original_shape = size(keo.data, /dimensions)
+  
+  ; Now call the aurorax_keogram_inject_nans()
+  ;
+  ; Note that by default, this function will determine the cadence of the image
+  ; data automatically to determine where the missing data is, but a cadence keyword
+  ; is also available to manually supply a cadence
+  keo = aurorax_keogram_inject_nans(keo)
+  new_shape = size(keo.data, /dimensions)
+  
+  ; Plot the keogram with missing data indicated as you normally would
+  p3 = aurorax_keogram_plot(keo, title = 'Keogram with Missing Data', location = [850, 0], dimensions = [1000, 400])
+  
+  ; Inspecting the shape reveals that indeed there was missing data, which
+  ; has been filled using the aurorax_keogram_inject_nans() function
+  print
+  print, "Original Keogram Shape:"
+  print, original_shape
+  print
+  print, "Keogram Shape after aurorax_keogram_inject_nans():"
+  print, new_shape
 end

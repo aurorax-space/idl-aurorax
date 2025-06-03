@@ -83,5 +83,46 @@ pro aurorax_example_create_keogram_trex_spectrograph
   ; Add geographic and elevation axes to the keogram object
   keo_red = aurorax_keogram_add_axis(keo_red, skymap, /geo, /elev, altitude_km = 110)
   p_red = aurorax_keogram_plot(keo_red, location = [900, 0], title = '630.0 nm (Georeferenced)', /geo, $
-                          dimensions = [1000, 500], aspect_ratio=0.35, x_tick_interval=40, colortable=3)
+                               dimensions = [1000, 500], aspect_ratio=0.35, x_tick_interval=40, colortable=3)
+  
+  ;  === Dealing with missing data ===
+  ;
+  ; When a keogram is created with aurorax_keogram_create() it will, by default, only include timetamps
+  ; for which data exists. You may want to indicate missing data in the keogram, and this can be easily
+  ; achieved using the aurorax_keogram_inject_nans() function.
+  ;
+  ; As an example, the below code creates a keogram for a different date with some missing data, and
+  ; then calls the aurorax_keogram_inject_nans() function before plotting.
+
+  ; Download and read some more TREx Spectrograph data
+  d = aurorax_ucalgary_download('TREX_SPECT_PROCESSED_V1', '2023-03-17T04:00:00', '2023-03-17T04:59:00', site_uid = 'rabb')
+  spect_data = aurorax_ucalgary_read(d.dataset, d.filenames)
+  spectra = spect_data.data.spectra
+  timestamps = spect_data.timestamp
+  wavelengths = spect_data.metadata.wavelength
+  
+  ; Create keogram object
+  keo = aurorax_keogram_create(spectra, timestamps, /spectra, wavelength=wavelengths, spect_emission='green')
+  original_shape = size(keo.data, /dimensions)
+
+  ; Now call the aurorax_keogram_inject_nans()
+  ;
+  ; Note that by default, this function will determine the cadence of the image
+  ; data automatically to determine where the missing data is, but a cadence keyword
+  ; is also available to manually supply a cadence
+  keo = aurorax_keogram_inject_nans(keo)
+  new_shape = size(keo.data, /dimensions)
+
+  ; Plot the keogram with missing data indicated as you normally would
+  p3 = aurorax_keogram_plot(keo, title = 'Spectrograph (557.7 nm) Keogram with Missing Data', location = [850, 0], dimensions = [1000, 400], $
+                            aspect_ratio=0.35, x_tick_interval=40, colortable=8)
+
+  ; Inspecting the shape reveals that indeed there was missing data, which
+  ; has been filled using the aurorax_keogram_inject_nans() function
+  print
+  print, "Original Keogram Shape:"
+  print, original_shape
+  print
+  print, "Keogram Shape after aurorax_keogram_inject_nans():"
+  print, new_shape
 end

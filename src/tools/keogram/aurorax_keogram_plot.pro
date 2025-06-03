@@ -91,7 +91,10 @@ function aurorax_keogram_plot, $
   endif else begin
     y = keogram_struct.ccd_y
   endelse
-
+  
+  ; First grab indices into keogram where NaNs are located
+  w_nan = where(finite(keogram_struct.data, /nan))
+  
   ; Extract keogram data
   keo_arr = bytscl(keogram_struct.data)
 
@@ -120,6 +123,12 @@ function aurorax_keogram_plot, $
 
   ; Create the plot
   w = window(dimensions = dimensions, location = location, margin=0)
+  
+  ; Create a temporary keogram array and mask the NaN values with
+  ; the max value (white usually)
+  ; This is done so that Nan's are plotted as white in the keogram,
+  ; as by default IDL does black and there's no option to change
+  keo_arr[w_nan] = max(keo_arr, /nan)
 
   if not keyword_set(colortable) then colortable = 0
   keo_image = image(keo_arr, /current, axis_style = 4, aspect_ratio = aspect, rgb_table = colortable, margin=0.1)
