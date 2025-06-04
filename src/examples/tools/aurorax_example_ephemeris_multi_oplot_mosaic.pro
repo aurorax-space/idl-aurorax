@@ -113,8 +113,8 @@ pro aurorax_example_ephemeris_multi_oplot_mosaic
   ; the same - alternatively, one can use a hash to scale images on a per-site basis
   scale = [10, 105]
 
-  ; Plot the first frame
-  image_idx = 0
+  ; Timestamp within mosaic data to plot for
+  mosaic_dt = '2023-02-24T07:05:00'
 
   ; Plot some gridlines
   gridline_color = aurorax_get_decomposed_color([0, 0, 0])
@@ -123,7 +123,7 @@ pro aurorax_example_ephemeris_multi_oplot_mosaic
   aurorax_mosaic_oplot, constant_lats = clats, constant_lons = clons, color = gridline_color, linestyle = 2, thick = 2
 
   ; Call the mosaic creation function to plot the mosaic in the current window
-  aurorax_mosaic_plot, prepped_images, prepped_skymaps, image_idx, intensity_scales = scale
+  aurorax_mosaic_plot, prepped_images, prepped_skymaps, mosaic_dt, intensity_scales = scale
 
   ; Overplot the Swarm A and Swarm C footprints
   swarm_a_color = aurorax_get_decomposed_color([255, 0, 0])
