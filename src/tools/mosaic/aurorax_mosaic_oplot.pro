@@ -41,6 +41,12 @@
 ;         integer giving IDL symbol size (default is 1)
 ;       mag: in, optional, Boolean
 ;         specify that coordinates are given in geomagnetic coordinates (default is geographic)
+;       aacgm_date: in, optioinal, String
+;         a date string in the format 'YYYY-MM-DD' specifying the date to use for AACGM
+;         coordinate transformations
+;       aacgm_height: in, optional, String
+;         input altitude (km) for geomagnetic (AACGM) coordinate transformations - if
+;         not supplied, default is 0.0
 ;
 ; :Examples:
 ;       aurorax_mosaic_oplot, point=[245,61.2], color=aurorax_get_decomposed_color([0,0,255])
@@ -55,15 +61,11 @@ pro aurorax_mosaic_oplot, $
   linestyle = linestyle, $
   symbol = symbol, $
   symsize = symsize, $
-  mag = mag
+  mag = mag, $
+  aacgm_date = aacgm_date, $
+  aacgm_height = aacgm_height
   device, get_decomposed = old_decomp
   device, decomposed = 1
-
-  if keyword_set(mag) then begin
-    print, '[aurorax_mosaic_plot_contour] Error: Magnetic coordinates are not ' + $
-      'currently supported for this procedure.'
-    goto, error
-  endif
 
   ; Set default values
   if not isa(color) then color = 0
@@ -98,8 +100,25 @@ pro aurorax_mosaic_oplot, $
       'from 0-10. (See IDL built-in psym).'
     goto, error
   endif
-
-  ; Replace the period symbol
+  
+  ; If date is supplied for magnetic transformations, check correct format
+  if keyword_set(aacgm_date) then begin
+    if ~isa(aacgm_date, /string, /scalar) then begin
+      print, '[aurorax_bounding_box_extract_metric] Error: keyword ''aacgm_date'' should be a scalar string in the format "YYYY-MM-DD"'
+      goto, error
+    endif
+    if (strlen(aacgm_date) ne 10) or (strmid(aacgm_date,4,1) ne '-') or (strmid(aacgm_date,7,1) ne '-') then begin
+      print, '[aurorax_bounding_box_extract_metric] Error: keyword ''aacgm_date'' should be a scalar string in the format "YYYY-MM-DD"'
+      goto, error
+    endif
+  endif
+    
+  ; set default height for aacgm transformations if not supplied
+  if ~ keyword_set(aacgm_height) then begin
+    aacgm_height = 0.0
+  endif
+  
+  ; Replace the period symbol with a better circle symbol
   if symbol eq 2 then begin
     a = findgen(32) * (!pi * 2 / 32.)
     usersym, cos(a), sin(a), /fill
@@ -129,17 +148,34 @@ pro aurorax_mosaic_oplot, $
   ; Check that point is a single point
   if keyword_set(point) and not isa(point, /array, /number) then begin
     print, '[aurorax_mosaic_plot_contour] Error: ''point'' must be a 2-element ' + $
-      'array of numbers.'
+      'array of numbers giving [lon, lat].'
     goto, error
   endif
   if keyword_set(point) and n_elements(point) ne 2 then begin
     print, '[aurorax_mosaic_plot_contour] Error: ''point'' must be a 2-element ' + $
-      'array of numbers.'
+      'array of numbers giving [lon, lat].'
     goto, error
   endif
-
+  
+  ; Set AACGM date variable if inputs are in AACGM coords
+  if keyword_set(mag) then begin
+    if keyword_set(aacgm_date) then begin
+      aacgm_yy = fix(strmid(aacgm_date,0,4))
+      aacgm_mm = fix(strmid(aacgm_date,5,2))
+      aacgm_dd = fix(strmid(aacgm_date,8,2))
+      !null = aacgm_v2_setdatetime(aacgm_yy, aacgm_mm, aacgm_dd)
+    endif else begin
+      !null = aacgm_v2_setnow()
+    endelse
+  endif
+  
   ; Plot the single point if provided
   if keyword_set(point) then begin
+    ; convert to geographic if input is in magnetic coords
+    if keyword_set(mag) then begin
+      geo_pos = cnvcoord_v2(point[1], point[0], aacgm_height, /geo)
+      point = [geo_pos[1], geo_pos[0]]
+    endif
     ; Default to a circle point
     if symbol eq 0 then begin
       a = findgen(32) * (!pi * 2 / 32.)
@@ -159,8 +195,15 @@ pro aurorax_mosaic_oplot, $
       ; Generate arrays defining this line of constant lon
       lats = findgen(180 / 0.1) * 0.1 - 90.
       lons = lats * 0 + lon
-
-      plots, lons, lats, color = color, psym = symbol, linestyle = linestyle, symsize = symsize
+      
+      ; convert to geographic if input is in magnetic coords
+      if keyword_set(mag) then begin
+        geo_pos = cnvcoord_v2(transpose([[lats], [lons], [replicate(aacgm_height, n_elements(lons))]]), /geo)
+        lons = reform(geo_pos[1,*])
+        lats = reform(geo_pos[0,*])
+      endif
+      
+      plots, lons, lats, color = color, psym = symbol, linestyle = linestyle, symsize = symsize, thick = thick
     endfor
   endif
 
@@ -174,8 +217,15 @@ pro aurorax_mosaic_oplot, $
       ; Generate arrays defining this line of constant lon
       lons = findgen(360 / 0.05) * 0.05 - 180.
       lats = lons * 0 + lat
-
-      plots, lons, lats, color = color, psym = symbol, linestyle = linestyle, symsize = symsize
+      
+      ; convert to geographic if input is in magnetic coords
+      if keyword_set(mag) then begin
+        geo_pos = cnvcoord_v2(transpose([[lats], [lons], [replicate(aacgm_height, n_elements(lons))]]), /geo)
+        lons = reform(geo_pos[1,*])
+        lats = reform(geo_pos[0,*])
+      endif
+      
+      plots, lons, lats, color = color, psym = symbol, linestyle = linestyle, symsize = symsize, thick = thick
     endfor
   endif
   error:

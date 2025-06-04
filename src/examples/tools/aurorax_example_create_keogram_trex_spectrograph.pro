@@ -80,9 +80,9 @@ pro aurorax_example_create_keogram_trex_spectrograph
   skymap_data = aurorax_ucalgary_read(d.dataset, d.filenames)
   skymap = skymap_data.data[0]
 
-  ; Add geographic and elevation axes to the keogram object
-  keo_red = aurorax_keogram_add_axis(keo_red, skymap, /geo, /elev, altitude_km = 110)
-  p_red = aurorax_keogram_plot(keo_red, location = [900, 0], title = '630.0 nm (Georeferenced)', /geo, $
+  ; Add geographic, elevation, and geomagnetic axes to the keogram object                           Plot using magnetic coord axis
+  keo_red = aurorax_keogram_add_axis(keo_red, skymap, /geo, /elev, /mag, altitude_km = 110)   ;         \/ 
+  p_red = aurorax_keogram_plot(keo_red, location = [900, 0], title = '630.0 nm - AACGM Coordinates)', /mag, $
                                dimensions = [1000, 500], aspect_ratio=0.35, x_tick_interval=40, colortable=3)
   
   ;  === Dealing with missing data ===

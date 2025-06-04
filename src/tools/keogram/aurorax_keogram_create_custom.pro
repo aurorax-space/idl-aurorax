@@ -14,7 +14,7 @@
 ; limitations under the License.
 ; -------------------------------------------------------------
 
-function __indices_in_polygon, vertices, image_shape
+function __aurorax_indices_in_polygon, vertices, image_shape
   compile_opt hidden
 
   ; Function to obtain all indices of an array/image, within the
@@ -51,7 +51,7 @@ function __indices_in_polygon, vertices, image_shape
   return, list(x_idx_inside, y_idx_inside)
 end
 
-function __haversine_distances, target_lat, target_lon, lat_array, lon_array
+function __aurorax_haversine_distances, target_lat, target_lon, lat_array, lon_array
   compile_opt hidden
 
   ; Computes the distance on the globe between target lat/lon,
@@ -75,7 +75,7 @@ function __haversine_distances, target_lat, target_lon, lat_array, lon_array
   return, r * c
 end
 
-function __convert_lonlat_to_ccd, lon_locs, lat_locs, skymap, altitude_km, time_stamp = time_stamp, mag = mag
+function __aurorax_convert_lonlat_to_ccd, lon_locs, lat_locs, skymap, altitude_km, time_stamp = time_stamp, mag = mag
   compile_opt hidden
 
   ; Converts a set of lat lon points to CCD coordinates
@@ -84,7 +84,7 @@ function __convert_lonlat_to_ccd, lon_locs, lat_locs, skymap, altitude_km, time_
   ; Note: This is a hidden function, and not available publicly
 
   if keyword_set(mag) and not keyword_set(time_stamp) then begin
-    print, '[__convert_lonlat_to_ccd] Error: Magnetic coordinates require a timestamp.'
+    print, '[__aurorax_convert_lonlat_to_ccd] Error: Magnetic coordinates require a timestamp.'
     return, !null
   endif
 
@@ -102,7 +102,7 @@ function __convert_lonlat_to_ccd, lon_locs, lat_locs, skymap, altitude_km, time_
   ; convert altitudes to km for interpolation
   interp_alts = altitudes / 1000.
   if not isa(altitude_km) then begin
-    print, '[__convert_lonlat_to_ccd] Error: altitude must be provided when working in lat/lon coordinates.'
+    print, '[__aurorax_convert_lonlat_to_ccd] Error: altitude must be provided when working in lat/lon coordinates.'
     return, !null
   endif
 
@@ -120,7 +120,7 @@ function __convert_lonlat_to_ccd, lon_locs, lat_locs, skymap, altitude_km, time_
 
     ; first check if supplied altitude is valid for interpolation
     if (altitude_km lt min(interp_alts)) or (altitude_km gt max(interp_alts)) then begin
-      error_msg = '[__convert_lonlat_to_ccd] Error: Altitude of ' + strcompress(string(altitude_km), /remove_all) + ' km is outside the valid ' + $
+      error_msg = '[__aurorax_convert_lonlat_to_ccd] Error: Altitude of ' + strcompress(string(altitude_km), /remove_all) + ' km is outside the valid ' + $
         'range of [' + strcompress(string(min(interp_alts)), /remove_all) + ',' + strcompress(string(max(interp_alts)), /remove_all) + '] km.'
       print, error_msg
       return, !null
@@ -155,7 +155,7 @@ function __convert_lonlat_to_ccd, lon_locs, lat_locs, skymap, altitude_km, time_
     if target_lon lt min_skymap_lon or target_lon gt max_skymap_lon then continue
 
     ; Compute the haversine distance between all points in skymap
-    haversine_diff = __haversine_distances(target_lat, target_lon, lats, lons)
+    haversine_diff = __aurorax_haversine_distances(target_lat, target_lon, lats, lons)
 
     ; Compute the skymap indices of the nearest point
     flat_idx = (where(haversine_diff eq min(haversine_diff, /nan), /null))[0]
@@ -293,7 +293,7 @@ function aurorax_keogram_create_custom, $
 
   ; Convert lat/lons to CCD coordinates
   if coordinate_system eq 'geo' then begin
-    result = __convert_lonlat_to_ccd(x_locs, y_locs, skymap, altitude_km)
+    result = __aurorax_convert_lonlat_to_ccd(x_locs, y_locs, skymap, altitude_km)
     local_x_locs = result[0]
     local_y_locs = result[1]
   endif else if coordinate_system eq 'mag' then begin
@@ -380,7 +380,7 @@ function aurorax_keogram_create_custom, $
     vertices = list(vertex1, vertex2, vertex3, vertex4)
 
     ; Obtain the indexes into the image of this polygon
-    idx_list = __indices_in_polygon(vertices, [x_max, y_max])
+    idx_list = __aurorax_indices_in_polygon(vertices, [x_max, y_max])
     x_idx_inside = idx_list[0]
     y_idx_inside = idx_list[1]
 

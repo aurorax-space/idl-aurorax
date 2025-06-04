@@ -14,7 +14,7 @@
 ; limitations under the License.
 ; -------------------------------------------------------------
 
-function __perform_dark_frame_calibration, images, size
+function __aurorax_perform_dark_frame_calibration, images, size
   ; This method will perform a dark frame correction by subtracting an average
   ; of a bottom corner grid from the image (ie. 4x4.).
 
@@ -47,7 +47,7 @@ function __perform_dark_frame_calibration, images, size
   return, reform(images)
 end
 
-function __perform_flatfield_calibration, images, cal_flatfield
+function __aurorax_perform_flatfield_calibration, images, cal_flatfield
   ; Performs flatfield calibration using a calibration file
   ;
   ; NOTE: This is an internal-only used function. It is not publicly exposed.
@@ -67,7 +67,7 @@ function __perform_flatfield_calibration, images, cal_flatfield
   return, reform(images)
 end
 
-function __perform_rayleighs_calibration, images, cal_rayleighs, exposure_length_sec
+function __aurorax_perform_rayleighs_calibration, images, cal_rayleighs, exposure_length_sec
   ; Performs rayleighs calibration using a calibration file
   ;
   ; NOTE: This is an internal-only used function. It is not publicly exposed.

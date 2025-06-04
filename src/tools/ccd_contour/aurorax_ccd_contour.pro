@@ -46,6 +46,17 @@
 ; :Keywords:
 ;       mag: in, optional, Boolean
 ;         use this keyword if lats/lons are supplied in magnetic coordinates
+;       aacgm_date: in, optioinal, String
+;         a date string in the format 'YYYY-MM-DD' specifying the date to use for AACGM
+;         coordinate transformations
+;       aacgm_height: in, optional, String
+;         input altitude (km) for geomagnetic (AACGM) coordinate transformations - if
+;         not supplied, default is 0.0
+;       no_auto_flip: in, optional, Boolean
+;         by defult, the skymap is oriented automatically so that the returned contours
+;         are oriented such that when plotted on a window, the top of the window represents
+;         North - if the no_auto_flip keyword is set, the skymap is used as it
+;         
 ;
 ; :Returns:
 ;       Array
@@ -64,7 +75,30 @@ function aurorax_ccd_contour, $
   contour_lats = contour_lats, $
   contour_lons = contour_lons, $
   altitude_km = altitude_km, $
-  mag = mag
+  mag = mag, $
+  aacgm_date = aacgm_date, $
+  aacgm_height = aacgm_height, $
+  no_auto_flip = no_auto_flip
+  
+  if ~keyword_set(no_auto_flip) then begin
+    skymap_height = (size(skymap.full_elevation, /dimensions))[1]
+    
+    top_mean_lat = mean(skymap.full_map_latitude[*,0:skymap_height/2-1,0], /nan)
+    bot_mean_lat = mean(skymap.full_map_latitude[*,skymap_height/2:skymap_height-1,0], /nan)
+    
+    if (top_mean_lat lt bot_mean_lat) then begin
+      local_skymap = skymap
+      local_skymap.full_elevation = reverse(skymap.full_elevation, 2)
+      local_skymap.full_azimuth = reverse(skymap.full_azimuth, 2)
+      local_skymap.full_map_latitude = reverse(skymap.full_map_latitude, 2)
+      local_skymap.full_map_longitude = reverse(skymap.full_map_longitude, 2)
+    endif else begin
+      local_skymap = skymap
+    endelse
+  endif else begin
+    local_skymap = skymap
+  endelse
+  
   ; Check that both lat/lon are provided for custom contour
   if isa(contour_lats) + isa(contour_lons) eq 1 then begin
     print, '[aurorax_ccd_contour] Error: When manually providing a contour, contour_lats & contour_lons must both be provided.'
@@ -82,12 +116,29 @@ function aurorax_ccd_contour, $
     print, '[aurorax_ccd_contour] Error: Only one contour may be provided per call.'
     return, !null
   endif
+  
+  ; If date is supplied for magnetic transformations, check correct format
+  if keyword_set(aacgm_date) then begin
+    if ~isa(aacgm_date, /string, /scalar) then begin
+      print, '[aurorax_bounding_box_extract_metric] Error: keyword ''aacgm_date'' should be a scalar string in the format "YYYY-MM-DD"'
+      return, !null
+    endif
+    if (strlen(aacgm_date) ne 10) or (strmid(aacgm_date,4,1) ne '-') or (strmid(aacgm_date,7,1) ne '-') then begin
+      print, '[aurorax_bounding_box_extract_metric] Error: keyword ''aacgm_date'' should be a scalar string in the format "YYYY-MM-DD"'
+      return, !null
+    endif
+  endif
 
+  ; set default height for aacgm transformations if not supplied
+  if ~ keyword_set(aacgm_height) then begin
+    aacgm_height = 0.0
+  endif
+  
   ; If contour is defined in lat/lon space, check that an altitude is provided. If not, default to middle.
   if isa(constant_lat) or isa(constant_lon) or isa(contour_lats) then begin
     if not isa(altitude_km) then begin
       ; Select middle altitude from skymap
-      altitude_km = skymap.full_map_altitude[1] / 1000.0
+      altitude_km = local_skymap.full_map_altitude[1] / 1000.0
     endif
   endif
 
@@ -106,8 +157,8 @@ function aurorax_ccd_contour, $
     if constant_azimuth eq 360 then const_az = 0 else const_az = constant_azimuth
 
     ; pull az and el arrays from skymap
-    azimuth = skymap.full_azimuth
-    elevation = skymap.full_elevation
+    azimuth = local_skymap.full_azimuth
+    elevation = local_skymap.full_elevation
 
     ; iterate through elevation array in steps
     x_list = []
@@ -150,8 +201,8 @@ function aurorax_ccd_contour, $
     endif
 
     ; pull az and el arrays from skymap
-    azimuth = skymap.full_azimuth
-    elevation = skymap.full_elevation
+    azimuth = local_skymap.full_azimuth
+    elevation = local_skymap.full_elevation
 
     ; In the case that the user requests 90 degrees, return the single closest pixel
     if constant_elevation eq 90 then begin
@@ -204,17 +255,45 @@ function aurorax_ccd_contour, $
     endif
 
     ; grab necessary data from skymap
-    lons = skymap.full_map_longitude
+    lons = local_skymap.full_map_longitude
     lons[where(lons gt 180)] -= 360
-
+    
     ; Take min/max lon to be mean +/- 20 degrees
     min_skymap_lon = mean(lons, /nan) - 15
     max_skymap_lon = mean(lons, /nan) + 15
-
+    
     n_points = 50
     contour_lats = replicate(constant_lat, n_points)
     contour_lons = findgen(n_points, increment = (max_skymap_lon - min_skymap_lon) / n_points, start = min_skymap_lon)
-    result = __convert_lonlat_to_ccd(contour_lons, contour_lats, skymap, altitude_km)
+    
+    ; If magnetic coords is specified, we convert from magnetic to geographic
+    if keyword_set(mag) then begin
+      n_points = 1000
+      contour_lats = replicate(constant_lat, n_points)
+      contour_lons = findgen(n_points, increment = (360.0) / n_points, start = -180.0)
+      
+      ; First, we have to set the date for transformations
+      if keyword_set(aacgm_date) then begin
+        aacgm_yy = fix(strmid(aacgm_date,0,4))
+        aacgm_mm = fix(strmid(aacgm_date,5,2))
+        aacgm_dd = fix(strmid(aacgm_date,8,2))
+        !null = aacgm_v2_setdatetime(aacgm_yy, aacgm_mm, aacgm_dd)
+      endif else begin
+        !null = aacgm_v2_setnow()
+      endelse
+      
+      ; Perform aacgm conversion
+      mag_pos = transpose([[contour_lats], [contour_lons], [replicate(aacgm_height, n_elements(contour_lats))]])
+      geo_pos = cnvcoord_v2(mag_pos, /geo)
+
+      ; re-assign only the lats, we want lons to just span the CCD
+      contour_lats = reform(geo_pos[0,*])
+      contour_lons = reform(geo_pos[1,*])
+      contour_lats = contour_lats[where(contour_lons gt min_skymap_lon and contour_lons lt max_skymap_lon)]
+      contour_lons = contour_lons[where(contour_lons gt min_skymap_lon and contour_lons lt max_skymap_lon)]
+    endif
+        
+    result = __aurorax_convert_lonlat_to_ccd(contour_lons, contour_lats, local_skymap, altitude_km)
     x_list = result[0]
     y_list = result[1]
 
@@ -235,7 +314,7 @@ function aurorax_ccd_contour, $
     endif
 
     ; grab necessary data from skymap
-    lats = skymap.full_map_latitude
+    lats = local_skymap.full_map_latitude
 
     min_skymap_lat = mean(lats, /nan) - 5
     max_skymap_lat = mean(lats, /nan) + 5
@@ -244,7 +323,35 @@ function aurorax_ccd_contour, $
     n_points = 50
     contour_lons = replicate(constant_lon, n_points)
     contour_lats = findgen(n_points, increment = (max_skymap_lat - min_skymap_lat) / n_points, start = min_skymap_lat)
-    result = __convert_lonlat_to_ccd(contour_lons, contour_lats, skymap, altitude_km)
+    
+    ; If magnetic coords is specified, we convert from magnetic to geographic
+    if keyword_set(mag) then begin
+      n_points = 500
+      contour_lons = replicate(constant_lon, n_points)
+      contour_lats = findgen(n_points, increment = (180.0) / n_points, start = -90.0)
+      
+      ; First, we have to set the date for transformations
+      if keyword_set(aacgm_date) then begin
+        aacgm_yy = fix(strmid(aacgm_date,0,4))
+        aacgm_mm = fix(strmid(aacgm_date,5,2))
+        aacgm_dd = fix(strmid(aacgm_date,8,2))
+        !null = aacgm_v2_setdatetime(aacgm_yy, aacgm_mm, aacgm_dd)
+      endif else begin
+        !null = aacgm_v2_setnow()
+      endelse
+
+      ; Perform aacgm conversion
+      mag_pos = transpose([[contour_lats], [contour_lons], [replicate(aacgm_height, n_elements(contour_lats))]])
+      geo_pos = cnvcoord_v2(mag_pos, /geo)
+
+      ; re-assign only the lons, we want lons to just span the CCD
+      contour_lons = reform(geo_pos[1,*])
+      contour_lats = reform(geo_pos[0,*])
+      contour_lons = contour_lons[where(contour_lats gt min_skymap_lat and contour_lats lt max_skymap_lat)]
+      contour_lats = contour_lats[where(contour_lats gt min_skymap_lat and contour_lats lt max_skymap_lat)]
+    endif
+    
+    result = __aurorax_convert_lonlat_to_ccd(contour_lons, contour_lats, local_skymap, altitude_km)
     x_list = result[0]
     y_list = result[1]
 
@@ -259,7 +366,7 @@ function aurorax_ccd_contour, $
   ; Finally handling case of custom lats and lons
   if isa(contour_lats) then begin
     ; Convert lat/lons to CCD coordinates
-    result = __convert_lonlat_to_ccd(contour_lons, contour_lats, skymap, altitude_km)
+    result = __aurorax_convert_lonlat_to_ccd(contour_lons, contour_lats, local_skymap, altitude_km)
     x_list = result[0]
     y_list = result[1]
 

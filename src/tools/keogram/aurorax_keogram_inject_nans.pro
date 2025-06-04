@@ -45,7 +45,7 @@ function aurorax_keogram_inject_nans, $
   
   ; First, determine the apparent cadence based on the keogram, regardless
   ; of whether or not a manual cadence was supplied
-  apparent_cadence = __determine_cadence(keogram.timestamp)
+  apparent_cadence = __aurorax_determine_cadence(keogram.timestamp)
   
   ; Check if cadence was supplied
   if keyword_set(cadence) then begin

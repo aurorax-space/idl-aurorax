@@ -37,6 +37,12 @@
 ;         adds an axis of geomagnetic coordinates
 ;       elev: in, optional, Boolean
 ;         adds an axis of elevation angles
+;       aacgm_date: in, optioinal, String
+;         a date string in the format 'YYYY-MM-DD' specifying the date to use for AACGM
+;         coordinate transformations
+;       aacgm_height: in, optional, String
+;         input altitude (km) for geomagnetic (AACGM) coordinate transformations - if
+;         not supplied, default is 0.0
 ;
 ; :Returns:
 ;       Struct
@@ -44,7 +50,16 @@
 ; :Examples:
 ;       keo = aurorax_keogram_add_axis(keo, skymap, /geo, /elev, altitude_km=110)
 ;+
-function aurorax_keogram_add_axis, keogram_struct, skymap, altitude_km = altitude_km, geo = geo, mag = mag, elev = elev
+function aurorax_keogram_add_axis, $
+  keogram_struct, $
+  skymap, $
+  altitude_km = altitude_km, $
+  geo = geo, $
+  mag = mag, $
+  elev = elev, $
+  aacgm_date = aacgm_date, $
+  aacgm_height = aacgm_height
+  
   if keyword_set(geo) and not keyword_set(altitude_km) then begin
     print, '[aurorax_keogram_add_axis] Error: Using ''/geo'' or ''/mag'' requires passing in ''altitude_km''.'
     return, !null
@@ -66,7 +81,24 @@ function aurorax_keogram_add_axis, keogram_struct, skymap, altitude_km = altitud
     print, '[aurorax_keogram_add_axis] Error: At least one of ''/geo'', ''/mag'', ''/elev'', must be set to add axes.'''
     return, !null
   endif
+  
+  ; If date is supplied for magnetic transformations, check correct format
+  if keyword_set(aacgm_date) then begin
+    if ~isa(aacgm_date, /string, /scalar) then begin
+      print, '[aurorax_bounding_box_extract_metric] Error: keyword ''aacgm_date'' should be a scalar string in the format "YYYY-MM-DD"'
+      return, !null
+    endif
+    if (strlen(aacgm_date) ne 10) or (strmid(aacgm_date,4,1) ne '-') or (strmid(aacgm_date,7,1) ne '-') then begin
+      print, '[aurorax_bounding_box_extract_metric] Error: keyword ''aacgm_date'' should be a scalar string in the format "YYYY-MM-DD"'
+      return, !null
+    endif
+  endif
 
+  ; set default height for aacgm transformations if not supplied
+  if ~ keyword_set(aacgm_height) then begin
+    aacgm_height = 0.0
+  endif
+  
   ; Check that skymap size matches keogram
   if keogram_struct.instrument_type eq 'asi' then begin
     if keogram_struct.axis eq 0 then begin
@@ -147,47 +179,106 @@ function aurorax_keogram_add_axis, keogram_struct, skymap, altitude_km = altitud
       print, error_msg
       return, !null
     endif
-
+    
     ; Interpolate all latitudes
     geo_y = []
     foreach row_idx, keogram_struct.ccd_y do begin
       if keogram_struct.axis eq 0 then begin
-        lat = interpol(lats[slice_idx, row_idx, *], interp_alts, altitude_km)
+        lat = interpol(reform(lats[slice_idx, row_idx, *]), interp_alts, altitude_km)
         geo_y = [geo_y, lat]
       endif else begin
-        lon = interpol(lons[row_idx, slice_idx, *], interp_alts, altitude_km)
+        lon = interpol(reform(lons[row_idx, slice_idx, *]), interp_alts, altitude_km)
         geo_y = [geo_y, lon]
       endelse
     endforeach
   endelse
+  
+  ; Compute Geomagnetic Axis
+  if keyword_set(mag) then begin 
+    
+    ; First, we have to set the date for transformations
+    if keyword_set(aacgm_date) then begin
+      aacgm_yy = fix(strmid(aacgm_date,0,4))
+      aacgm_mm = fix(strmid(aacgm_date,5,2))
+      aacgm_dd = fix(strmid(aacgm_date,8,2))
+      !null = aacgm_v2_setdatetime(aacgm_yy, aacgm_mm, aacgm_dd)
+    endif else begin
+      !null = aacgm_v2_setnow()
+    endelse
+    
+    if where(float(altitude_km) eq interp_alts, /null) ne !null then begin
+      ; no interpolation required
+      alt_idx = where(float(altitude_km) eq interp_alts, /null)
 
-  if keyword_set(mag) then begin
-    print, 'Warning: Magnetic coordinates are not currently supported for this routine.'
-    return, !null
+      ; Grab all latitudes
+      mag_y = []
+      foreach row_idx, keogram_struct.ccd_y do begin
+        if keogram_struct.axis eq 0 then begin
+          lat = lats[slice_idx, row_idx, alt_idx]
+          lon = lons[slice_idx, row_idx, alt_idx]
+          mag_pos = cnvcoord_v2(lat, lon, aacgm_height)
+          lat = mag_pos[0]
+          mag_y = [mag_y, lat]
+        endif else begin
+          lat = lats[row_idx, slice_idx, alt_idx]
+          lon = lons[row_idx, slice_idx, alt_idx]
+          mag_pos = cnvcoord_v2(lat, lon, aacgm_height)
+          lon = mag_pos[1]
+          mag_y = [mag_y, lon]
+        endelse
+      endforeach
+    endif else begin
+      ; interpolation is required
+      ; first check if supplied altitude is valid for interpolation
+      if (altitude_km lt min(interp_alts)) or (altitude_km gt max(interp_alts)) then begin
+        error_msg = '[aurorax_keogram_add_axis] Error: Altitude of ' + strcompress(string(altitude_km), /remove_all) + ' km is outside the valid ' + $
+          'range of [' + strcompress(string(min(interp_alts)), /remove_all) + ',' + strcompress(string(max(interp_alts)), /remove_all) + '] km.'
+        print, error_msg
+        return, !null
+      endif
+      
+      ; Interpolate all latitudes
+      mag_y = []
+      foreach row_idx, keogram_struct.ccd_y do begin
+        if keogram_struct.axis eq 0 then begin
+          lat = interpol(reform(lats[slice_idx, row_idx, *]), interp_alts, altitude_km)
+          lon = interpol(reform(lons[slice_idx, row_idx, *]), interp_alts, altitude_km)
+          mag_pos = cnvcoord_v2(lat, lon, aacgm_height)
+          lat = mag_pos[0]
+          mag_y = [mag_y, lat]
+        endif else begin
+          lat = interpol(reform(lats[row_idx, slice_idx, *]), interp_alts, altitude_km)
+          lon = interpol(reform(lons[row_idx, slice_idx, *]), interp_alts, altitude_km)
+          mag_pos = cnvcoord_v2(lat, lon, aacgm_height)
+          lon = mag_pos[1]
+          mag_y = [mag_y, lon]
+        endelse
+      endforeach
+    endelse
   endif
 
   keywords = [keyword_set(geo), keyword_set(mag), keyword_set(elev)]
 
   if array_equal(keywords, [0, 0, 1]) then begin
-    ; Return keogram array with desired axes added
+    ; Elevation 
     return, {data: keo_arr, timestamp: time_stamp, ut_decimal: keogram_struct.ut_decimal, ccd_y: ccd_y, slice_idx: slice_idx, axis: keogram_struct.axis, elev_y: elev_y}
   endif else if array_equal(keywords, [0, 1, 0]) then begin
-    ; Return keogram array with desired axes added
-    return, {data: keo_arr, timestamp: time_stamp, ut_decimal: keogram_struct.ut_decimal, ccd_y: ccd_y, slice_idx: slice_idx, axis: keogram_struct.axis}
+    ; Magnetic
+    return, {data: keo_arr, timestamp: time_stamp, ut_decimal: keogram_struct.ut_decimal, ccd_y: ccd_y, slice_idx: slice_idx, axis: keogram_struct.axis, mag_y: mag_y}
   endif else if array_equal(keywords, [0, 1, 1]) then begin
-    ; Return keogram array with desired axes added
-    return, {data: keo_arr, timestamp: time_stamp, ut_decimal: keogram_struct.ut_decimal, ccd_y: ccd_y, slice_idx: slice_idx, axis: keogram_struct.axis, elev_y: elev_y}
+    ; Magnetic and Elevation
+    return, {data: keo_arr, timestamp: time_stamp, ut_decimal: keogram_struct.ut_decimal, ccd_y: ccd_y, slice_idx: slice_idx, axis: keogram_struct.axis, elev_y: elev_y, mag_y: mag_y}
   endif else if array_equal(keywords, [1, 0, 0]) then begin
-    ; Return keogram array with desired axes added
+    ; Geographic
     return, {data: keo_arr, timestamp: time_stamp, ut_decimal: keogram_struct.ut_decimal, ccd_y: ccd_y, slice_idx: slice_idx, axis: keogram_struct.axis, geo_y: geo_y}
   endif else if array_equal(keywords, [1, 0, 1]) then begin
-    ; Return keogram array with desired axes added
+    ; Geographic and Elevation
     return, {data: keo_arr, timestamp: time_stamp, ut_decimal: keogram_struct.ut_decimal, ccd_y: ccd_y, slice_idx: slice_idx, axis: keogram_struct.axis, geo_y: geo_y, elev_y: elev_y}
   endif else if array_equal(keywords, [1, 1, 0]) then begin
-    ; Return keogram array with desired axes added
-    return, {data: keo_arr, timestamp: time_stamp, ut_decimal: keogram_struct.ut_decimal, ccd_y: ccd_y, slice_idx: slice_idx, axis: keogram_struct.axis, geo_y: geo_y}
+    ; Geographic and Magnetic
+    return, {data: keo_arr, timestamp: time_stamp, ut_decimal: keogram_struct.ut_decimal, ccd_y: ccd_y, slice_idx: slice_idx, axis: keogram_struct.axis, geo_y: geo_y, mag_y: mag_y}
   endif else if array_equal(keywords, [1, 1, 1]) then begin
-    ; Return keogram array with desired axes added
-    return, {data: keo_arr, timestamp: time_stamp, ut_decimal: keogram_struct.ut_decimal, ccd_y: ccd_y, slice_idx: slice_idx, axis: keogram_struct.axis, geo_y: geo_y, elev_y: elev_y}
+    ; Geographic and Magnetic and Elevation
+    return, {data: keo_arr, timestamp: time_stamp, ut_decimal: keogram_struct.ut_decimal, ccd_y: ccd_y, slice_idx: slice_idx, axis: keogram_struct.axis, geo_y: geo_y, elev_y: elev_y, mag_y: mag_y}
   endif
 end

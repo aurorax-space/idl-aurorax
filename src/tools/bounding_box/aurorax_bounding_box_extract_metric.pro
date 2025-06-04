@@ -39,7 +39,14 @@
 ;       skymap: in, optional, Struct
 ;         the skymap to use for georeferencing
 ;       altitude_km: in, optional, Integer or Float
-;         the altitude of the image data for georeferencing
+;         the altitude of the image data for georeferencing - must be provided if
+;         working with geographic or geomagnetic coordinates
+;       aacgm_date: in, optioinal, String
+;         a date string in the format 'YYYY-MM-DD' specifying the date to use for AACGM
+;         coordinate transformations
+;       aacgm_height: in, optional, String
+;         input altitude (km) for geomagnetic (AACGM) coordinate transformations - if
+;         not supplied, default is 0.0
 ;       n_channels: in, optional, Integer
 ;         manually specify the image data channels, otherwise its estimated based on shape
 ;       show_preview: in, optional, Boolean
@@ -61,19 +68,23 @@ function aurorax_bounding_box_extract_metric, $
   time_stamp = time_stamp, $
   skymap = skymap, $
   altitude_km = altitude_km, $
-  n_channels = n_channels
+  n_channels = n_channels, $
+  aacgm_date = aacgm_date, $
+  aacgm_height = aacgm_height
   if keyword_set(metric) and keyword_set(percentile) then begin
     print, '[aurorax_bounding_box_extract_metric] Error: only one of ''metric'' and ''percentile'' may be used at once.'''
     return, !null
   endif
 
+  ; Check that metric is valid
   metrics = ['mean', 'median', 'sum']
   if not keyword_set(metric) then metric = 'median'
   if where(metric eq metrics, /null) eq !null then begin
     print, '[aurorax_bounding_box_extract_metric] Error: metric \''' + string(metric) + ''' not recognized. Accepted metrics are: ' + strjoin(modes, ',') + '.'
     return, !null
   endif
-
+  
+  ; Check that there are no conflicts with percentile keyword
   if keyword_set(percentile) then begin
     if not isa(percentile, /number) then begin
       print, '[aurorax_bounding_box_extract_metric] Error: ''percentile'' must be a number between 0 and 100.'''
@@ -85,7 +96,7 @@ function aurorax_bounding_box_extract_metric, $
     endif
     metric = 'percentile'
   endif
-
+  
   modes = ['azim', 'ccd', 'elev', 'geo', 'mag']
   mode_idx = where(strlowcase(mode) eq modes, /null)
   if mode_idx eq !null then begin
@@ -93,7 +104,24 @@ function aurorax_bounding_box_extract_metric, $
     return, !null
   endif
   mode = strlowcase(mode)
-
+  
+  ; If date is supplied for magnetic transformations, check correct format
+  if keyword_set(aacgm_date) then begin
+    if ~isa(aacgm_date, /string, /scalar) then begin
+      print, '[aurorax_bounding_box_extract_metric] Error: keyword ''aacgm_date'' should be a scalar string in the format "YYYY-MM-DD"'
+      return, !null
+    endif 
+    if (strlen(aacgm_date) ne 10) or (strmid(aacgm_date,4,1) ne '-') or (strmid(aacgm_date,7,1) ne '-') then begin
+      print, '[aurorax_bounding_box_extract_metric] Error: keyword ''aacgm_date'' should be a scalar string in the format "YYYY-MM-DD"'
+      return, !null
+    endif
+  endif 
+  
+  ; set default height for aacgm transformations if not supplied
+  if ~ keyword_set(aacgm_height) then begin
+    aacgm_height = 0.0
+  endif
+  
   ; Get number of channels
   if n_elements(size(images, /dimensions)) eq 4 then begin
     n_channels = (size(images, /dimensions))[0]
@@ -171,7 +199,7 @@ function aurorax_bounding_box_extract_metric, $
         preview_img = bytscl(flat_images[*, 0], top = 230)
         preview_img[bounded_idx] = 255
         preview_img = reform(preview_img, (size(images, /dimensions))[0], (size(images, /dimensions))[1])
-        im = image(preview_img, rgb_table = 0, title = 'Preview of Bounded Area', position = [5, 5], /device)
+        im = image(preview_img, rgb_table=0, title = 'Preview of Bounded Area ('+mode+')', position = [0, 60], /device, dimensions=[(size(images, /dimensions))[0], (size(images, /dimensions))[1]+85], /no_toolbar)
       endif
 
       ; Obtain bounded data and then take metric over all images
@@ -202,7 +230,7 @@ function aurorax_bounding_box_extract_metric, $
         preview_img[0, bounded_idx] = 255
         preview_img[1 : *, bounded_idx] = 0
         preview_img = reform(preview_img, 3, (size(images, /dimensions))[1], (size(images, /dimensions))[2])
-        im = image(preview_img, title = 'Preview of Bounded Area', position = [5, 5], /device)
+        im = image(preview_img, title = 'Preview of Bounded Area ('+mode+')', position = [0, 60], /device, dimensions=[(size(images, /dimensions))[1], (size(images, /dimensions))[2]+85], /no_toolbar)
       endif
 
       ; Obtain bounded data and then take metric over all images
@@ -310,7 +338,7 @@ function aurorax_bounding_box_extract_metric, $
         ; plot the first image, with bounded idx masked
         preview_img = bytscl(images[*, *, 0], top = 230)
         preview_img[x_0 : x_1, y_0 : y_1] = 255
-        im = image(preview_img, rgb_table = 0, title = 'Preview of Bounded Area', position = [5, 5], /device)
+        im = image(preview_img, rgb_table=0, title = 'Preview of Bounded Area ('+mode+')', position = [0, 60], /device, dimensions=[(size(images, /dimensions))[0], (size(images, /dimensions))[1]+85], /no_toolbar)
       endif
 
       ; Obtain bounded data and then take metric over all images
@@ -338,7 +366,7 @@ function aurorax_bounding_box_extract_metric, $
         preview_img = bytscl(images[*, *, *, 0], top = 230)
         preview_img[0, x_0 : x_1, y_0 : y_1] = 255
         preview_img[1 : *, x_0 : x_1, y_0 : y_1] = 0
-        im = image(preview_img, title = 'Preview of Bounded Area', position = [5, 5], /device)
+        im = image(preview_img, title = 'Preview of Bounded Area ('+mode+')', position = [0, 60], /device, dimensions=[(size(images, /dimensions))[1], (size(images, /dimensions))[2]+85], /no_toolbar)
       endif
 
       ; Obtain bounded data and then take metric over all images
@@ -431,7 +459,7 @@ function aurorax_bounding_box_extract_metric, $
         preview_img = bytscl(flat_images[*, 0], top = 230)
         preview_img[bounded_idx] = 255
         preview_img = reform(preview_img, (size(images, /dimensions))[0], (size(images, /dimensions))[1])
-        im = image(preview_img, rgb_table = 0, title = 'Preview of Bounded Area', position = [5, 5], /device)
+        im = image(preview_img, rgb_table=0, title = 'Preview of Bounded Area ('+mode+')', position = [0, 60], /device, dimensions=[(size(images, /dimensions))[0], (size(images, /dimensions))[1]+85], /no_toolbar)
       endif
 
       ; Obtain bounded data and then take metric over all images
@@ -462,7 +490,7 @@ function aurorax_bounding_box_extract_metric, $
         preview_img[0, bounded_idx] = 255
         preview_img[1 : *, bounded_idx] = 0
         preview_img = reform(preview_img, 3, (size(images, /dimensions))[1], (size(images, /dimensions))[2])
-        im = image(preview_img, title = 'Preview of Bounded Area', position = [5, 5], /device)
+        im = image(preview_img, title = 'Preview of Bounded Area ('+mode+')', position = [0, 60], /device, dimensions=[(size(images, /dimensions))[1], (size(images, /dimensions))[2]+85], /no_toolbar)
       endif
 
       ; Obtain bounded data and then take metric over all images
@@ -622,7 +650,7 @@ function aurorax_bounding_box_extract_metric, $
         preview_img = bytscl(flat_images[*, 0], top = 230)
         preview_img[bounded_idx] = 255
         preview_img = reform(preview_img, (size(images, /dimensions))[0], (size(images, /dimensions))[1])
-        im = image(preview_img, rgb_table = 0, title = 'Preview of Bounded Area', position = [5, 5], /device)
+        im = image(preview_img, rgb_table=0, title = 'Preview of Bounded Area ('+mode+')', position = [0, 60], /device, dimensions=[(size(images, /dimensions))[0], (size(images, /dimensions))[1]+85], /no_toolbar)
       endif
 
       ; Obtain bounded data and then take metric over all images
@@ -653,7 +681,7 @@ function aurorax_bounding_box_extract_metric, $
         preview_img[0, bounded_idx] = 255
         preview_img[1 : *, bounded_idx] = 0
         preview_img = reform(preview_img, 3, (size(images, /dimensions))[1], (size(images, /dimensions))[2])
-        im = image(preview_img, title = 'Preview of Bounded Area', position = [5, 5], /device)
+        im = image(preview_img, title = 'Preview of Bounded Area ('+mode+')', position = [0, 60], /device, dimensions=[(size(images, /dimensions))[1], (size(images, /dimensions))[2]+85], /no_toolbar)
       endif
 
       ; Obtain bounded data and then take metric over all images
@@ -689,7 +717,226 @@ function aurorax_bounding_box_extract_metric, $
 
     return, result
   endif else if mode eq 'mag' then begin
-    print, '[aurorax_bounding_box_extract_metric] Error: magnetic coordinates are not yet supported for this routine...'
-    return, !null
+    if (not isa(xy_bounds, /array)) or (n_elements(xy_bounds) ne n_elements([0, 0, 0, 0])) then begin
+      print, '[aurorax_bounding_box_extract_metric] Error: xy_array must be a four-element array specifying [mlon_0, mlon_1, mlat_0, mlat_1].'
+      return, !null
+    endif
+
+    ; Select individual magnetic lat/lon from array
+    lon_0 = xy_bounds[0]
+    lon_1 = xy_bounds[1]
+    lat_0 = xy_bounds[2]
+    lat_1 = xy_bounds[3]
+    
+    ; Ensure that coordinates are valid
+    if lat_0 gt 90. or lat_0 lt -90. then begin
+      print, '[aurorax_bounding_box_extract_metric] Error: latitude ' + strcompress(string(lat_0), /remove_all) + ' out of range (-90,90).'
+      return, !null
+    endif else if lat_1 gt 90. or lat_1 lt -90. then begin
+      print, '[aurorax_bounding_box_extract_metric] Error: latitude ' + strcompress(string(lat_1), /remove_all) + ' out of range (-90,90).'
+      return, !null
+    endif else if lon_0 gt 180. or lon_0 lt -180. then begin
+      print, '[aurorax_bounding_box_extract_metric] Error: longitude ' + strcompress(string(lon_0), /remove_all) + ' out of range (-180,180).'
+      return, !null
+    endif else if lon_1 gt 180. or lon_1 lt -180. then begin
+      print, '[aurorax_bounding_box_extract_metric] Error: longitude ' + strcompress(string(lon_0), /remove_all) + ' out of range (-180,180).'
+      return, !null
+    endif
+    
+    ; Now perform conversion from magnetic coordinates to geographic
+    ;
+    ; First, we have to set the date for transformations
+    if keyword_set(aacgm_date) then begin
+      aacgm_yy = fix(strmid(aacgm_date,0,4))
+      aacgm_mm = fix(strmid(aacgm_date,5,2))
+      aacgm_dd = fix(strmid(aacgm_date,8,2))
+      !null = aacgm_v2_setdatetime(aacgm_yy, aacgm_mm, aacgm_dd)
+    endif else begin
+      !null = aacgm_v2_setnow()
+    endelse
+    
+    ; Convert each lat/lon pair from magnetic to geographic
+    pos_0 = cnvcoord_v2(lat_0, lon_0, aacgm_height, /geo)
+    pos_1 = cnvcoord_v2(lat_1, lon_1, aacgm_height, /geo)
+
+    ; Re-assign coordinates after conversion
+    lat_0 = pos_0[0]
+    lon_0 = pos_0[1]
+    lat_1 = pos_1[0]
+    lon_1 = pos_1[1]
+
+    ; Ensure that coordinates are properly ordered
+    if lat_0 gt lat_1 then begin
+      tmp = lat_0
+      lat_0 = lat_1
+      lat_1 = tmp
+    endif else if lon_0 gt lon_1 then begin
+      tmp = lon_0
+      lon_0 = lon_1
+      lon_1 = tmp
+    endif
+
+    ; Ensure that this is a valid area
+    if lat_1 eq lat_0 or lon_1 eq lon_0 then begin
+      print, '[aurorax_bounding_box_extract_metric] Error: Coordinate range defined with zero area, ensure that lats and lons are different.'
+      return, !null
+    endif
+    
+    ; grab necessary data from skymap
+    altitudes = skymap.full_map_altitude
+    lats = skymap.full_map_latitude
+    lons = skymap.full_map_longitude
+    lons[where(lons gt 180)] -= 360
+    elev = skymap.full_elevation
+
+    ; convert altitudes to km for interpolation
+    interp_alts = altitudes / 1000.
+    if not isa(altitude_km) then begin
+      print, '[aurorax_bounding_box_extract_metric] Error: altitude must be provided when working in lat/lon coordinates.'
+      return, !null
+    endif
+
+    if where(float(altitude_km) eq interp_alts, /null) ne !null then begin
+      ; no interpolation required
+      alt_idx = where(float(altitude_km) eq interp_alts, /null)
+
+      ; grab lat/lons at this altitude
+      lats = lats[*, *, alt_idx]
+      lons = lons[*, *, alt_idx]
+    endif else begin
+      ; interpolation is required
+      lats_xsize = (size(lats, /dimensions))[0]
+      lats_ysize = (size(lats, /dimensions))[1]
+      ; first check if supplied altitude is valid for interpolation
+      if (altitude_km lt min(interp_alts)) or (altitude_km gt max(interp_alts)) then begin
+        error_msg = '[aurorax_bounding_box_extract_metric] Error: Altitude of ' + strcompress(string(altitude_km), /remove_all) + ' km is outside the valid ' + $
+          'range of [' + strcompress(string(min(interp_alts)), /remove_all) + ',' + strcompress(string(max(interp_alts)), /remove_all) + '] km.'
+        print, error_msg
+        return, !null
+      endif
+      ; interpolate entire lat lon arrays
+      new_lats = lats[*, *, 0]
+      new_lons = lons[*, *, 0]
+      for i = 0, lats_xsize - 1 do begin
+        for j = 0, lats_ysize - 1 do begin
+          new_lats[i, j] = interpol(lats[i, j, *], interp_alts, altitude_km)
+          new_lons[i, j] = interpol(lons[i, j, *], interp_alts, altitude_km)
+        endfor
+      endfor
+      lats = new_lats
+      lons = new_lons
+    endelse
+
+    ; Check that lat/lon range is reasonable
+    min_skymap_lat = min(lats, /nan)
+    max_skymap_lat = max(lats, /nan)
+    min_skymap_lon = min(lons, /nan)
+    max_skymap_lon = max(lons, /nan)
+    
+    ; Convert skymap range to aacgm coords for use in user message in case of invalid inputs
+    min_skymap_pos = cnvcoord_v2(min_skymap_lat, min_skymap_lon, aacgm_height, verbose=-1)
+    max_skymap_pos = cnvcoord_v2(max_skymap_lat, max_skymap_lon, aacgm_height, verbose=-1)
+    min_skymap_mlat = min_skymap_pos[0]
+    max_skymap_mlat = max_skymap_pos[0]
+    min_skymap_mlon = min_skymap_pos[1]
+    max_skymap_mlon = max_skymap_pos[1]
+        
+    if (lat_0 le min_skymap_lat) or (lat_1 ge max_skymap_lat) then begin
+      print, '[aurorax_bounding_box_extract_metric] Error: latitude range supplied is outside the valid range for this skymap (' + strcompress(string(min_skymap_mlat), /remove_all) + $
+        ',' + strcompress(string(max_skymap_mlat), /remove_all) + ').'
+      return, !null
+    endif
+    if (lon_0 le min_skymap_lon) or (lon_1 ge max_skymap_lon) then begin
+      print, '[aurorax_bounding_box_extract_metric] Error: longitude range supplied is outside the valid range for this skymap (' + strcompress(string(min_skymap_mlon), /remove_all) + $
+        ',' + strcompress(string(max_skymap_mlon), /remove_all) + ').'
+      return, !null
+    endif
+
+    ; Get index into flattened CCD corresponding to bounded area
+    flattened_lats = reform(lats[1 : *, 1 : *], ((size(lats, /dimensions))[0] - 1) * ((size(lats, /dimensions))[1] - 1))
+    flattened_lons = reform(lons[1 : *, 1 : *], ((size(lons, /dimensions))[0] - 1) * ((size(lons, /dimensions))[1] - 1))
+    bounded_idx = where((flattened_lats ge float(lat_0)) and (flattened_lats le float(lat_1)) and (flattened_lons ge float(lon_0)) and (flattened_lons le float(lon_1)), /null)
+
+    ; If boundaries contain no data, raise error
+    if bounded_idx eq !null then begin
+      print, '[aurorax_bounding_box_extract_metric] Error: Could not extract data within lat/lon bounds. Try a larger area, and ensure it is within range for this image.'
+      return, !null
+    endif
+
+    ; Slice data of interest from images
+    if n_channels eq 1 then begin
+      ; flatten images for indexing
+      flat_images = reform(images, (size(images, /dimensions))[0] * (size(images, /dimensions))[1], (size(images, /dimensions))[2])
+      if keyword_set(show_preview) then begin
+        ; plot the first image, with bounded idx masked
+        preview_img = bytscl(flat_images[*, 0], top = 230)
+        preview_img[bounded_idx] = 255
+        preview_img = reform(preview_img, (size(images, /dimensions))[0], (size(images, /dimensions))[1])
+        im = image(preview_img, rgb_table=0, title = 'Preview of Bounded Area ('+mode+')', position = [0, 60], /device, dimensions=[(size(images, /dimensions))[0], (size(images, /dimensions))[1]+85], /no_toolbar)
+      endif
+      
+      ; Obtain bounded data and then take metric over all images
+      flat_bounded_data = flat_images[bounded_idx, *]
+      if metric eq 'median' then begin
+        result = reform(median(flat_bounded_data, dimension = 1))
+      endif else if metric eq 'mean' then begin
+        result = reform(mean(flat_bounded_data, dimension = 1))
+      endif else if metric eq 'sum' then begin
+        result = reform(total(flat_bounded_data, dimension = 1))
+      endif else if metric eq 'percentile' then begin
+        sorted = flat_bounded_data
+        result = []
+        for i = 0, (size(sorted, /dimensions))[1] - 1 do begin
+          ; get the x percentile value of each frame and take those as result
+          sorted_frame = sorted[*, i]
+          sorted_frame = sorted_frame[sort(sorted_frame)]
+          percentile_idx = fix((percentile / 100.) * ((size(sorted, /dimensions))[0] - 1))
+          result = [result, sorted_frame[percentile_idx]]
+        endfor
+      endif
+    endif else if n_channels eq 3 then begin
+      ; flatten images
+      flat_images = reform(images, 3, (size(images, /dimensions))[1] * (size(images, /dimensions))[2], (size(images, /dimensions))[3])
+      if keyword_set(show_preview) then begin
+        ; plot the first image, with bounded idx masked
+        preview_img = bytscl(flat_images[*, *, 0], top = 230)
+        preview_img[0, bounded_idx] = 255
+        preview_img[1 : *, bounded_idx] = 0
+        preview_img = reform(preview_img, 3, (size(images, /dimensions))[1], (size(images, /dimensions))[2])
+        im = image(preview_img, title = 'Preview of Bounded Area ('+mode+')', position = [0, 60], /device, dimensions=[(size(images, /dimensions))[1], (size(images, /dimensions))[2]+85], /no_toolbar)
+      endif
+
+      ; Obtain bounded data and then take metric over all images
+      flat_bounded_data = flat_images[*, bounded_idx, *]
+      if metric eq 'median' then begin
+        result = reform(median(flat_bounded_data, dimension = 2))
+      endif else if metric eq 'mean' then begin
+        result = reform(mean(flat_bounded_data, dimension = 2))
+      endif else if metric eq 'sum' then begin
+        result = reform(total(flat_bounded_data, 2))
+      endif else if metric eq 'percentile' then begin
+        sorted = flat_bounded_data
+        result_r = []
+        result_g = []
+        result_b = []
+        for i = 0, (size(sorted, /dimensions))[2] - 1 do begin
+          ; get the x percentile value of each frame and take those as result
+          sorted_frame = sorted[*, *, i]
+
+          sorted_frame = sorted_frame[*, sort(total(sorted_frame, 1))]
+          percentile_idx = fix((percentile / 100.) * ((size(sorted, /dimensions))[1] - 1))
+
+          result_r = [result_r, (reform(sorted_frame[*, percentile_idx]))[0]]
+          result_g = [result_g, (reform(sorted_frame[*, percentile_idx]))[1]]
+          result_b = [result_b, (reform(sorted_frame[*, percentile_idx]))[2]]
+        endfor
+        result = transpose([[result_r], [result_g], [result_b]])
+      endif
+    endif else begin
+      print, '[aurorax_bounding_box_extract_metric] Error: enrecognized image format with ' + strcompress(string(n_elements(size(images, /dimensions))), /remove_all) + ' dimensions.'
+      return, !null
+    endelse
+
+    return, result
   endif
 end

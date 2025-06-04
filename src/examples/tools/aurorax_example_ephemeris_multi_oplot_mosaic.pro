@@ -120,7 +120,13 @@ pro aurorax_example_ephemeris_multi_oplot_mosaic
   gridline_color = aurorax_get_decomposed_color([0, 0, 0])
   clats = [30, 40, 50, 60, 70, 80]
   clons = [200, 220, 240, 260, 280, 300, 320, 340]
-  aurorax_mosaic_oplot, constant_lats = clats, constant_lons = clons, color = gridline_color, linestyle = 2, thick = 2
+  aurorax_mosaic_oplot, constant_lats = clats, constant_lons = clons, color = gridline_color, linestyle = 2
+  
+  ; The aurorax_mosaic_oplot routine also includes a /mag option, to overplot contours
+  ; that are defined in geomagnetic (AACGM) coordinates
+  magnetic_gridline_color = aurorax_get_decomposed_color([255, 179, 0])
+  clats = [63, 77]
+  aurorax_mosaic_oplot, constant_lats = clats, color = magnetic_gridline_color, linestyle = 0, thick = 6, /mag
 
   ; Call the mosaic creation function to plot the mosaic in the current window
   aurorax_mosaic_plot, prepped_images, prepped_skymaps, mosaic_dt, intensity_scales = scale

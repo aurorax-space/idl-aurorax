@@ -37,12 +37,13 @@ pro aurorax_example_create_keogram_trex_rgb
   ; array, you can grab it like this:
   keo_arr = keo.data
 
-  ; Add geographic and elevation axes to the keogram object
-  keo = aurorax_keogram_add_axis(keo, skymap, /geo, /elev, altitude_km = 110)
+  ; Add geographic, elevation, and geomagnetic axes to the keogram object
+  keo = aurorax_keogram_add_axis(keo, skymap, /geo, /elev, /mag, altitude_km = 110)
 
   ; Plot with aurorax function
   p1 = aurorax_keogram_plot(keo, title = 'Geographic', /geo, location = [0, 0], dimensions = [800, 400])
-  p2 = aurorax_keogram_plot(keo, title = 'Elevation', /elev, location = [0, 420], dimensions = [800, 400])
+  p2 = aurorax_keogram_plot(keo, title = 'Elevation', /elev, location = [800, 0], dimensions = [800, 400])
+  p3 = aurorax_keogram_plot(keo, title = 'Geomagnetic (AACGM)', /mag, location = [0, 450], dimensions = [800, 400])
 
 
   ;  === Dealing with missing data ===
@@ -73,7 +74,7 @@ pro aurorax_example_create_keogram_trex_rgb
   new_shape = size(keo.data, /dimensions)
   
   ; Plot the keogram with missing data indicated as you normally would
-  p3 = aurorax_keogram_plot(keo, title = 'Keogram with Missing Data', location = [850, 0], dimensions = [1000, 400])
+  p4 = aurorax_keogram_plot(keo, title = 'Keogram with Missing Data', location = [800, 450], dimensions = [800, 400], colortable = 0)
   
   ; Inspecting the shape reveals that indeed there was missing data, which
   ; has been filled using the aurorax_keogram_inject_nans() function

@@ -66,7 +66,7 @@ pro aurorax_example_ccd_contours
   ; ==================================================================================
   ; == Lines of constant lat/lon ==
   ; ==================================================================================
-  window, 3, xsize = 553, ysize = 480, title = 'LINES OF CONSTANT LAT/LON AND CUSTOM CONTOUR'
+  window, 2, xsize = 553, ysize = 480, title = 'LINES OF CONSTANT LAT/LON AND CUSTOM CONTOUR'
   tvscl, img, /true
   ; Iterate through some different latitudes
   for lat = 62, 63 do begin
@@ -100,4 +100,31 @@ pro aurorax_example_ccd_contours
   ccd_x = ccd_coords[*, 0]
   ccd_y = ccd_coords[*, 1]
   plots, ccd_x, ccd_y, color = red, /device, thick = 5
+  
+  ; ==================================================================================
+  ; == Lines of constant geomagnetic (AACGM) lat/lon ==
+  ; ==================================================================================
+  window, 3, xsize = 553, ysize = 480, title = 'LINES OF CONSTANT GEOMAGNETIC LAT/LON'
+  tvscl, img, /true
+  ; Iterate through some different latitudes
+  for mlat = 68, 69 do begin
+    ; Obtain pixel coordinates of this line of constant geomagnetic latitude (/MAG keyword)
+    ccd_coords = aurorax_ccd_contour(skymap, constant_lat = mlat, /mag)
+    ccd_x = ccd_coords[*, 0]
+    ccd_y = ccd_coords[*, 1]
+
+    ; overplot the line in device coordinates
+    plots, ccd_x, ccd_y, color = white, /device, thick = 2, linestyle = 2
+  endfor
+
+  ; Iterate through some different longitudes
+  foreach mlon, [-53, -56] do begin
+    ; Obtain pixel coordinates of this line of constant geomagnetic longitude (/MAG keyword)
+    ccd_coords = aurorax_ccd_contour(skymap, constant_lon = mlon, /mag)
+    ccd_x = ccd_coords[*, 0]
+    ccd_y = ccd_coords[*, 1]
+
+    ; overplot the line in device coordinates
+    plots, ccd_x, ccd_y, color = white, /device, thick = 2, linestyle = 2
+  endforeach
 end

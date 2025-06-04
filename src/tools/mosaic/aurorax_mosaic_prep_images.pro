@@ -14,7 +14,7 @@
 ; limitations under the License.
 ; -------------------------------------------------------------
 
-function __determine_cadence, timestamp_arr
+function __aurorax_determine_cadence, timestamp_arr
   compile_opt hidden
 
   ; ;;
@@ -71,7 +71,7 @@ function __determine_cadence, timestamp_arr
   return, cadence
 end
 
-function __get_julday, time_stamp
+function __aurorax_get_julday, time_stamp
   compile_opt hidden
 
   ; ;;
@@ -190,17 +190,17 @@ function aurorax_mosaic_prep_images, $
   ; 1) finding the over-arching start and end times of data across all sites
   ; 2) determine the cadence using the timestamps
   ; 3) determine the number of expected frames using the cadence, start and end
-  start_ts = __get_julday(image_list[0].timestamp[0])
-  end_ts = __get_julday(image_list[0].timestamp[-1])
+  start_ts = __aurorax_get_julday(image_list[0].timestamp[0])
+  end_ts = __aurorax_get_julday(image_list[0].timestamp[-1])
   foreach site_data, image_list do begin
-    this_start_ts = __get_julday(site_data.timestamp[0])
-    this_end_ts = __get_julday(site_data.timestamp[-1])
+    this_start_ts = __aurorax_get_julday(site_data.timestamp[0])
+    this_end_ts = __aurorax_get_julday(site_data.timestamp[-1])
     if (this_start_ts lt start_ts) then start_ts = this_start_ts
     if (this_end_ts gt end_ts) then end_ts = this_end_ts
   endforeach
 
   ; Determine cadance, and generate all expected timestamps
-  cadence = __determine_cadence(image_list[0].timestamp)
+  cadence = __aurorax_determine_cadence(image_list[0].timestamp)
 
   ; indicate burst data or not
   if cadence lt 1.0 then is_burst = 1 else is_burst = 0

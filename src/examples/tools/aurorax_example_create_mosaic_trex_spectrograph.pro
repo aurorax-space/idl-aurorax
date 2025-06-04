@@ -89,6 +89,18 @@ pro aurorax_example_create_mosaic_trex_spectrograph
   img_scale = [10, 105]
   spect_scale = [0, 7500] ; in Rayleighs, for whichever emission we are plotting (greenline in this example)
   
+  ; Plot some gridlines
+  gridline_color = aurorax_get_decomposed_color([0, 0, 0])
+  clats = [30, 40, 50, 60, 70, 80]
+  clons = [200, 220, 240, 260, 280, 300, 320, 340]
+  aurorax_mosaic_oplot, constant_lats = clats, constant_lons = clons, color = gridline_color, linestyle = 2
+
+  ; The aurorax_mosaic_oplot routine also includes a /mag option, to overplot contours
+  ; that are defined in geomagnetic (AACGM) coordinates
+  magnetic_gridline_color = aurorax_get_decomposed_color([255, 179, 0])
+  clats = [63, 77]
+  aurorax_mosaic_oplot, constant_lats = clats, color = magnetic_gridline_color, linestyle = 0, thick = 6, /mag
+  
   ; Call the plotting function
   aurorax_mosaic_plot, prepped_data, prepped_skymaps, '2021-03-13T09:40:15', intensity_scales=img_scale, spect_intensity_scales=spect_scale, colortable=[0,8]
   
