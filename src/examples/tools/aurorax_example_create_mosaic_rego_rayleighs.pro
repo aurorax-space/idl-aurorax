@@ -117,8 +117,11 @@ pro aurorax_example_create_mosaic_rego_rayleighs
   ; Call the mosaic creation function to plot the mosaic in the current window
   aurorax_mosaic_plot, prepped_data, prepped_skymap, mosaic_dt, intensity_scales = scale, colortable = ct, min_elevation = min_elevation
 
-  ; Plot some text on top
+  ; Overplot some text
+  !p.font = 1
+  device, set_font="Helvetica Bold", /tt_font, set_character_size=[7,7]
   xyouts, 0.01, 0.9, 'REGO - Absolute Intensity', /normal, font = 1, charsize = 6
   xyouts, 0.01, 0.085, strmid(images.timestamp[0], 0, 10), /normal, font = 1, charsize = 5
   xyouts, 0.01, 0.01, strmid(images.timestamp[0], 11, 8) + ' UTC', /normal, font = 1, charsize = 5
+  !p.font = -1
 end

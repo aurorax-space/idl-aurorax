@@ -135,9 +135,12 @@ pro aurorax_example_create_mosaic_multi_network
   aurorax_mosaic_plot, prepped_data, prepped_skymap, mosaic_dt, min_elevation = [10, 5], intensity_scales = scale, colortable = colortable
 
   ; Plot some text on top
+  !p.font = 1
+  device, set_font="Helvetica Bold", /tt_font, set_character_size=[7,7]
   xyouts, 0.01, 0.9, 'THEMIS ASI', /normal, font = 1, charsize = 5
   xyouts, 0.01, 0.825, 'TREx RGB', /normal, font = 1, charsize = 5
   xyouts, 0.01, 0.75, 'REGO', /normal, font = 1, charsize = 5
   xyouts, 0.01, 0.085, strmid(image_data.timestamp[0], 0, 10), /normal, font = 1, charsize = 5
   xyouts, 0.01, 0.01, strmid(image_data.timestamp[0], 11, 8) + ' UTC', /normal, font = 1, charsize = 5
+  !p.font = -1
 end

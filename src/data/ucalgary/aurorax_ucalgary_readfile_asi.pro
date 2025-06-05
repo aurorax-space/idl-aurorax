@@ -365,8 +365,8 @@ function __aurorax_asi_png_readfile, $
   endif
   
   ; cleanup untarred files
-  if (no_untar_cleanup eq 0) then __aurorax_asi_png_cleanup_tar_files, cleanup_list, verbose = verbose
-  return, 0
+  if (no_untar_cleanup eq 0) then __aurorax_asi_cleanup_tar_files, cleanup_list, verbose = verbose
+  return, 0                       
   
   ; on error, remove extra unused memory, cleanup files, and return
   ioerror:
@@ -375,7 +375,7 @@ function __aurorax_asi_png_readfile, $
     image_data = image_data[*, *, *, 0 : n_frames - 1]
     meta_data = meta_data[0 : n_frames - 1]
   endif
-  if (no_untar_cleanup eq 0) then __aurorax_asi_png_cleanup_tar_files, cleanup_list, verbose = verbose
+  if (no_untar_cleanup eq 0) then __aurorax_asi_cleanup_tar_files, cleanup_list, verbose = verbose
   return, 1
 end
 
@@ -808,7 +808,7 @@ pro __aurorax_ucalgary_readfile_asi, $
       if (stregex(strupcase(filenames[i]), '.*\PNG') eq 0) then begin
         ; file is a PNG (either tarred or not)
         processing_mode = 'png'
-        ret = __aurorax_asi_png_readfile(filenames[i], file_images, file_metadata, file_dimension_details, file_nframes, file_total_bytes, untar_extract_supported, idl_version_full_support, untar_dir = untar_dir, no_untar_cleanup = 1, verbose = verbose, no_metadata = no_metadata, first_frame = first_frame)
+        ret = __aurorax_asi_png_readfile(filenames[i], file_images, file_metadata, file_dimension_details, file_nframes, file_total_bytes, untar_extract_supported, idl_version_full_support, untar_dir = untar_dir, no_untar_cleanup = no_untar_cleanup, verbose = verbose, no_metadata = no_metadata, first_frame = first_frame)
       endif else begin
         ; file is an h5
         processing_mode = 'h5'

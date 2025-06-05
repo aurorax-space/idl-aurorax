@@ -104,8 +104,15 @@ pro aurorax_example_create_mosaic_trex_spectrograph
   ; Call the plotting function
   aurorax_mosaic_plot, prepped_data, prepped_skymaps, '2021-03-13T09:40:15', intensity_scales=img_scale, spect_intensity_scales=spect_scale, colortable=[0,8]
   
+  !p.font = 1
+  device, set_font="Helvetica Bold", /tt_font, set_character_size=[7,7]
+  xyouts, 0.01, 0.9, 'TREx RGB + Spectrograph', /normal, font = 1, charsize = 6
+  xyouts, 0.01, 0.085, strmid(image_data.timestamp[0], 0, 10), /normal, font = 1, charsize = 5
+  xyouts, 0.01, 0.01, strmid(image_data.timestamp[0], 11, 8) + ' UTC', /normal, font = 1, charsize = 5
+  !p.font = -1
+  
   ; Let's manually create a quick colorbar for the spectrograph data
-  w = window(dimensions=[100,300], /no_toolbar, margin=0)
+  w = window(dimensions=[100,300], /no_toolbar, margin=0, location=[800,200])
   n_ticks = 5
   tickvals = []
   ticknames = []
@@ -113,33 +120,6 @@ pro aurorax_example_create_mosaic_trex_spectrograph
     tickvals = [tickvals, 255.0*(i/(n_ticks-1.0))]
     ticknames = [ticknames, strcompress(string(fix(7500*(i/(n_ticks-1.0)))),/remove_all)]
   endfor
-
-  c = colorbar(rgb_table=8, range=spect_scale, orientation=1, title="Spectrograph 557.7 nm Intensity (Rayleighs)", $
+  c = colorbar(rgb_table=8, orientation=1, title="Spectrograph 557.7 nm Intensity (Rayleighs)", $
                position=[0.6,0.1,0.8,0.9], tickvalues=tickvals, tickname=ticknames)
-
 end
-
-
-
-
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  

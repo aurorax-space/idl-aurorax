@@ -121,7 +121,8 @@ pro aurorax_example_ephemeris_oplot_mosaic
 
   ; Overplot the location of the Swarm spacecraft in this mosaic as a point
   aurorax_mosaic_oplot, point = [conjunction_lon, conjunction_lat], color = footprint_color, symsize = 2
-
+  
+  !p.font = 1
   ; Add a label for the spacecraft
   xyouts, 0.25, 0.55, 'Swarm A', color = footprint_color, /normal, font = 1, charsize = 2
 
@@ -129,4 +130,5 @@ pro aurorax_example_ephemeris_oplot_mosaic
   xyouts, 0.01, 0.9, 'TREx RGB', /normal, font = 1, charsize = 6
   xyouts, 0.01, 0.085, strmid(image_data.timestamp[0], 0, 10), /normal, font = 1, charsize = 5
   xyouts, 0.01, 0.01, strmid(image_data.timestamp[0], 11, 8) + ' UTC', /normal, font = 1, charsize = 5
+  !p.font = -1
 end

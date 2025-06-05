@@ -108,10 +108,13 @@ pro aurorax_example_create_mosaic_trex_rgb_burst
   ; Call the mosaic creation function to plot the mosaic in the current window
   aurorax_mosaic_plot, prepped_images, prepped_skymaps, mosaic_dt, intensity_scales = scale
 
-  ; Plot some text on top
-  xyouts, 0.01, 0.9, 'TREx RGB - Burst Mode', /normal, font = 1, charsize = 6
-  xyouts, 0.01, 0.085, strmid(mosaic_dt, 0, 10), /normal, font = 1, charsize = 5
-  xyouts, 0.01, 0.01, strmid(mosaic_dt, 11, 11) + ' UTC', /normal, font = 1, charsize = 5
+  ; Overplot some text
+  !p.font = 1
+  device, set_font="Helvetica Bold", /tt_font, set_character_size=[7,7]
+  xyouts, 0.01, 0.9, 'TREx RGB - Burst Mode', /normal, font = 1, charsize = 3
+  xyouts, 0.01, 0.085, strmid(mosaic_dt, 0, 10), /normal, font = 1, charsize = 2
+  xyouts, 0.01, 0.01, strmid(mosaic_dt, 11, 11) + ' UTC', /normal, font = 1, charsize = 2
+  !p.font = -1
 end
 
 

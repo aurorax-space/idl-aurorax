@@ -49,6 +49,12 @@ pro aurorax_example_plot_fovs
   ; You can also pass in multiple sites at once, and change the altitude that FOVs are mapped at
   aurorax_fov_oplot, [57.0, 62.5], [-118.0,-97.0], 230.0, thick=4, linestyle=1, site_name=["site2", "site3"], /label_site, color=aurorax_get_decomposed_color([0,160,0])
   
+  ; Add a label for the map
+  !p.font = 1
+  xyouts, 0.02, 0.02, "ASI FoVs", /normal, color=0, charthick=2, charsize=1.5
+  !p.font = -1
+  
+  
   ; Plotting FoVs for an actual instrument
   ;
   ; The aurorax_fov_oplot routine can be used in combination with aurorax_list_observatories()
@@ -99,7 +105,11 @@ pro aurorax_example_plot_fovs
   
   ; Now, call the aurorax_fov_oplot procedure with the themis site information
   aurorax_fov_oplot, themis_lats, themis_lons, 110.0, thick=2, site_name=themis_uid
-  xyouts, 0.02, 0.02, "THEMIS-ASI SITES", /normal, color=0, charthick=2
+  
+  ; Add a label for the map
+  !p.font = 1
+  xyouts, 0.02, 0.02, "THEMIS-ASI SITES", /normal, color=0, charthick=2, charsize=1.5
+  !p.font = -1
   
   
   ; This process can be repeated for any instrument array
@@ -143,12 +153,17 @@ pro aurorax_example_plot_fovs
   clons = [200, 220, 240, 260, 280, 300, 320, 340]
   aurorax_mosaic_oplot, constant_lats = clats, constant_lons = clons, color = gridline_color, linestyle = 2
   
+  
   ; Now, call the aurorax_fov_oplot procedure with the rego site information
   ;
   ; *** Since we are plotting REGO sites, we'll set the altitude_km parameter to 230.0
   ;     as this is a commonly assumed altitude of the 630.0 nm redline emission
   aurorax_fov_oplot, rego_lats, rego_lons, 230.0, thick=2, site_name=rego_uids, color=aurorax_get_decomposed_color([255,0,0]), /label_site
-  xyouts, 0.02, 0.02, "REGO SITES", /normal, color=0, charthick=2
+  
+  ; Add a label for the map
+  !p.font = 1
+  xyouts, 0.02, 0.02, "REGO SITES", /normal, color=0, charthick=2, charsize=1.5
+  !p.font = -1
   
   
   ; Plotting spectrograph FOVs
@@ -197,7 +212,7 @@ pro aurorax_example_plot_fovs
   aurorax_mosaic_oplot, constant_lats = clats, constant_lons = clons, color = gridline_color, linestyle = 2
 
   ; Now, call the aurorax_fov_oplot procedure with the rgb site information
-  aurorax_fov_oplot, rgb_lats, rgb_lons, 110.0, thick=2, site_name=rgb_uids, color=aurorax_get_decomposed_color([0,255,0]), /label_site
+  aurorax_fov_oplot, rgb_lats, rgb_lons, 110.0, thick=2, site_name=rgb_uids, color=aurorax_get_decomposed_color([0,200,0]), /label_site
   
   ; Now, repeat the process for TREx spectrograph
   all_spect_sites = aurorax_list_observatories('trex_spectrograph')
@@ -223,13 +238,9 @@ pro aurorax_example_plot_fovs
   ; *** Here, we use the /specotograph keyword
   yellow = aurorax_get_decomposed_color([255,255,0])
   aurorax_fov_oplot, spect_lats, spect_lons, 110.0, thick=2, site_name=spect_uids, color=yellow, /label_site, label_color=yellow, /spectrograph
-  xyouts, 0.02, 0.02, "TREx RGB & SPECTROGRAPH FoV", /normal, color=0, charthick=2
+  
+  ; Add a label for the map
+  !p.font = 1
+  xyouts, 0.02, 0.02, "TREx RGB & SPECTROGRAPH FoV", /normal, color=0, charthick=2, charsize=1.5
+  !p.font = -1
 end
-
-
-
-
-
-
-
-
