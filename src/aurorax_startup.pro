@@ -40,6 +40,7 @@ setenv, 'IGRF_COEFFS=' + !package_path + path_sep() + $
 .run aurorax_ucalgary_get_urls
 .run aurorax_ucalgary_download
 .run aurorax_ucalgary_download_best_skymap
+.run aurorax_ucalgary_download_best_calibration
 .run aurorax_ucalgary_readfile_asi
 .run aurorax_ucalgary_readfile_skymap
 .run aurorax_ucalgary_readfile_calibration
