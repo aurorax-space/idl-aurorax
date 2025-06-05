@@ -80,6 +80,7 @@ setenv, 'IGRF_COEFFS=' + !package_path + path_sep() + $
 .run aurorax_mosaic_oplot
 .run aurorax_mosaic_prep_images
 .run aurorax_mosaic_prep_skymap
+.run aurorax_fov_oplot
 .run aurorax_get_decomposed_color
 .run aurorax_movie
 

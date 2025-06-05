@@ -41,7 +41,10 @@
 ;         from the integration over spect_band for manual emission selection
 ;
 ; :Examples:
-;       ????????????????????????????????????????????
+;       i_4278 = aurorax_spectra_get_intensity(spect_data, '2021-02-16T09:30:00', 125, spect_emission='blue')
+;       i_4861 = aurorax_spectra_get_intensity(spect_data, '2021-02-16T09:30:00', 125, spect_emission='hbeta')
+;       i_5577 = aurorax_spectra_get_intensity(spect_data, '2021-02-16T09:30:00', 125, spect_emission='green')
+;       i_6300 = aurorax_spectra_get_intensity(spect_data, '2021-02-16T09:30:00', 125, spect_emission='red')
 ;+
 function aurorax_spectra_get_intensity, $
   spect_data, $
