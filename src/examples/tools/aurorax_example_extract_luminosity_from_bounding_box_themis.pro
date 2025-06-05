@@ -15,6 +15,21 @@
 ; -------------------------------------------------------------
 
 pro aurorax_example_extract_luminosity_from_bounding_box_themis
+  ; -------------------------------------------------
+  ; Working with Bounding Boxes - Single Channel Data
+  ; -------------------------------------------------
+  ;
+  ; When using ASI data, it is often advantageous to restrict your area of study to a 
+  ; particular region of the ASI. Perhaps you'd like to isolate one region of some patchy
+  ; pulsating aurora or isolate an arc, or maybe you're only interested in a specific
+  ; region of geomagnetic latitudes and longitudes.
+  ; 
+  ; The aurorax_bounding_box_extract_metric() functions provides various options for using
+  ; bounding boxes to analyze regions of ASI data for a series of images. We'll explore
+  ; some different things you can do below, using single-channel (monochromatic) ASI data,
+  ; usng THEMIS ASI as an example.
+  ;
+  
   ; Download an hour of THEMIS data
   d = aurorax_ucalgary_download('THEMIS_ASI_RAW', '2021-11-04T09:00:00', '2021-11-04T09:59:59', site_uid = 'fsim')
 

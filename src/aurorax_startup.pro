@@ -69,11 +69,11 @@ setenv, 'IGRF_COEFFS=' + !package_path + path_sep() + $
 
 ; tools
 .run aurorax_bounding_box_extract_metric
+.run aurorax_keogram_create_custom
 .run aurorax_ccd_contour
 .run aurorax_calibrate_rego
 .run aurorax_calibrate_trex_nir
 .run aurorax_keogram_add_axis
-.run aurorax_keogram_create_custom
 .run aurorax_keogram_create
 .run aurorax_keogram_plot
 .run aurorax_montage_create
@@ -84,7 +84,6 @@ setenv, 'IGRF_COEFFS=' + !package_path + path_sep() + $
 .run aurorax_fov_oplot
 .run aurorax_get_decomposed_color
 .run aurorax_movie
-
 ; check if there's a new version available
 print, '[idl-aurorax] Checking for new version ...'
 version_info = aurorax_check_version(/quiet)

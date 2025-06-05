@@ -15,6 +15,28 @@
 ; -------------------------------------------------------------
 
 pro aurorax_example_plot_grid_file_8446
+  ; -----------------------
+  ; Plot TREx NIR Grid Data
+  ; -----------------------
+  ;
+  ; We are developing new array-wide standard grid data products for our data.
+  ; We refer to these as 'grid files', since they are data organized into a common
+  ; grid format:
+  ;
+  ;   512 x 1024 latitude by longitude (~0.3 degrees per bin).
+  ;
+  ; For the optical instruments, the grid files are a downsampled pre-computed mosaic.
+  ; Preventing the need to download the raw data and generate your own mosaic which can
+  ; be tedious and compute/network intensive. Of course, if these grid files are not
+  ; good enough, you can always still download the raw data and generate your own mosaic
+  ; as you'd like for full control.
+  ;
+  ; Let's have a look at downloading and plotting a grid file for the TREx NIR dataset.
+  ; 
+  ; Note that these grid files are created usng the common calibration procedure for TREx
+  ; NIR and thus each grid cell gives the 844.6 nm emission intensity.
+  ;
+  
   ; First, download and read 5 minutes of grid data
   d = aurorax_ucalgary_download('TREX_NIR_GRID_MOSV001', '2023-03-24T08:00:00', '2023-03-24T08:00:00')
   grid_data = aurorax_ucalgary_read(d.dataset, d.filenames)

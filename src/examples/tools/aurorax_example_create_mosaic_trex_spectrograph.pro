@@ -15,6 +15,25 @@
 ; -------------------------------------------------------------
 
 pro aurorax_example_create_mosaic_trex_spectrograph
+  ; --------------------------------
+  ; Creating TREx Spectrogaph Mosaic
+  ; --------------------------------
+  ; 
+  ; Generating Spectrograph mosaics is very similar to making them for all-sky imagers like THEMIS,
+  ; REGO, and TREx RGB. However, the spectrograph has a different field of view that its data covers.
+  ; Where an all-sky imager has a circular FoV (due to the fisheye lens and all-sky nature of the
+  ; data), the spectrograph's FoV is a straight line, oriented approximately with magnetic north.
+  ; 
+  ; The most common use case of mosaics for the spectrographs is overlaying them on top of ASI data,
+  ; like TREx RGB. Below, we'll work through an example of that
+  ; 
+  ; For this example, we're going to make a mosaic of several TREx RGBs and both TREx Spectrograph
+  ; plotted on top. First step is to download and read in the image data for both those instruments.
+  ; 
+  ; NOTE: TREx Spectrograph data is organized into 1-hr files, where-as the ASI data is in 1 minute
+  ; files. That will be why the data files are so much larger compared to the ASIs.
+  ;
+  
   ; Minute of interest for downloading data
   date_time = '2021-03-13T09:40:00'
     

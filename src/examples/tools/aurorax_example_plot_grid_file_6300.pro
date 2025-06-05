@@ -15,6 +15,28 @@
 ; -------------------------------------------------------------
 
 pro aurorax_example_plot_grid_file_6300
+  ; -------------------
+  ; Plot REGO Grid Data
+  ; -------------------
+  ;
+  ; We are developing new array-wide standard grid data products for our data.
+  ; We refer to these as 'grid files', since they are data organized into a common
+  ; grid format:
+  ; 
+  ;   512 x 1024 latitude by longitude (~0.3 degrees per bin).
+  ; 
+  ; For the optical instruments, the grid files are a downsampled pre-computed mosaic.
+  ; Preventing the need to download the raw data and generate your own mosaic which can
+  ; be tedious and compute/network intensive. Of course, if these grid files are not
+  ; good enough, you can always still download the raw data and generate your own mosaic
+  ; as you'd like for full control.
+  ; 
+  ; Let's have a look at downloading and plotting a grid file for the REGO dataset.
+  ; 
+  ; Note that these grid files are created usng the common calibration procedure for
+  ; REGO and thus each grid cell gives the 630.0 nm redline emission intensity.
+  ;
+
   ; First, download and read 5 minutes of grid data
   d = aurorax_ucalgary_download('REGO_GRID_MOSV001', '2023-03-24T04:45:00', '2023-03-24T04:45:00')
   grid_data = aurorax_ucalgary_read(d.dataset, d.filenames)

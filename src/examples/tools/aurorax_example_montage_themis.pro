@@ -15,6 +15,21 @@
 ; -------------------------------------------------------------
 
 pro aurorax_example_montage_themis
+  ; -----------------------
+  ; Generate THEMIS montage
+  ; -----------------------
+  ; 
+  ; Montages are a nice way to visualize a series of individual ASI frames.
+  ; Montages are simply a series of images displayed as a grid.
+  ; 
+  ; Note that montages are included in the automatically-generated summary
+  ; products available on the Open Data Platform:
+  ;     https://data-portal.phys.ucalgary.ca/archive/themis/montage
+  ;
+  ; This crib sheet walks through the process of creating your own montage
+  ; for a specified time range of data, using THEMIS as an example.
+  ;
+  
   ; First, download and read some THEMIS data
   d = aurorax_ucalgary_download('THEMIS_ASI_RAW', '2023-02-24T06:00:00', '2023-02-24T06:04:59', site_uid = 'fsmi')
   image_data = aurorax_ucalgary_read(d.dataset, d.filenames)

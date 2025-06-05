@@ -15,6 +15,17 @@
 ; -------------------------------------------------------------
 
 pro aurorax_example_movie_themis
+  ; ---------------------
+  ; Creating THEMIS Movie
+  ; ---------------------
+  ; 
+  ; There is a handy function available that makes a movie from any list of image
+  ; files. This means that we need to generate the files first, and then pass the
+  ; filenames into the function.
+  ; 
+  ; Let's have a look at an example of making a movie for an hour of THEMIS data.
+  ; 
+  
   ; First, download and read some THEMIS data
   start_ts = '2021-11-04T09:20:00'
   end_ts = '2021-11-04T09:29:00'

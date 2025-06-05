@@ -15,6 +15,22 @@
 ; -------------------------------------------------------------
 
 pro aurorax_example_ephemeris_multi_oplot_mosaic
+  ; --------------------------------------------------
+  ; Creating Mosaic with Multiple Satellite Footprints
+  ; --------------------------------------------------
+  ;
+  ; Note:
+  ;   For more information on the actual procedure of making a mosaic, see one of the
+  ;   normal mosaic crib sheets (e.g. aurorax_example_create_mosaic_themis.pro)
+  ;   
+  ; Combining IDL-AuroraX's mosaic tools with it's ephemeris search capababilities
+  ; make it straightforward to map satellite locations over a mosaic.
+  ; 
+  ; The belor crib sheet provides an example of doing so - the below code and comments
+  ; walk through the process of obtaining the footprints of two Swarm spacecraft, creating
+  ; a mosaic, and mapping Swarm's overflight on top of the mosaic.
+  ;
+  
   ; Timestamp for the mosaic
   mosaic_timestamp = '2023-02-24T07:05:00'
 

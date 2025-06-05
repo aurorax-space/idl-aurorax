@@ -15,6 +15,36 @@
 ; -------------------------------------------------------------
 
 pro aurorax_example_create_mosaic_trex_rgb_burst
+  ; ------------------------------
+  ; Creating RGB Burst Data Mosaic
+  ; ------------------------------
+  ; 
+  ; Note on working with burst data:
+  ;   Due to the size of TREx-RGB Burst data, special considerations may be required, depending
+  ;   on your available computational resources. Even when working with a single-minute of data,
+  ;   it may be advantageous (both for efficiency and for memory management) to slice out and
+  ;   work with a smaller chunk of the burst data. This crib sheet provides an explained example
+  ;   of splitting up a minute of burst data into a smaller, more-manageable data object (26 frames).
+  ;   **This may or may not be necessary depending on your available computational resources.**
+  ;   
+  ; The process of making a mosaic involves properly accounting for the mapping of each pixel. Due
+  ; to the fisheye optics, the pixels become increasingly large as you move away from zenith, to
+  ; lower elevation angles.
+  ;
+  ; Our methodology for creating mosaics relies on two key points.
+  ;
+  ; 1. We must accurately account for the changing (and unique) pixel areas and locations in geodetic
+  ;    coordinates, and when putting multiple imagers together, we want to use the information from
+  ;    the closest camera
+  ; 2. Our methodology involves creating exact polygons for each pixel (this is why the skymap
+  ;    contains the pixel corners!), for each camera and filling those polygons with the correct
+  ;    (scaled, or calibrated) imager data. This methodology ensures accuracy of all pixels within
+  ;    the FoV.
+  ;
+  ; The procedure for making a mosaic is best done in 1D vector space. Below you will find functions
+  ; that convert the skymaps and images to vectors, before plotting those vectors.
+  ;
+
   ; Initialize list to hold image data and skymaps
   image_list = list()
   skymap_list = list()

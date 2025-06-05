@@ -15,6 +15,15 @@
 ; -------------------------------------------------------------
 
 pro aurorax_example_create_custom_keogram
+  ; ------------------------==
+  ; Creating a Custom Keograms
+  ; ------------------------==
+  ;
+  ; We can generate keograms from a custom slice of a set of images. The slice used is defined
+  ; by a set of points in CCD, geographic, or geomagnetic coordinates, within the bounds of
+  ; the image data.
+  ; 
+  
   ; First, download and read an hour of TREx RGB data
   d = aurorax_ucalgary_download('TREX_RGB_RAW_NOMINAL', '2021-11-04T03:00:00', '2021-11-04T03:59:59', site_uid = 'gill')
   image_data = aurorax_ucalgary_read(d.dataset, d.filenames)

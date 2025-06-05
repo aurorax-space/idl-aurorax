@@ -48,14 +48,6 @@
 ;         a two element vector specifying the [min, max] intensities to plot for the y-axis
 ;       xlim: in, optional, Float
 ;         a two element vector specifying the [min, max] wavelengths (in nm) to plot for the x-axis
-;       plot_line: in, optional, Float
-;         a scalar or array of wavelengths (in nm) to underlay vertical lines below the plotted spectra,
-;         which can be useful for indicating common emission lines (e.g. 557.7)
-;       plot_line_color: in, optional, Float
-;         a scalar or array of strings specifying colors to use for plotting lines specifies by the
-;         plot_line keyword
-;       plot_line_thick: in, optional, Int
-;         a scalar integer specifying the thickness of plotted vertical lines
 ;       overplot: in, optional, Boolean
 ;         plots over the current function graphics plotting window (which must exist)
 ;       auto_legend: in, optional, Boolean
@@ -83,9 +75,6 @@ function aurorax_spectra_plot, $
   ylabel = ylabel, $
   ylim = ylim, $
   xlim = xlim, $
-  plot_line_wavelength = plot_line_wavelength, $
-  plot_line_color = plot_line_color, $
-  plot_line_thick = plot_line_thick, $
   overplot = overplot, $
   auto_legend = auto_legend, $
   legend_position = legend_position
@@ -198,7 +187,7 @@ function aurorax_spectra_plot, $
       endif else if n_elements(spect_loc) gt 1 then begin
         plot_label = 'bin '+strcompress(string(loc_idx),/remove_all)
       endif
-      
+
       ; plot spectrum
       p = plot(wavelength, $
                spectrum, $

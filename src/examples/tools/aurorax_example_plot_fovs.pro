@@ -15,8 +15,23 @@
 ; -------------------------------------------------------------
 
 pro aurorax_example_plot_fovs
+  ; --------------------------------
+  ; Creating Maps of Instrument FOVs
+  ; --------------------------------
+  ;
   ; IDL-AuroraX include tools for plotting an instrument's field of view at specific sites,
-  ; across all site, or even for custom locations. Below are several examples of doing so
+  ; across all site, or even for custom locations. 
+  ; 
+  ; Using the aurorax_fov_oplot routine in combination with aurorax_ucalgary_list_observatories,
+  ; it is straightforward to create maps of the field of view of:
+  ;   - Manually defined ASIs at custom locations
+  ;   - Manually defined spectrographs at custom locations
+  ;   - Specific cameras or entire arrays of ASIs (e.g. REGO)
+  ;   - Specific spectrographs or entire arrays of spectrographs (e.g. TREx Spectrograph)
+  ;   
+  ; This crib sheet walks through these functionalities, and how they can be combined
+  ; to visualize instrument coverage.
+  ;
   
   ; First, we need to create a direct graphics map that the data can be plotted
   ; onto. Using, the map_set procedure (see IDL docs for info), create the map

@@ -15,6 +15,16 @@
 ; -------------------------------------------------------------
 
 pro aurorax_example_create_mosaic_rego_rayleighs
+  ; --------------------------------------------
+  ; Creating Rego Mosaic Calibrated in Rayleighs
+  ; --------------------------------------------
+  ; 
+  ; Combining the mosaic and calibration functionality, we can generate
+  ; a mosaic of REGO data calibrated to Rayleighs.
+  ; 
+  ; Let's have a look at an example.
+  ;
+
   ; Create lists to hold all image data and skymap structures
   images_list = list()
   skymap_list = list()

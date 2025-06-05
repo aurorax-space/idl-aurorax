@@ -15,6 +15,17 @@
 ; -------------------------------------------------------------
 
 pro aurorax_example_create_mosaic_multi_network
+  ; ------------------------------
+  ; Creating Multi-Network Mosaics
+  ; ------------------------------
+  ;
+  ; It is also possible to make a mosaic that has several instrument arrays
+  ; on it.
+  ; 
+  ; As an example, this crib sheet walks throuogh the procedure for
+  ; displaying THEMIS ASI, TREx RGB, and REGO images on a single map
+  ;
+  
   ; Initialize two lists for holding image data, to seperate image data
   ; from different altitudes
   data_list_110km = list()

@@ -15,6 +15,17 @@
 ; -------------------------------------------------------------
 
 pro aurorax_example_movie_trex_rgb
+  ; -----------------------
+  ; Creating TREx RGB Movie
+  ; -----------------------
+  ;
+  ; There is a handy function available that makes a movie from any list of image
+  ; files. This means that we need to generate the files first, and then pass the
+  ; filenames into the function.
+  ;
+  ; Let's have a look at an example of making a movie for an hour of TREx RGB data.
+  ;
+
   ; First, download and read some TREx RGB data
   start_ts = '2021-11-04T03:30:00'
   end_ts = '2021-11-04T03:39:00'

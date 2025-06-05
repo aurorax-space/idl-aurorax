@@ -15,8 +15,9 @@
 ; -------------------------------------------------------------
 
 pro aurorax_example_get_intensity_from_trex_spectrograph
-  
+  ; -------------------------------------------------
   ; Compute absolute intensity from spectrograph data
+  ; -------------------------------------------------
   ; 
   ; TREx Spectrograph data allows you to obtain the absolute intensities of known
   ; auroral emissions, such as the 427.8 nm Blueline, the 486.1 nm HBeta, the 557.7 nm
@@ -31,7 +32,7 @@ pro aurorax_example_get_intensity_from_trex_spectrograph
   ; functionality is particularly handy for deriving inputs to the TREx-ATM model
   ; inversion calculation, which requires the absolute intensities of several common
   ; auroral emissions.
-  
+  ;
   
   ; First, read one hour of processed (L1) spectrograph data
   d = aurorax_ucalgary_download('TREX_SPECT_PROCESSED_V1', '2021-02-16T09:00', '2021-02-16T09:59', site_uid = 'rabb')

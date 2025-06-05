@@ -15,7 +15,22 @@
 ; -------------------------------------------------------------
 
 pro aurorax_example_create_keogram_trex_spectrograph
-
+  ; ---------------------------------
+  ; Creating a TREx RGB Burst Keogram
+  ; ---------------------------------
+  ;
+  ; Like with ASI data, keograms can be a helpful data product for summarizing spectrograph
+  ; data over some time period. In the case of a meridian scanning spectrograph like TREx
+  ; Spectrograph, the meridional slices of data measured by the spectrograph can be stacked
+  ; in time. Given that the spectrographs measure a range of wavelengths (~ 400-800 nm in the
+  ; case of TREx), the spectra must be integrated to create spectrograph keograms of select
+  ; emissions. Because of this, the aurorax_keogram_create() function has built in options
+  ; for handling spectrograph data.
+  ;
+  ; Below, we'll work through the creation of a 5 minute keogram created from
+  ; TREx-RGB 3 Hz Burst Mode data.
+  ;
+  
   ; First, read one hour of processed (L1) spectrograph data
   d = aurorax_ucalgary_download('TREX_SPECT_PROCESSED_V1', '2021-02-16T09:00', '2021-02-16T09:59', site_uid = 'rabb')
   spect_data = aurorax_ucalgary_read(d.dataset, d.filenames)
@@ -38,7 +53,6 @@ pro aurorax_example_create_keogram_trex_spectrograph
   p = aurorax_keogram_plot(keogram, location = [0, 0], title = 'TREx Spectrograph Keogram - 557.7 nm', $
                            dimensions = [1000, 400], aspect_ratio=0.35, x_tick_interval=40, colortable=8)
                            
-
   ; For the above keogram, we did not specify which emission to pull from the spectrograph data
   ; in creating the keogram, and so the default 557.7 nm greenline emission was used.
   
@@ -71,21 +85,44 @@ pro aurorax_example_create_keogram_trex_spectrograph
                            dimensions = [800, 400], aspect_ratio=0.35, x_tick_interval=40, colortable=3)
   legend_tickval_str = strcompress(string(ulong(findgen(6, start=0, increment=max(keo_red.data)/5.0))),/remove_all)
   legend_red = colorbar(target=p_red, title='Intensity (Rayleighs)', position=[0.6,0.9,0.9,0.95], tickname=legend_tickval_str)
+
+  ;------------------------------------
+  ; Reference in geographic coordinates
+  ;
+  ; For each camera, the UCalgary maintains a geospatial calibration dataset that maps pixel
+  ; coordinates (detector X and Y) to local observer and geodetic coordinates (at altitudes
+  ; of interest). We refer to this calibration as a 'skymap'. The skymaps may change due to
+  ; the freeze-thaw cycle and changes in the building, or when the instrument is serviced.
+  ; A skymap is valid for a range of dates. The metadata contained in a file includes the
+  ; start and end dates of the period of its validity.
+  ;
+  ; Be sure you choose the correct skymap for your data timeframe. The aurorax_download_best_skymap()
+  ; function is there to help you, but for maximum flexibility you can download a range of skymap
+  ; files and use whichever you prefer. For a complete breakdown of how to choose the correct
+  ; skymap for the data you are working with, refer to the crib sheet:
+  ;
+  ;     aurorax_example_skymaps.pro
+  ;
+  ; All skymaps can be viewed by looking at the data tree for
+  ; the imager you are using (see https://data.phys.ucalgary.ca/). If you believe the geospatial
+  ; calibration may be incorrect, please contact the UCalgary team.
+  ;
+  ; For more on the skymap files, please see the skymap file description document:
+  ;   https://data.phys.ucalgary.ca/sort_by_project/other/documentation/skymap_file_description.pdf
+  ;
   
-  
-  ; As with an ASI image, you may want to georefernce the axis, which can be done as usual:
-  ; 
   ; Download and read the corresponding skymap
   d = aurorax_ucalgary_download_best_skymap('TREX_SPECT_SKYMAP_IDLSAV', 'rabb', '2021-02-16T09:00')
   skymap_data = aurorax_ucalgary_read(d.dataset, d.filenames)
   skymap = skymap_data.data[0]
-
+  
   ; Add geographic, elevation, and geomagnetic axes to the keogram object                           Plot using magnetic coord axis
   keo_red = aurorax_keogram_add_axis(keo_red, skymap, /geo, /elev, /mag, altitude_km = 110)   ;         \/ 
   p_red = aurorax_keogram_plot(keo_red, location = [900, 0], title = '630.0 nm - AACGM Coordinates)', /mag, $
                                dimensions = [1000, 500], aspect_ratio=0.35, x_tick_interval=40, colortable=3)
   
-  ;  === Dealing with missing data ===
+  ; -------------------------
+  ; Dealing with missing data
   ;
   ; When a keogram is created with aurorax_keogram_create() it will, by default, only include timetamps
   ; for which data exists. You may want to indicate missing data in the keogram, and this can be easily

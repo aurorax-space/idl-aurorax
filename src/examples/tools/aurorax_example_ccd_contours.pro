@@ -15,6 +15,15 @@
 ; -------------------------------------------------------------
 
 pro aurorax_example_ccd_contours
+  ; -------------------------------------------
+  ; Adding Georeferenced Contours to CCD Images
+  ; -------------------------------------------
+  ;
+  ; There are a few functions that help display contour lines on top of individual ASI images (CCD coordinates),
+  ; facilitated using the aurorax_ccd_contour() function. In the below sections, we'll have a look at the
+  ; options available and the different things you can do with them.
+  ;
+
   ; Load in a skymap that we want to reference for our contours
   date_time = '2023-02-24T06:15:00'
   d = aurorax_ucalgary_download_best_skymap('TREX_RGB_SKYMAP_IDLSAV', 'yknf', date_time)

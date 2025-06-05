@@ -15,6 +15,21 @@
 ; -------------------------------------------------------------
 
 pro aurorax_example_montage_trex_rgb
+  ; -------------------------
+  ; Generate TREx RGB montage
+  ; -------------------------
+  ;
+  ; Montages are a nice way to visualize a series of individual ASI frames.
+  ; Montages are simply a series of images displayed as a grid.
+  ;
+  ; Note that montages are included in the automatically-generated summary
+  ; products available on the Open Data Platform:
+  ;     https://data-portal.phys.ucalgary.ca/archive/themis/montage
+  ;
+  ; This crib sheet walks through the process of creating your own montage
+  ; for a specified time range of data, using TREx RGB as an example.
+  ; 
+
   ; First, download and read some TREx RGB data
   d = aurorax_ucalgary_download('TREX_RGB_RAW_NOMINAL', '2023-02-24T06:00:00', '2023-02-24T06:09:59', site_uid = 'rabb')
   image_data = aurorax_ucalgary_read(d.dataset, d.filenames)

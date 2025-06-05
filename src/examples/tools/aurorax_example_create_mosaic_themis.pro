@@ -15,6 +15,28 @@
 ; -------------------------------------------------------------
 
 pro aurorax_example_create_mosaic_themis
+  ; ----------------------
+  ; Creating THEMIS Mosaic
+  ; ----------------------
+  ; 
+  ; The process of making a mosaic involves properly accounting for the mapping of each pixel. Due
+  ; to the fisheye optics, the pixels become increasingly large as you move away from zenith, to
+  ; lower elevation angles.
+  ; 
+  ; Our methodology for creating mosaics relies on two key points.
+  ; 
+  ; 1. We must accurately account for the changing (and unique) pixel areas and locations in geodetic
+  ;    coordinates, and when putting multiple imagers together, we want to use the information from
+  ;    the closest camera
+  ; 2. Our methodology involves creating exact polygons for each pixel (this is why the skymap
+  ;    contains the pixel corners!), for each camera and filling those polygons with the correct
+  ;    (scaled, or calibrated) imager data. This methodology ensures accuracy of all pixels within
+  ;    the FoV.
+  ; 
+  ; The procedure for making a mosaic is best done in 1D vector space. Below you will find functions
+  ; that convert the skymaps and images to vectors, before plotting those vectors.
+  ;
+  
   ; Create lists to hold all image data and skymap structures
   data_list = list()
   skymap_list = list()
