@@ -18,7 +18,7 @@
 pro aurorax_asi_pgm_metadata__define
   compile_opt hidden
 
-  dummy = { $
+  !null = { $
     Aurorax_Asi_Pgm_Metadata, $
     site_uid: '', $
     imager_uid: '', $
@@ -41,7 +41,7 @@ end
 pro aurorax_asi_png_metadata__define
   compile_opt hidden
 
-  dummy = { $
+  !null = { $
     Aurorax_Asi_Png_Metadata, $
     site_uid: '', $
     device_uid: '', $
@@ -56,7 +56,7 @@ end
 pro aurorax_asi_h5_metadata__define
   compile_opt hidden
 
-  dummy = { $
+  !null = { $
     Aurorax_Asi_H5_Metadata, $
     site_uid: '', $
     imager_uid: '', $
