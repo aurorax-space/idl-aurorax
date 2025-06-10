@@ -18,10 +18,10 @@ pro aurorax_example_create_mosaic_rego_rayleighs
   ; --------------------------------------------
   ; Creating Rego Mosaic Calibrated in Rayleighs
   ; --------------------------------------------
-  ; 
+  ;
   ; Combining the mosaic and calibration functionality, we can generate
   ; a mosaic of REGO data calibrated to Rayleighs.
-  ; 
+  ;
   ; Let's have a look at an example.
   ;
 
@@ -98,7 +98,7 @@ pro aurorax_example_create_mosaic_rego_rayleighs
   polyfill, [map_win_loc[0], map_win_loc[2], map_win_loc[2], map_win_loc[0]], [map_win_loc[1], map_win_loc[1], map_win_loc[3], map_win_loc[3]], color = water_color, /normal
   map_set, ilat, ilon, 0, sat_p = [20, 0, 0], /satellite, limit = map_bounds, position = map_win_loc, /noerase, /noborder ; <---- (Change Projection)
   map_continents, /fill, /countries, color = land_color
-  map_continents, color = border_color, thick = border_thick
+  map_continents, color = border_color, mlinethick = border_thick
 
   ; Scale all data the same, since we're working with absolute intensity
   scale = [0, 5000]
@@ -117,7 +117,7 @@ pro aurorax_example_create_mosaic_rego_rayleighs
   clats = [30, 40, 50, 60, 70, 80]
   clons = [200, 220, 240, 260, 280, 300, 320, 340]
   aurorax_mosaic_oplot, constant_lats = clats, constant_lons = clons, color = gridline_color, linestyle = 2
-  
+
   ; The aurorax_mosaic_oplot routine also includes a /mag option, to overplot contours
   ; that are defined in geomagnetic (AACGM) coordinates
   magnetic_gridline_color = aurorax_get_decomposed_color([255, 179, 0])
@@ -129,7 +129,7 @@ pro aurorax_example_create_mosaic_rego_rayleighs
 
   ; Overplot some text
   !p.font = 1
-  device, set_font="Helvetica Bold", /tt_font, set_character_size=[7,7]
+  device, set_font = 'Helvetica Bold', /tt_font, set_character_size = [7, 7]
   xyouts, 0.01, 0.9, 'REGO - Absolute Intensity', /normal, font = 1, charsize = 6
   xyouts, 0.01, 0.085, strmid(images.timestamp[0], 0, 10), /normal, font = 1, charsize = 5
   xyouts, 0.01, 0.01, strmid(images.timestamp[0], 11, 8) + ' UTC', /normal, font = 1, charsize = 5

@@ -23,7 +23,7 @@ pro aurorax_example_plot_grid_file_trex_rgb
   ; We refer to these as 'grid files', since they are data organized into a common
   ; grid format:
   ;
-  ;   512 x 1024 latitude by longitude (~0.3 degrees per bin).
+  ; 512 x 1024 latitude by longitude (~0.3 degrees per bin).
   ;
   ; For the optical instruments, the grid files are a downsampled pre-computed mosaic.
   ; Preventing the need to download the raw data and generate your own mosaic which can
@@ -33,14 +33,13 @@ pro aurorax_example_plot_grid_file_trex_rgb
   ;
   ; Let's have a look at downloading and plotting a grid file for the TREx RGB dataset.
   ;
-  
+
   ; First, download and read 5 minutes of grid data
   d = aurorax_ucalgary_download('TREX_RGB_GRID_MOSV001', '2023-03-24T08:10:00', '2023-03-24T08:10:00')
   grid_data = aurorax_ucalgary_read(d.dataset, d.filenames)
 
   ; Grab the first frame and corresponding_timestamp
   grid = grid_data.data.grid[*, *, *, 0]
-  timestamp = grid_data.metadata.timestamp[0]
 
   ; The fill value used for cells with no data is stored in the metadata
   fill_val = float(grid_data.metadata.file_meta[0].fill_value)

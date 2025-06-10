@@ -20,8 +20,8 @@ pro aurorax_example_ephemeris_oplot_mosaic
   ; ----------------------------------------
   ;
   ; Note:
-  ;   For more information on the actual procedure of making a mosaic, see one of the
-  ;   normal mosaic crib sheets (e.g. aurorax_example_create_mosaic_themis.pro)
+  ; For more information on the actual procedure of making a mosaic, see one of the
+  ; normal mosaic crib sheets (e.g. aurorax_example_create_mosaic_themis.pro)
   ;
   ; Combining IDL-AuroraX's mosaic tools with it's ephemeris search capababilities
   ; make it straightforward to map satellite locations over a mosaic.
@@ -107,7 +107,7 @@ pro aurorax_example_ephemeris_oplot_mosaic
   polyfill, [map_win_loc[0], map_win_loc[2], map_win_loc[2], map_win_loc[0]], [map_win_loc[1], map_win_loc[1], map_win_loc[3], map_win_loc[3]], color = water_color, /normal
   map_set, ilat, ilon, 0, sat_p = [20, 0, 0], /satellite, limit = map_bounds, position = map_win_loc, /noerase, /noborder ; <---- (Change Projection)
   map_continents, /fill, /countries, color = land_color
-  map_continents, color = border_color, thick = border_thick
+  map_continents, color = border_color, mlinethick = border_thick
 
   ; Define scaling bounds for image data - in this case we just use an array to scale all sites
   ; the same - alternatively, one can use a hash to scale images on a per-site basis
@@ -121,7 +121,7 @@ pro aurorax_example_ephemeris_oplot_mosaic
   clats = [30, 40, 50, 60, 70, 80]
   clons = [200, 220, 240, 260, 280, 300, 320, 340]
   aurorax_mosaic_oplot, constant_lats = clats, constant_lons = clons, color = gridline_color, linestyle = 2
-  
+
   ; The aurorax_mosaic_oplot routine also includes a /mag option, to overplot contours
   ; that are defined in geomagnetic (AACGM) coordinates
   magnetic_gridline_color = aurorax_get_decomposed_color([255, 179, 0])
@@ -137,7 +137,7 @@ pro aurorax_example_ephemeris_oplot_mosaic
 
   ; Overplot the location of the Swarm spacecraft in this mosaic as a point
   aurorax_mosaic_oplot, point = [conjunction_lon, conjunction_lat], color = footprint_color, symsize = 2
-  
+
   !p.font = 1
   ; Add a label for the spacecraft
   xyouts, 0.25, 0.55, 'Swarm A', color = footprint_color, /normal, font = 1, charsize = 2

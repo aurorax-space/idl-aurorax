@@ -55,6 +55,9 @@
 ;       legend_position: in, optional, Float
 ;         the position, in normalized (0.0-1.0) coordinates, of the top right corner of the legend
 ;
+; :Returns:
+;       reference to the created graphic
+;
 ; :Examples:
 ;       d = aurorax_ucalgary_download('TREX_SPECT_PROCESSED_V1', '2021-02-16T09:00', '2021-02-16T09:59', site_uid = 'rabb')
 ;       spect_data = aurorax_ucalgary_read(d.dataset, d.filenames)
@@ -78,164 +81,114 @@ function aurorax_spectra_plot, $
   overplot = overplot, $
   auto_legend = auto_legend, $
   legend_position = legend_position
-  
   ; Set default parameters if not passed
-  if ~ keyword_set(dimensions) then dimensions = [800, 400]
-  if ~ keyword_set(location) then location = [0, 0]
-  if ~ keyword_set(title) then title = ''
-  if ~ keyword_set(ylog) then ylog = 0
-  if ~ keyword_set(ylim) then ylim = [0,10000]
-  if ~ keyword_set(xlabel) then xlabel = 'Wavelength (nm)'
-  if ~ keyword_set(ylabel) then ylabel = 'Intensity (R/nm)'
-  if ~ keyword_set(thick) then thick = 2
-  if ~ keyword_set(plot_line_thick) then plot_line_thick = 2
-  if ~ keyword_set(position) then position = [0.1, 0.15, 0.9, 0.9]
-  if ~ keyword_set(legend_position) then legend_position = [0.4, 0.85]
-  
-  ; check for input errors - line plotting
-  if isa(plot_line_wavelength, /scalar) then plot_line_wavelength = [plot_line_wavelength]
-  if isa(plot_line_color, /scalar) then plot_line_color = [plot_line_color]
-  if keyword_set(plot_line_wavelength) and keyword_set(plot_line_color) and (n_elements(plot_line_wavelength) ne n_elements(plot_line_color)) then begin
-    print, '[aurorax_spectra_plot] Error: if supplying both plot_line_wavelength and plot_line_color, they must have the same length.'
-    return, !null
-  endif
-  if keyword_set(plot_line_wavelength) and ~keyword_set(plot_line_color) then begin
-    plot_line_color = []
-    foreach line, plot_line_wavelength do begin
-      plot_line_color = [plot_line_color, 'gray']
-    endforeach
-  endif
-  if keyword_set(plot_line_color) and ~keyword_set(plot_line_wavelength) then begin
-    print, '[aurorax_spectra_plot] Warning: ignoring keyword plot_line_color as nothing was passed in for plot_line_wavelength keyword.'
-  endif
-  
+  if ~keyword_set(dimensions) then dimensions = [800, 400]
+  if ~keyword_set(location) then location = [0, 0]
+  if ~keyword_set(title) then title = ''
+  if ~keyword_set(ylog) then ylog = 0
+  if ~keyword_set(ylim) then ylim = [0, 10000]
+  if ~keyword_set(xlabel) then xlabel = 'Wavelength (nm)'
+  if ~keyword_set(ylabel) then ylabel = 'Intensity (R/nm)'
+  if ~keyword_set(thick) then thick = 2
+  if ~keyword_set(position) then position = [0.1, 0.15, 0.9, 0.9]
+  if ~keyword_set(legend_position) then legend_position = [0.4, 0.85]
+
   ; Turn input plotting timestamp and spect loc into arrays if they're scalars
   if isa(time_stamp, /scalar) then time_stamp = [time_stamp]
   if isa(spect_loc, /scalar) then spect_loc = [spect_loc]
-  
+
   ; check for input errors - spectra plotting
   total_n_plots = n_elements(time_stamp) * n_elements(spect_loc)
   if isa(color, /scalar) then color = [color]
   if keyword_set(color) and n_elements(color) ne total_n_plots then begin
     if total_n_plots gt n_elements(color) then begin
       print, '[aurorax_spectra_plot] Warning: not enough colors supplied for requested plot - remaining spectra will be plotted in black.'
-      for i=0, total_n_plots-2 do begin
+      for i = 0, total_n_plots - 2 do begin
         if i ge n_elements(color) then continue
         color = [color, 'black']
       endfor
     endif
   endif
 
-  if ~ keyword_set(color) then begin
+  if ~keyword_set(color) then begin
     color = []
-    for i=0, total_n_plots-1 do begin
+    for i = 0, total_n_plots - 1 do begin
       plot_line_color = [plot_line_color, 'black']
     endfor
   endif
-    
+
   ; Create plotting window
-  if ~ keyword_set(overplot) then w = window(dimensions=dimensions, location=location, margin=0)
-  
+  if ~keyword_set(overplot) then !null = window(dimensions = dimensions, location = location)
+
   ; Pull out spectra, timestamps, wavelength from spect_data_objects
   spectra = spect_data.data.spectra
   ts = spect_data.timestamp
   wavelength = spect_data.metadata.wavelength
-  
-  if ~ keyword_set(xlim) then xlim = [min(wavelength, /nan), max(wavelength, /nan)]
 
+  if ~keyword_set(xlim) then xlim = [min(wavelength, /nan), max(wavelength, /nan)]
 
   ; Obtain indices along time dimension of spectra corresponding to requested timestamp(s)
   ts_idx_arr = []
   foreach t, time_stamp do begin
     ; search for ts in metadata array
-    formatted_time_stamp = strjoin(strsplit(t, 'T', /regex, /extract), " ")+" UTC"
+    formatted_time_stamp = strjoin(strsplit(t, 'T', /regex, /extract), ' ') + ' UTC'
     idx = where(ts eq formatted_time_stamp, /null)
-    
+
     ; raise error if timestamp doesn't exist in data
     if idx eq !null then begin
-      print, '[aurorax_spectra_plot] Error: could not find data in spect_data for requested timestamp '+t+'.'
+      print, '[aurorax_spectra_plot] Error: could not find data in spect_data for requested timestamp ' + t + '.'
       return, !null
     endif
     ts_idx_arr = [ts_idx_arr, idx]
   endforeach
-  
-  ; Plot any requested vertical lines first, as those should be behind spectral data
-  if keyword_set(plot_line_wavelength) then begin
-    
-    ; convert to array if scalar was passed
-    foreach line, plot_line_wavelength, k do begin
-      p = plot([line, line], [-5000.0, 5000000.0], color=plot_line_color[k], /current, thick=plot_line_thick, linestyle=2)
-    endforeach
-  endif
-  
+
   ; Plot the spectra
   plot_idx = 0
   plot_obj_arr = []
   foreach ts_idx, ts_idx_arr, k do begin
     foreach loc_idx, spect_loc do begin
-      
       ; pull out spectrum for this time / location (bin)
-      spectrum = reform(spectra[loc_idx,*,ts_idx])
-      
+      spectrum = reform(spectra[loc_idx, *, ts_idx])
+
       ; Dynamically create plot labels
       if n_elements(ts_idx_arr) gt 1 then begin
         if n_elements(spect_loc) gt 1 then begin
-          plot_label = time_stamp[k] + '(bin '+strcompress(string(loc_idx),/remove_all)+')'
+          plot_label = time_stamp[k] + '(bin ' + strcompress(string(loc_idx), /remove_all) + ')'
         endif else begin
           plot_label = time_stamp[k]
         endelse
       endif else if n_elements(spect_loc) gt 1 then begin
-        plot_label = 'bin '+strcompress(string(loc_idx),/remove_all)
+        plot_label = 'bin ' + strcompress(string(loc_idx), /remove_all)
       endif
 
       ; plot spectrum
       p = plot(wavelength, $
-               spectrum, $
-               color=color[plot_idx], $
-               thick=thick, $
-               ylog=ylog, $
-               /overplot, $
-               position=position, $
-               name=plot_label)
-      
+        spectrum, $
+        color = color[plot_idx], $
+        thick = thick, $
+        ylog = ylog, $
+        /overplot, $
+        position = position, $
+        name = plot_label)
+
       ; append graphic to array for legend creation
       plot_obj_arr = [plot_obj_arr, p]
-      
-      ; track how many we've plotted so we can cycle through colors 
+
+      ; track how many we've plotted so we can cycle through colors
       plot_idx += 1
     endforeach
   endforeach
-  
+
   ; create legend if requested
-  if keyword_set(auto_legend) then l = legend(target=plot_obj_arr, position=legend_position, /normal)
-  
+  if keyword_set(auto_legend) then !null = legend(target = plot_obj_arr, position = legend_position, /normal)
+
   ; set options once at the end so we're not overlapping axes
   p.xrange = xlim
   p.yrange = ylim
   p.xtitle = xlabel
   p.ytitle = ylabel
   p.title = title
-  
+
   ; return value so user has control of plot object after creation
   return, p
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

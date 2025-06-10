@@ -70,7 +70,7 @@ pro aurorax_open_conjunctions_in_swarmaurora, request_id, xsize = xsize, ysize =
   if (keyword_set(url_kw) eq 0) and (keyword_set(clipboard_kw) eq 0) then begin
     ; realize the window
     window_parent = widget_base()
-    browser = widget_browser(window_parent, value = url, xsize = xsize, ysize = ysize)
+    !null = widget_browser(window_parent, value = url, xsize = xsize, ysize = ysize)
     widget_control, window_parent, /realize
   endif
 end
@@ -191,7 +191,7 @@ pro aurorax_open_conjunctions_in_aurorax, request_id, $
   if (keyword_set(url_kw) eq 0) and (keyword_set(clipboard_kw) eq 0) then begin
     ; realize the window
     window_parent = widget_base()
-    browser = widget_browser(window_parent, value = url, xsize = xsize, ysize = ysize)
+    !null = widget_browser(window_parent, value = url, xsize = xsize, ysize = ysize)
     widget_control, window_parent, /realize
   endif
 end

@@ -19,23 +19,23 @@ function __aurorax_gc_npts, lon_1, lat_1, lon_2, lat_2, n_points, include_endpoi
   ; between two points on a sphere. Used to determine spectrogaph fovs
 
   ; Convert to radians
-  conv = !dpi/180d
-  lon1 = lon_1*conv
-  lat1 = lat_1*conv
-  lon2 = lon_2*conv
-  lat2 = lat_2*conv
+  conv = !dpi / 180d
+  lon1 = lon_1 * conv
+  lat1 = lat_1 * conv
+  lon2 = lon_2 * conv
+  lat2 = lat_2 * conv
 
   ; 3-D unit vectors
-  v1 = [cos(lat1)*cos(lon1), cos(lat1)*sin(lon1), sin(lat1)]
-  v2 = [cos(lat2)*cos(lon2), cos(lat2)*sin(lon2), sin(lat2)]
+  v1 = [cos(lat1) * cos(lon1), cos(lat1) * sin(lon1), sin(lat1)]
+  v2 = [cos(lat2) * cos(lon2), cos(lat2) * sin(lon2), sin(lat2)]
 
-  omega = acos(total(v1*v2))
+  omega = acos(total(v1 * v2))
 
   ; get number of intermediate points
   if keyword_set(include_endpoints) then begin
-    res = dblarr(2, n_points+2)
-    res[*,0] = [lon1/conv, lat1/conv]
-    res[*,-1] = [lon2/conv, lat2/conv]
+    res = dblarr(2, n_points + 2)
+    res[*, 0] = [lon1 / conv, lat1 / conv]
+    res[*, -1] = [lon2 / conv, lat2 / conv]
     idx = 1
   endif else begin
     res = dblarr(2, n_points)
@@ -44,13 +44,13 @@ function __aurorax_gc_npts, lon_1, lat_1, lon_2, lat_2, n_points, include_endpoi
 
   for k = 1, n_points do begin
     f = k / (n_points + 1d)
-    a = sin((1d - f)*omega) / sin(omega)
-    b = sin(f*omega) / sin(omega)
-    v = a*v1 + b*v2
-    v = v / sqrt(total(v^2)) ; re-normalise
+    a = sin((1d - f) * omega) / sin(omega)
+    b = sin(f * omega) / sin(omega)
+    v = a * v1 + b * v2
+    v = v / sqrt(total(v ^ 2)) ; re-normalise
     lat = asin(v[2]) / conv
     lon = atan(v[1], v[0]) / conv
-    res[*,idx] = [lon, lat]
+    res[*, idx] = [lon, lat]
     idx += 1
   endfor
 
@@ -67,14 +67,14 @@ function __aurorax_compute_fov_contour, lat, lon, height_km, min_elevation, spec
 
   f = 1.0 / f1
   e2 = f * (2.0 - f)
-  e_minus = (1.0 - f)^2
+  e_minus = (1.0 - f) ^ 2
   deg2rad = !dpi / 180.0
   rad2deg = 180.0 / !dpi
 
   ; Convert from geodetic coordinates
   h = 0.0
   phi = lat * deg2rad
-  n_phi = a / sqrt(1.0 - e2 * sin(phi)^2)
+  n_phi = a / sqrt(1.0 - e2 * sin(phi) ^ 2)
 
   ; To Cartesian coordinates
   lam = lon * deg2rad
@@ -100,40 +100,38 @@ function __aurorax_compute_fov_contour, lat, lon, height_km, min_elevation, spec
   rho = height_km * (2 * re + height_km) / (2 * re * sin(min_elevation * deg2rad) + rho0)
 
   ; Create empty array for lat/lon at every 1deg along 360deg azimuth range
-  azimuth_angle = findgen(361, increment=1.0)
-  fov_latlon = make_array(n_elements(azimuth_angle), 2, value=0.0)
+  azimuth_angle = findgen(361, increment = 1.0)
+  fov_latlon = make_array(n_elements(azimuth_angle), 2, value = 0.0)
 
-  for idx=0, n_elements(azimuth_angle)-1 do begin
-
+  for idx = 0, n_elements(azimuth_angle) - 1 do begin
     ; Adjust aim for this point along FOV
     az = azimuth_angle[idx] * deg2rad
     aim = north * cos(az) * cos(el) + east * sin(az) * cos(el) - down * sin(el)
 
     ; Map from Cartesian back to geodetic for this iteration's point
-    point_cartesian = result + aim * rho * (1.0 * 10^3)
+    point_cartesian = result + aim * rho * (1.0 * 10 ^ 3)
     x = point_cartesian[0]
     y = point_cartesian[1]
     z = point_cartesian[2]
 
     lam = atan(y, x)
-    r = sqrt(x^2 + y^2)
+    r = sqrt(x ^ 2 + y ^ 2)
 
     phi = 0.0
     n_phi = 0.0
 
-    for i=0, 4 do begin
+    for i = 0, 4 do begin
       phi = atan((z + n_phi * e2 * sin(phi)) / r)
-      n_phi = a / sqrt(1.0 - e2 * (sin(phi))^2)
+      n_phi = a / sqrt(1.0 - e2 * (sin(phi)) ^ 2)
     endfor
 
     h = r / cos(phi) - n_phi
 
     point_lat = phi * rad2deg
     point_lon = lam * rad2deg
-    
+
     fov_latlon[idx, 0] = point_lat
     fov_latlon[idx, 1] = point_lon
-
   endfor
 
   ; If we're working on an ASI FoV we are done, for spectrograph there's additional work
@@ -143,31 +141,31 @@ function __aurorax_compute_fov_contour, lat, lon, height_km, min_elevation, spec
 
     ; We need to find the line that bisects the current
     ; fov contour that is aligned with magnetic north
-    !null = aacgm_v2_setnow()
-    mag_pos = cnvcoord_v2(transpose([[fov_latlon[*,0]], [fov_latlon[*,1]], [fov_latlon[*,1]*0.0]]), verbose=-1)
-    mag_lat = reform(mag_pos[0,*])
+    !null = AACGM_v2_SetNow()
+    mag_pos = cnvcoord_v2(transpose([[fov_latlon[*, 0]], [fov_latlon[*, 1]], [fov_latlon[*, 1] * 0.0]]), verbose = -1)
+    mag_lat = reform(mag_pos[0, *])
 
-    mag_north_bin = where(mag_lat eq max(mag_lat,/nan))
-    mag_south_bin = where(mag_lat eq min(mag_lat,/nan))
+    mag_north_bin = where(mag_lat eq max(mag_lat, /nan))
+    mag_south_bin = where(mag_lat eq min(mag_lat, /nan))
 
     ; dynamically determine number of bins based on elevation threshold
-    n_points = 180 - 2 * (fix(min_elevation)-1)
+    n_points = 180 - 2 * (fix(min_elevation) - 1)
 
     ; Get lat/lon of min/max bins
-    lat_max = fov_latlon[mag_north_bin,0]
-    lat_min = fov_latlon[mag_south_bin,0]
-    lon_max = fov_latlon[mag_north_bin,1]
-    lon_min = fov_latlon[mag_south_bin,1]
+    lat_max = fov_latlon[mag_north_bin, 0]
+    lat_min = fov_latlon[mag_south_bin, 0]
+    lon_max = fov_latlon[mag_north_bin, 1]
+    lon_min = fov_latlon[mag_south_bin, 1]
 
     ; Get contour along great circle that connects these two points
     result = __aurorax_gc_npts(lon_min, lat_min, lon_max, lat_max, n_points, /include_endpoints)
-    lons = reform(result[0,*])
-    lats = reform(result[1,*])
+    lons = reform(result[0, *])
+    lats = reform(result[1, *])
 
     ; re-initialize fov coordinate array and fill
-    fov_latlon = make_array(n_points+2, 2, value=0.0)
-    fov_latlon[*,0] = lats
-    fov_latlon[*,1] = lons
+    fov_latlon = make_array(n_points + 2, 2, value = 0.0)
+    fov_latlon[*, 0] = lats
+    fov_latlon[*, 1] = lons
   endif
 
   return, fov_latlon
@@ -221,9 +219,8 @@ pro aurorax_fov_oplot, $
   thick = thick, $
   label_site = label_site, $
   label_color = label_color
-
   ; First, check that required inputs are valid
-  
+
   ; convert scalar inputs to arrays
   if isa(site_lat, /scalar) then site_lat = [site_lat]
   if isa(site_lon, /scalar) then site_lon = [site_lon]
@@ -252,10 +249,10 @@ pro aurorax_fov_oplot, $
       goto, error_jump
     endif
   endelse
-  
+
   ; Check input lat
   if not isa(site_lat, /float) then begin
-    if ~ isa(site_lat, /int) then begin
+    if ~isa(site_lat, /int) then begin
       print, '[aurorax_oplot_fov] Error: input ''site_lat'' must be of type Float or Int'
       goto, error_jump
     endif
@@ -309,7 +306,7 @@ pro aurorax_fov_oplot, $
       goto, error_jump
     endif
   endif else min_elevation = 5.0
-  
+
   ; Make sure that all plot parameters are accepted
   if keyword_set(color) then begin
     if not isa(color, /scalar, /number) or color lt 0 or color gt aurorax_get_decomposed_color([255, 255, 255]) then begin
@@ -332,7 +329,7 @@ pro aurorax_fov_oplot, $
         'from 0-6. (See IDL built-in linestyles).'
       goto, error_jump
     endif
-  endif else linestyle=0
+  endif else linestyle = 0
 
   ; Ensure label parameters are accepted
   if keyword_set(label_color) then begin
@@ -342,10 +339,9 @@ pro aurorax_fov_oplot, $
         'integer from RGB triple.'
       goto, error_jump
     endif
-  endif else label_color=0
+  endif else label_color = 0
 
-  for site_idx=0, n_elements(site_lat)-1 do begin
-
+  for site_idx = 0, n_elements(site_lat) - 1 do begin
     lat = site_lat[site_idx]
     lon = site_lon[site_idx]
 
@@ -354,17 +350,17 @@ pro aurorax_fov_oplot, $
     endif else begin
       contour_latlon = __aurorax_compute_fov_contour(lat, lon, altitude_km, min_elevation)
     endelse
-    
-    contour_lats = contour_latlon[*,0]
-    contour_lons = contour_latlon[*,1]
+
+    contour_lats = contour_latlon[*, 0]
+    contour_lons = contour_latlon[*, 1]
 
     plots, contour_lons, contour_lats, color = color, linestyle = linestyle, thick = thick
-    
+
     if keyword_set(label_site) eq 1 then begin
       site_uid = site_name[site_idx]
       !p.font = 1
-      device, set_font="Helvetica Bold", /tt_font, set_character_size=[12,12]
-      xyouts, mean(contour_lons), mean(contour_lats), site_uid, color=label_color, alignment=0.5
+      device, set_font = 'Helvetica Bold', /tt_font, set_character_size = [12, 12]
+      xyouts, mean(contour_lons), mean(contour_lats), site_uid, color = label_color, alignment = 0.5
       !p.font = -1
     endif
   endfor

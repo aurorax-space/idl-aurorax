@@ -20,14 +20,14 @@ pro aurorax_example_create_mosaic_trex_rgb
   ; ------------------------
   ;
   ; Note:
-  ;   In general, before building a mosaic you'll want to verify what sites you should use by looking
-  ;   at the summary data. In this case, the summary data clearly shows that Fort Smith had a different
-  ;   color profile than the other RGB cameras. The data is still useable, however in multi-imager
-  ;   studies Fort Smith's instrument response cannot be directly intercompared with, for example Rabbit,
-  ;   because of the color offset. This was an operational issue at Fort Smith.
-  ;   
-  ;   For the event used in this crib sheet, it is far more advantageous to use Yellowknife which has
-  ;   singificant overlap with Fort Smith but did not have the color profile issue.
+  ; In general, before building a mosaic you'll want to verify what sites you should use by looking
+  ; at the summary data. In this case, the summary data clearly shows that Fort Smith had a different
+  ; color profile than the other RGB cameras. The data is still useable, however in multi-imager
+  ; studies Fort Smith's instrument response cannot be directly intercompared with, for example Rabbit,
+  ; because of the color offset. This was an operational issue at Fort Smith.
+  ;
+  ; For the event used in this crib sheet, it is far more advantageous to use Yellowknife which has
+  ; singificant overlap with Fort Smith but did not have the color profile issue.
   ;
   ; The process of making a mosaic involves properly accounting for the mapping of each pixel. Due
   ; to the fisheye optics, the pixels become increasingly large as you move away from zenith, to
@@ -36,17 +36,17 @@ pro aurorax_example_create_mosaic_trex_rgb
   ; Our methodology for creating mosaics relies on two key points.
   ;
   ; 1. We must accurately account for the changing (and unique) pixel areas and locations in geodetic
-  ;    coordinates, and when putting multiple imagers together, we want to use the information from
-  ;    the closest camera
+  ; coordinates, and when putting multiple imagers together, we want to use the information from
+  ; the closest camera
   ; 2. Our methodology involves creating exact polygons for each pixel (this is why the skymap
-  ;    contains the pixel corners!), for each camera and filling those polygons with the correct
-  ;    (scaled, or calibrated) imager data. This methodology ensures accuracy of all pixels within
-  ;    the FoV.
+  ; contains the pixel corners!), for each camera and filling those polygons with the correct
+  ; (scaled, or calibrated) imager data. This methodology ensures accuracy of all pixels within
+  ; the FoV.
   ;
   ; The procedure for making a mosaic is best done in 1D vector space. Below you will find functions
   ; that convert the skymaps and images to vectors, before plotting those vectors.
   ;
-  
+
   ; Initialize list to hold image data and skymaps
   image_list = list()
   skymap_list = list()
@@ -95,7 +95,7 @@ pro aurorax_example_create_mosaic_trex_rgb
   polyfill, [map_win_loc[0], map_win_loc[2], map_win_loc[2], map_win_loc[0]], [map_win_loc[1], map_win_loc[1], map_win_loc[3], map_win_loc[3]], color = water_color, /normal
   map_set, ilat, ilon, 0, sat_p = [20, 0, 0], /satellite, limit = map_bounds, position = map_win_loc, /noerase, /noborder ; <---- (Change Projection)
   map_continents, /fill, /countries, color = land_color
-  map_continents, color = border_color, thick = border_thick
+  map_continents, color = border_color, mlinethick = border_thick
 
   ; Define scaling bounds for image data - in this case we just use an array to scale all sites
   ; the same - alternatively, one can use a hash to scale images on a per-site basis
@@ -112,7 +112,7 @@ pro aurorax_example_create_mosaic_trex_rgb
   clats = [30, 40, 50, 60, 70, 80]
   clons = [200, 220, 240, 260, 280, 300, 320, 340]
   aurorax_mosaic_oplot, constant_lats = clats, constant_lons = clons, color = gridline_color, linestyle = 2
-  
+
   ; The aurorax_mosaic_oplot routine also includes a /mag option, to overplot contours
   ; that are defined in geomagnetic (AACGM) coordinates
   magnetic_gridline_color = aurorax_get_decomposed_color([255, 179, 0])
@@ -124,7 +124,7 @@ pro aurorax_example_create_mosaic_trex_rgb
 
   ; Overplot some text
   !p.font = 1
-  device, set_font="Helvetica Bold", /tt_font, set_character_size=[7,7]
+  device, set_font = 'Helvetica Bold', /tt_font, set_character_size = [7, 7]
   xyouts, 0.01, 0.9, 'TREx RGB', /normal, font = 1, charsize = 6
   xyouts, 0.01, 0.085, strmid(image_data.timestamp[0], 0, 10), /normal, font = 1, charsize = 5
   xyouts, 0.01, 0.01, strmid(image_data.timestamp[0], 11, 8) + ' UTC', /normal, font = 1, charsize = 5

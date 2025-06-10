@@ -97,7 +97,6 @@ function __aurorax_convert_lonlat_to_ccd, lon_locs, lat_locs, skymap, altitude_k
   lats = skymap.full_map_latitude
   lons = skymap.full_map_longitude
   lons[where(lons gt 180)] -= 360
-  elev = skymap.full_elevation
 
   ; convert altitudes to km for interpolation
   interp_alts = altitudes / 1000.
@@ -182,7 +181,7 @@ end
 ; :Description:
 ;       Create a keogram by slicing image data along a custom contour
 ;       defined by lats/lons or CCD coordinates.
-;       
+;
 ;       This function returns a custom keogram structure containing keogram
 ;       data and temporal axis
 ;
@@ -235,14 +234,13 @@ function aurorax_keogram_create_custom, $
   metric = metric, $
   percentile = percentile, $
   show_preview = show_preview
-
   ; check that coord system is valid
   coord_options = ['ccd', 'geo', 'mag']
   if where(coordinate_system eq coord_options, /null) eq !null then begin
     print, '[aurorax_keogram_create_custom] Error: accepted coordinate systems are ''ccd'', ''geo'', or ''mag''.'
     return, !null
   endif
-  
+
   ; check percentile is valid if supplied
   if keyword_set(percentile) then begin
     if percentile le 0.0 or percentile gt 100.0 then begin
@@ -250,7 +248,7 @@ function aurorax_keogram_create_custom, $
       return, !null
     endif
   endif
-  
+
   if not isa(images, /array) then begin
     print, '[aurorax_keogram_create_custom] Error: ''images'' must be an array'
     return, !null
@@ -391,7 +389,7 @@ function aurorax_keogram_create_custom, $
     metrics = ['mean', 'median', 'sum', 'percentile']
     if not keyword_set(metric) then metric = 'median'
     if where(metric eq metrics, /null) eq !null then begin
-      print, '(aurorax_bounding_box_extract_metric) Error: Metric ''' + string(metric) + ''' not recognized. Accepted metrics are: ' + strjoin(modes, ',') + '.'
+      print, '(aurorax_bounding_box_extract_metric) Error: Metric ''' + string(metric) + ''' not recognized. Accepted metrics are: ' + strjoin(metrics, ',') + '.'
       return, !null
     endif
 
@@ -402,18 +400,18 @@ function aurorax_keogram_create_custom, $
       endif else if metric eq 'mean' then begin
         result = reform(mean(images[x_idx_inside, y_idx_inside, *], dimension = 1))
       endif else if metric eq 'sum' then begin
-        result = reform(total(images[x_idx_inside, y_idx_inside, *], dimension = 1))
+        result = reform(total(images[x_idx_inside, y_idx_inside, *], 1))
       endif else if metric eq 'percentile' then begin
         ; set default percentile
-        if ~ keyword_set(percentile) then percentile=95.0
-        
+        if ~keyword_set(percentile) then percentile = 95.0
+
         ; flatten array
-        tmp_n_points = n_elements(x_idx_inside)*n_elements(y_idx_inside)
+        tmp_n_points = n_elements(x_idx_inside) * n_elements(y_idx_inside)
         tmp_n_frames = (size(images, /dimensions))[-1]
         tmp = reform(images[x_idx_inside, y_idx_inside, *], tmp_n_points, tmp_n_frames)
-        result = make_array(tmp_n_frames, type=size(images, /type))
+        result = make_array(tmp_n_frames, type = size(images, /type))
         percentile_idx = (percentile / 100.0) * (tmp_n_points - 1)
-        for frame_idx=0, tmp_n_frames-1 do begin
+        for frame_idx = 0, tmp_n_frames - 1 do begin
           sorted_frame = tmp[sort(tmp[*, frame_idx]), frame_idx]
           result[frame_idx] = sorted_frame[percentile_idx]
         endfor
@@ -436,15 +434,15 @@ function aurorax_keogram_create_custom, $
         result = reform(total(total(images[*, x_idx_inside, y_idx_inside, *], 2), 2))
       endif else if metric eq 'percentile' then begin
         ; set default percentile
-        if ~ keyword_set(percentile) then percentile=95.0
+        if ~keyword_set(percentile) then percentile = 95.0
 
         ; flatten array
-        tmp_n_points = n_elements(x_idx_inside)*n_elements(y_idx_inside)
+        tmp_n_points = n_elements(x_idx_inside) * n_elements(y_idx_inside)
         tmp_n_frames = (size(images, /dimensions))[-1]
         tmp = reform(images[*, x_idx_inside, y_idx_inside, *], 3, tmp_n_points, tmp_n_frames)
-        result = make_array(3, tmp_n_frames, type=size(images, /type))
+        result = make_array(3, tmp_n_frames, type = size(images, /type))
         percentile_idx = (percentile / 100.0) * (tmp_n_points - 1)
-        for frame_idx=0, tmp_n_frames-1 do begin
+        for frame_idx = 0, tmp_n_frames - 1 do begin
           sorted_frame_r = reform(tmp[0, sort(reform(tmp[0, *, frame_idx])), frame_idx])
           result[0, frame_idx] = sorted_frame_r[percentile_idx]
           sorted_frame_g = reform(tmp[1, sort(reform(tmp[1, *, frame_idx])), frame_idx])
@@ -453,7 +451,7 @@ function aurorax_keogram_create_custom, $
           result[2, frame_idx] = sorted_frame_b[percentile_idx]
         endfor
       endif
-      
+
       ; Insert this slice into keogram array
       keo_arr[*, *, i] = result
 

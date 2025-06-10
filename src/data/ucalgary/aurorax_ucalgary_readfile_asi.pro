@@ -19,7 +19,7 @@ pro aurorax_asi_pgm_metadata__define
   compile_opt hidden
 
   dummy = { $
-    aurorax_asi_pgm_metadata, $
+    Aurorax_Asi_Pgm_Metadata, $
     site_uid: '', $
     imager_uid: '', $
     site_latitude: 0.0, $
@@ -42,7 +42,7 @@ pro aurorax_asi_png_metadata__define
   compile_opt hidden
 
   dummy = { $
-    aurorax_asi_png_metadata, $
+    Aurorax_Asi_Png_Metadata, $
     site_uid: '', $
     device_uid: '', $
     mode_uid: '', $
@@ -57,7 +57,7 @@ pro aurorax_asi_h5_metadata__define
   compile_opt hidden
 
   dummy = { $
-    aurorax_asi_h5_metadata, $
+    Aurorax_Asi_H5_Metadata, $
     site_uid: '', $
     imager_uid: '', $
     site_latitude: 0.0, $
@@ -86,14 +86,14 @@ pro __aurorax_asi_cleanup_tar_files, file_list, verbose = verbose
   endfor
 end
 
-function __aurorax_asi_parse_pgm_comments, comments, metadata, minimal_metadata = minimal_metadata
+function __aurorax_asi_parse_pgm_comments, comments, metadata, minimal_metadata = minimal_metadata, no_metadata = no_metadata
   compile_opt hidden
 
   ; init errors
   on_ioerror, ioerror
 
   ; init metadata variable
-  metadata = {aurorax_asi_pgm_metadata}
+  metadata = {Aurorax_Asi_Pgm_Metadata}
 
   ; set comments field
   metadata.comments = comments[0]
@@ -160,10 +160,10 @@ function __aurorax_asi_parse_pgm_comments, comments, metadata, minimal_metadata 
 
   ; on ioerror, return failure
   ioerror:
-  if not keyword_set(NO_METADATA) then begin
+  if not keyword_set(no_metadata) then begin
     print, '[aurorax_read] Error - could not read metadata, use /no_metadata keyword to read image'
   endif
-  metadata = {aurorax_asi_pgm_metadata}
+  metadata = {Aurorax_Asi_Pgm_Metadata}
   return, 1
 end
 
@@ -317,11 +317,11 @@ function __aurorax_asi_png_readfile, $
     ; allocate memory for image data and metadata if this is the first frame
     if (n_frames eq 0) then begin
       image_data = make_array([channels, width, height, n_elements(file_list)], type = image_size.type, /nozero)
-      meta_data = replicate({aurorax_asi_png_metadata}, n_elements(file_list))
+      meta_data = replicate({Aurorax_Asi_Png_Metadata}, n_elements(file_list))
     endif
 
     ; set metadata
-    frame_metadata = {aurorax_asi_png_metadata}
+    frame_metadata = {Aurorax_Asi_Png_Metadata}
     if not keyword_set(no_metadata) then begin
       basename = file_basename(file_list[i])
       basename_split = strsplit(basename, '_', /extract)
@@ -363,11 +363,11 @@ function __aurorax_asi_png_readfile, $
     image_data = image_data[*, *, *, 0 : n_frames - 1]
     meta_data = meta_data[0 : n_frames - 1]
   endif
-  
+
   ; cleanup untarred files
   if (no_untar_cleanup eq 0) then __aurorax_asi_cleanup_tar_files, cleanup_list, verbose = verbose
-  return, 0                       
-  
+  return, 0
+
   ; on error, remove extra unused memory, cleanup files, and return
   ioerror:
   print, '[aurorax_read] Error - could not process PNG file'
@@ -389,7 +389,7 @@ function __aurorax_asi_h5_readfile, $
   verbose = verbose, $
   no_metadata = no_metadata, $
   minimal_metadata = minimal_metadata, $
-  first_frame = first_frames
+  first_frame = first_frame
   compile_opt hidden
 
   ; init
@@ -475,9 +475,9 @@ function __aurorax_asi_h5_readfile, $
   h5f_close, file_id
 
   ; populate metadata object
-  meta_data = replicate({aurorax_asi_h5_metadata}, n_frames)
+  meta_data = replicate({Aurorax_Asi_H5_Metadata}, n_frames)
   if not keyword_set(no_metadata) then begin
-    ret = __aurorax_asi_parse_h5_metadata(attributes, meta_data, dimension_details, minimal_metadata = minimal_metadata)
+    !null = __aurorax_asi_parse_h5_metadata(attributes, meta_data, dimension_details, minimal_metadata = minimal_metadata)
   endif
 
   ; normal return
@@ -740,33 +740,29 @@ pro __aurorax_ucalgary_readfile_asi, $
 
   ; If start_dt or end_dt were passed, we need to cut down the filenames accordingly
   if keyword_set(start_dt) or keyword_set(end_dt) then begin
-
     if keyword_set(start_dt) then begin
-      start_yy = strmid(start_dt,0,4)
-      start_mm = strmid(start_dt,5,2)
-      start_dd = strmid(start_dt,8,2)
-      start_hr = strmid(start_dt,11,2)
-      start_mn = strmid(start_dt,14,2)
+      start_yy = strmid(start_dt, 0, 4)
+      start_mm = strmid(start_dt, 5, 2)
+      start_dd = strmid(start_dt, 8, 2)
+      start_hr = strmid(start_dt, 11, 2)
+      start_mn = strmid(start_dt, 14, 2)
     endif
     if keyword_set(end_dt) then begin
-      end_yy = strmid(end_dt,0,4)
-      end_mm = strmid(end_dt,5,2)
-      end_dd = strmid(end_dt,8,2)
-      end_hr = strmid(end_dt,11,2)
-      end_mn = strmid(end_dt,14,2)
+      end_hr = strmid(end_dt, 11, 2)
+      end_mn = strmid(end_dt, 14, 2)
     endif
 
     hr_mn = []
     foreach f, filename do begin
-      if n_elements(strsplit(f, start_yy+start_mm+start_dd+'_', /extract, /regex)) eq 1 then begin
-        hr_mn = [hr_mn, "nan"]
+      if n_elements(strsplit(f, start_yy + start_mm + start_dd + '_', /extract, /regex)) eq 1 then begin
+        hr_mn = [hr_mn, 'nan']
       endif else begin
-        hr_mn = [hr_mn, strmid((strsplit(f, start_yy+start_mm+start_dd+'_', /extract, /regex))[-1], 0, 4)]
+        hr_mn = [hr_mn, strmid((strsplit(f, start_yy + start_mm + start_dd + '_', /extract, /regex))[-1], 0, 4)]
       endelse
     endforeach
 
-    start_dt_idx = where(hr_mn eq start_hr+start_mn, /null)
-    end_dt_idx = where(hr_mn eq end_hr+end_mn, /null)
+    start_dt_idx = where(hr_mn eq start_hr + start_mn, /null)
+    end_dt_idx = where(hr_mn eq end_hr + end_mn, /null)
 
     ; Check that the start/end time range actually corresponds to the files passed in
     if start_dt_idx eq !null then begin
@@ -778,13 +774,12 @@ pro __aurorax_ucalgary_readfile_asi, $
     endif
 
     ; if everything worked properly we can now slice out the filenames we actually want to read
-    filename = filename[start_dt_idx:end_dt_idx]
-
+    filename = filename[start_dt_idx : end_dt_idx]
   end
-  
+
   n_files = n_elements(filename)
 
-; sort filenames
+  ; sort filenames
   if (n_elements(filenames) gt 1) then filenames = filenames[sort(filenames)]
   ; if (verbose gt 0) then print,'[aurorax_read] Reading ' + strcompress(fix(n_elements(filenames)),/remove_all) + ' files'
 
@@ -795,7 +790,7 @@ pro __aurorax_ucalgary_readfile_asi, $
   endif else begin
     n_start = (n_chunk * n_files) < 2400
   endelse
-  
+
   ; for each file
   total_expected_frames = 0
   for i = 0, n_files - 1 do begin
@@ -817,13 +812,13 @@ pro __aurorax_ucalgary_readfile_asi, $
         if (verbose ge 2) then print, '[aurorax_read]  Reading frame: ' + string(n_frames)
         ret = __aurorax_asi_h5_readfile(filenames[i], file_images, file_metadata, file_dimension_details, file_nframes, file_total_bytes, verbose = verbose, no_metadata = no_metadata, minimal_metadata = minimal_metadata, first_frame = first_frame)
       endelse
-      
+
       ; set images and metadata array
       if (first_call eq 1) then begin
         ; pre-allocate images if it's the first call and we'll be reading more than one file
         if (n_files gt 1) then begin
           ; more than one file will be read, pre-allocate array for all images anticipated to be read in
-          
+
           ; workaround for burst data
           if strpos(filenames[0], 'burst') ne -1 then begin
             total_expected_frames = n_files * 180 ; array will be trimmed at end
@@ -888,12 +883,12 @@ pro __aurorax_ucalgary_readfile_asi, $
           dimensions = isize.dimensions[0 : isize.n_dimensions]
           dimensions[isize.n_dimensions] = n_start
           images = make_array(dimensions, type = isize.type, /nozero)
-          metadata = replicate({aurorax_asi_pgm_metadata}, n_start)
+          metadata = replicate({Aurorax_Asi_Pgm_Metadata}, n_start)
           dimensions[isize.n_dimensions] = n_chunk
         endif else if (n_frames ge n_start) then begin
           ; need to expand the arrays
           images = [[[images]], [[make_array(dimensions, type = isize.type, /nozero)]]]
-          metadata = [metadata, replicate({aurorax_asi_pgm_metadata}, n_chunk)]
+          metadata = [metadata, replicate({Aurorax_Asi_Pgm_Metadata}, n_chunk)]
           n_start = n_start + n_chunk
         endif
 
@@ -940,7 +935,7 @@ pro __aurorax_ucalgary_readfile_asi, $
     fail:
     if (isa(lun) eq 1) then free_lun, lun
   endfor
-  
+
   ; remove extra unused memory
   if (processing_mode eq 'pgm' and n_frames ge 0) then begin
     images = images[*, *, 0 : n_frames - 1]

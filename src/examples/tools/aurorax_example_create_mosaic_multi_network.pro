@@ -21,11 +21,11 @@ pro aurorax_example_create_mosaic_multi_network
   ;
   ; It is also possible to make a mosaic that has several instrument arrays
   ; on it.
-  ; 
+  ;
   ; As an example, this crib sheet walks throuogh the procedure for
   ; displaying THEMIS ASI, TREx RGB, and REGO images on a single map
   ;
-  
+
   ; Initialize two lists for holding image data, to seperate image data
   ; from different altitudes
   data_list_110km = list()
@@ -37,9 +37,6 @@ pro aurorax_example_create_mosaic_multi_network
 
   ; Date of Interest
   date_time = '2023-02-24T06:15:00'
-
-  ; Date to search back to for skymaps
-  earliest_date_time = '2019-02-24T06:15:00'
 
   ; Grab some TREx RGB data
   foreach site, ['yknf', 'gill', 'rabb', 'luck'] do begin
@@ -113,7 +110,7 @@ pro aurorax_example_create_mosaic_multi_network
   polyfill, [map_win_loc[0], map_win_loc[2], map_win_loc[2], map_win_loc[0]], [map_win_loc[1], map_win_loc[1], map_win_loc[3], map_win_loc[3]], color = water_color, /normal
   map_set, ilat, ilon, 0, sat_p = [20, 0, 0], /satellite, limit = map_bounds, position = map_win_loc, /noerase, /noborder ; <---- (Change Projection)
   map_continents, /fill, /countries, color = land_color
-  map_continents, color = border_color, thick = border_thick
+  map_continents, color = border_color, mlinethick = border_thick
 
   ; Define scaling bounds for image data if desiresd
   scale = hash('yknf', [10, 105], $
@@ -135,7 +132,7 @@ pro aurorax_example_create_mosaic_multi_network
   clats = [30, 40, 50, 60, 70, 80]
   clons = [200, 220, 240, 260, 280, 300, 320, 340]
   aurorax_mosaic_oplot, constant_lats = clats, constant_lons = clons, color = gridline_color, linestyle = 2
-  
+
   ; The aurorax_mosaic_oplot routine also includes a /mag option, to overplot contours
   ; that are defined in geomagnetic (AACGM) coordinates
   magnetic_gridline_color = aurorax_get_decomposed_color([255, 179, 0])
@@ -147,7 +144,7 @@ pro aurorax_example_create_mosaic_multi_network
 
   ; Plot some text on top
   !p.font = 1
-  device, set_font="Helvetica Bold", /tt_font, set_character_size=[7,7]
+  device, set_font = 'Helvetica Bold', /tt_font, set_character_size = [7, 7]
   xyouts, 0.01, 0.9, 'THEMIS ASI', /normal, font = 1, charsize = 5
   xyouts, 0.01, 0.825, 'TREx RGB', /normal, font = 1, charsize = 5
   xyouts, 0.01, 0.75, 'REGO', /normal, font = 1, charsize = 5

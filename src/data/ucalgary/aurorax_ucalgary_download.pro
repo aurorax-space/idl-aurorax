@@ -152,7 +152,7 @@ function aurorax_ucalgary_download, $
       endif
 
       ; do request
-      output = req.get(filename = output_filename)
+      !null = req.get(filename = output_filename)
       if (quiet_flag eq 0) then print, '[aurorax_download] Successfully downloaded ' + url
 
       ; get size of file

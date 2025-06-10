@@ -46,6 +46,9 @@
 ;       elev: in, optional, Boolean
 ;         labels elevation angles on the y-axis (axis must exist in keogram structure)
 ;
+; :Returns:
+;       reference to the created graphic
+;
 ; :Examples:
 ;       p = aurorax_keogram_plot(keo, title="Geographic", /geo, location=[0,0], dimensions=[1000,400])
 ;+
@@ -91,10 +94,10 @@ function aurorax_keogram_plot, $
   endif else begin
     y = keogram_struct.ccd_y
   endelse
-  
+
   ; First grab indices into keogram where NaNs are located
   w_nan = where(finite(keogram_struct.data, /nan))
-  
+
   ; Extract keogram data
   keo_arr = bytscl(keogram_struct.data)
 
@@ -122,8 +125,8 @@ function aurorax_keogram_plot, $
   if not isa(y_tick_interval) then y_tick_interval = 50
 
   ; Create the plot
-  w = window(dimensions = dimensions, location = location, margin=0)
-  
+  !null = window(dimensions = dimensions, location = location)
+
   ; Create a temporary keogram array and mask the NaN values with
   ; the max value (white usually)
   ; This is done so that Nan's are plotted as white in the keogram,
@@ -131,7 +134,7 @@ function aurorax_keogram_plot, $
   keo_arr[w_nan] = max(keo_arr, /nan)
 
   if not keyword_set(colortable) then colortable = 0
-  keo_image = image(keo_arr, /current, axis_style = 4, aspect_ratio = aspect, rgb_table = colortable, margin=0.1)
+  keo_image = image(keo_arr, /current, axis_style = 4, aspect_ratio = aspect, rgb_table = colortable, margin = 0.1)
   if keyword_set(title) and isa(title, /string) then keo_image.title = title
 
   ; Create the x axis (time)
@@ -169,7 +172,7 @@ function aurorax_keogram_plot, $
   y_axis.title = y_title
 
   custom_keogram_jump:
-  
+
   ; return function graphic
   return, keo_image
 end

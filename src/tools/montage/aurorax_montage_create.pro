@@ -44,6 +44,9 @@
 ;       no_timestamps: in, optional, Boolean
 ;         disable default behaviour of plotting timestamps
 ;
+; :Returns:
+;       reference to the created graphic
+;
 ; :Examples:
 ;       aurorax_montage_create, images, timestamps, 5, 5, colortable=7, timestamps_fontsize=16
 ;+
@@ -101,7 +104,7 @@ function aurorax_montage_create, $
   if not keyword_set(timestamps_color) then timestamps_color = 'white'
 
   ; Create the plot
-  w = window(dimensions = dimensions, location = location, /no_toolbar)
+  !null = window(dimensions = dimensions, location = location, /no_toolbar)
 
   ; convert images to bytes
   images = bytscl(images)
@@ -132,6 +135,6 @@ function aurorax_montage_create, $
     montage_frame_num += 1
     if montage_frame_num - 1 eq n_montage_img then break
   endfor
-  
+
   return, im
 end

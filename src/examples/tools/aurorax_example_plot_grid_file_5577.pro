@@ -21,25 +21,25 @@ pro aurorax_example_plot_grid_file_5577
   ;
   ; We are developing new array-wide standard grid data products for our data. We refer
   ; to these as 'grid files', since they are data organized into a common grid format:
-  ; 
-  ;   512 x 1024 latitude by longitude (~0.3 degrees per bin).
+  ;
+  ; 512 x 1024 latitude by longitude (~0.3 degrees per bin).
   ;
   ; For the optical instruments, the grid files are a downsampled pre-computed mosaic.
   ; Preventing the need to download the raw data and generate your own mosaic which can
   ; be tedious and compute/network intensive. Of course, if these grid files are not
   ; good enough, you can always still download the raw data and generate your own mosaic
   ; as you'd like for full control.
-  ; 
-  ; Let's have a look at downloading and plotting a grid file for the TREx RGB 
+  ;
+  ; Let's have a look at downloading and plotting a grid file for the TREx RGB
   ; 5577-derived dataset. These grid files provide the 557.7 nm greenline emission in
   ; each grid cell, as derived according to the procedure prescribed by:
-  ;     Liang et al. (2024) (http://dx.doi.org/10.26464/epp2023063)
+  ; Liang et al. (2024) (http://dx.doi.org/10.26464/epp2023063)
   ;
-  
+
   ; First, download and read 5 minutes of grid data
   d = aurorax_ucalgary_download('TREX_RGB5577_GRID_MOSV001', '2023-03-24T07:30:00', '2023-03-24T07:40:00')
   grid_data = aurorax_ucalgary_read(d.dataset, d.filenames, start_dt = '2023-03-24T07:35:00', end_dt = '2023-03-24T07:35:00', /first_record)
-  
+
   ; Grab the first frame and corresponding_timestamp
   grid = grid_data.data.grid
   timestamp = grid_data.metadata.timestamp

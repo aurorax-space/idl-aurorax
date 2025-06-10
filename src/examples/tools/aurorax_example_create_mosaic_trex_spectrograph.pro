@@ -18,29 +18,29 @@ pro aurorax_example_create_mosaic_trex_spectrograph
   ; --------------------------------
   ; Creating TREx Spectrogaph Mosaic
   ; --------------------------------
-  ; 
+  ;
   ; Generating Spectrograph mosaics is very similar to making them for all-sky imagers like THEMIS,
   ; REGO, and TREx RGB. However, the spectrograph has a different field of view that its data covers.
   ; Where an all-sky imager has a circular FoV (due to the fisheye lens and all-sky nature of the
   ; data), the spectrograph's FoV is a straight line, oriented approximately with magnetic north.
-  ; 
+  ;
   ; The most common use case of mosaics for the spectrographs is overlaying them on top of ASI data,
   ; like TREx RGB. Below, we'll work through an example of that
-  ; 
+  ;
   ; For this example, we're going to make a mosaic of several TREx RGBs and both TREx Spectrograph
   ; plotted on top. First step is to download and read in the image data for both those instruments.
-  ; 
+  ;
   ; NOTE: TREx Spectrograph data is organized into 1-hr files, where-as the ASI data is in 1 minute
   ; files. That will be why the data files are so much larger compared to the ASIs.
   ;
-  
+
   ; Minute of interest for downloading data
   date_time = '2021-03-13T09:40:00'
-    
+
   ; Initialize list to hold image data and skymaps
   image_list = list()
   skymap_list = list()
-  
+
   ; First, let's grab some TREx RGB data and skymaps to include in the mosaic
   foreach site, ['luck', 'gill', 'rabb'] do begin
     ; download and read image data for this site and add to list
@@ -54,11 +54,11 @@ pro aurorax_example_create_mosaic_trex_spectrograph
     skymap = skymap_data.data[0]
     skymap_list.add, skymap
   endforeach
-  
+
   ; Initialize list to hold image data and skymaps
   spect_list = list()
   spect_skymap_list = list()
-  
+
   ; Now, let's also grab the spectrograph data and skymaps
   foreach site, ['luck', 'rabb'] do begin
     ; download and read spectrograph data for this site and add to list
@@ -72,19 +72,19 @@ pro aurorax_example_create_mosaic_trex_spectrograph
     skymap = skymap_data.data[0]
     spect_skymap_list.add, skymap
   endforeach
-  
+
   ; Prep the ASI and spectrograph data/skymaps seperately
   altitude_km = 115.0
   prepped_asi_images = aurorax_mosaic_prep_images(image_list)
   prepped_asi_skymaps = aurorax_mosaic_prep_skymap(skymap_list, altitude_km)
   prepped_spect_images = aurorax_mosaic_prep_images(spect_list)
   prepped_spect_skymaps = aurorax_mosaic_prep_skymap(spect_skymap_list, altitude_km)
-  
-  ; Combine the prepared ASI and spectrograph data/skymaps. Make sure the ASI data 
+
+  ; Combine the prepared ASI and spectrograph data/skymaps. Make sure the ASI data
   ; comes first so that it is plotted below the spectrograph data
   prepped_data = [prepped_asi_images, prepped_spect_images]
   prepped_skymaps = [prepped_asi_skymaps, prepped_spect_skymaps]
-  
+
   ; Set up a plotting window with a map projection
   land_color = aurorax_get_decomposed_color([186, 186, 186])
   water_color = aurorax_get_decomposed_color([64, 89, 120])
@@ -101,13 +101,13 @@ pro aurorax_example_create_mosaic_trex_spectrograph
   polyfill, [map_win_loc[0], map_win_loc[2], map_win_loc[2], map_win_loc[0]], [map_win_loc[1], map_win_loc[1], map_win_loc[3], map_win_loc[3]], color = water_color, /normal
   map_set, ilat, ilon, 0, sat_p = [20, 0, 0], /satellite, limit = map_bounds, position = map_win_loc, /noerase, /noborder ; <---- (Change Projection)
   map_continents, /fill, /countries, color = land_color
-  map_continents, color = border_color, thick = border_thick
-  
+  map_continents, color = border_color, mlinethick = border_thick
+
   ; Define scaling bounds for image data AND spectrograph data- in this case we just use an array to scale all sites
   ; the same - alternatively, one can use a hash to scale images on a per-site basis
   img_scale = [10, 105]
   spect_scale = [0, 7500] ; in Rayleighs, for whichever emission we are plotting (greenline in this example)
-  
+
   ; Plot some gridlines
   gridline_color = aurorax_get_decomposed_color([0, 0, 0])
   clats = [30, 40, 50, 60, 70, 80]
@@ -119,26 +119,26 @@ pro aurorax_example_create_mosaic_trex_spectrograph
   magnetic_gridline_color = aurorax_get_decomposed_color([255, 179, 0])
   clats = [63, 77]
   aurorax_mosaic_oplot, constant_lats = clats, color = magnetic_gridline_color, linestyle = 0, thick = 6, /mag
-  
+
   ; Call the plotting function
-  aurorax_mosaic_plot, prepped_data, prepped_skymaps, '2021-03-13T09:40:15', intensity_scales=img_scale, spect_intensity_scales=spect_scale, colortable=[0,8]
-  
+  aurorax_mosaic_plot, prepped_data, prepped_skymaps, '2021-03-13T09:40:15', intensity_scales = img_scale, spect_intensity_scales = spect_scale, colortable = [0, 8]
+
   !p.font = 1
-  device, set_font="Helvetica Bold", /tt_font, set_character_size=[7,7]
+  device, set_font = 'Helvetica Bold', /tt_font, set_character_size = [7, 7]
   xyouts, 0.01, 0.9, 'TREx RGB + Spectrograph', /normal, font = 1, charsize = 6
   xyouts, 0.01, 0.085, strmid(image_data.timestamp[0], 0, 10), /normal, font = 1, charsize = 5
   xyouts, 0.01, 0.01, strmid(image_data.timestamp[0], 11, 8) + ' UTC', /normal, font = 1, charsize = 5
   !p.font = -1
-  
+
   ; Let's manually create a quick colorbar for the spectrograph data
-  w = window(dimensions=[100,300], /no_toolbar, margin=0, location=[800,200])
+  w = window(dimensions = [100, 300], /no_toolbar, margin = 0, location = [800, 200])
   n_ticks = 5
   tickvals = []
   ticknames = []
-  for i=0, n_ticks-1 do begin
-    tickvals = [tickvals, 255.0*(i/(n_ticks-1.0))]
-    ticknames = [ticknames, strcompress(string(fix(7500*(i/(n_ticks-1.0)))),/remove_all)]
+  for i = 0, n_ticks - 1 do begin
+    tickvals = [tickvals, 255.0 * (i / (n_ticks - 1.0))]
+    ticknames = [ticknames, strcompress(string(fix(7500 * (i / (n_ticks - 1.0)))), /remove_all)]
   endfor
-  c = colorbar(rgb_table=8, orientation=1, title="Spectrograph 557.7 nm Intensity (Rayleighs)", $
-               position=[0.6,0.1,0.8,0.9], tickvalues=tickvals, tickname=ticknames)
+  c = colorbar(rgb_table = 8, orientation = 1, title = 'Spectrograph 557.7 nm Intensity (Rayleighs)', $
+    position = [0.6, 0.1, 0.8, 0.9], tickvalues = tickvals, tickname = ticknames)
 end

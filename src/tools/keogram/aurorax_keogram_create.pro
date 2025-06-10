@@ -60,7 +60,6 @@ function aurorax_keogram_create, $
   spect_band_signal = spect_band_signal, $
   spect_band_bg = spect_band_bg, $
   wavelength = wavelength
-
   if not isa(images, /array) then begin
     print, '[aurorax_keogram_create] Error: ''images'' must be an array.'
     return, !null
@@ -94,9 +93,8 @@ function aurorax_keogram_create, $
 
   ; Check spectrograph inputs
   if keyword_set(spectra) then begin
-
     ; check that wavelengths are supplied
-    if ~ keyword_set(wavelength) then begin
+    if ~keyword_set(wavelength) then begin
       print, '[aurorax_keogram_create] Error: ''wavelength'' must be supplied for spectrograph data.'
     endif
 
@@ -107,19 +105,19 @@ function aurorax_keogram_create, $
     endif
 
     ; check that input emissions are valid
-    if keyword_set(spect_emission) and (keyword_set(spect_band_signal) or keyword_set(spect_band_bg_))then begin
+    if keyword_set(spect_emission) and (keyword_set(spect_band_signal) or keyword_set(spect_band_bg)) then begin
       print, '[aurorax_keogram_create] Error: only one of ''spect_emission'' and ''spect_band_signal''/''spect_band_bg'' may be set'
       return, !null
-    endif else if ~ keyword_set(spect_emission) and ~ keyword_set(spect_band_signal) then begin
+    endif else if ~keyword_set(spect_emission) and ~keyword_set(spect_band_signal) then begin
       spect_emission = 'green'
     endif else if keyword_set(spect_emission) then begin
-      if ~ isa(spect_emission, /string) then begin
+      if ~isa(spect_emission, /string) then begin
         print, '[aurorax_keogram_create] Error: ''spect_emission'' must be a string'
         return, !null
       endif
       if where(['hbeta', 'blue', 'green', 'red'] eq spect_emission, /null) eq !null then begin
-        print, '[aurorax_keogram_create] Error: input spect_emission='''+spect_emission+''' is not recognized... ' + $
-          'please select one of [''hbeta'', ''blue'', ''green'', ''red''], or pass in a manual wavelength range with ''spect_band_signal''
+        print, '[aurorax_keogram_create] Error: input spect_emission=''' + spect_emission + ''' is not recognized... ' + $
+          'please select one of [''hbeta'', ''blue'', ''green'', ''red''], or pass in a manual wavelength range with ''spect_band_signal'''
         return, !null
       endif
     endif
@@ -127,9 +125,8 @@ function aurorax_keogram_create, $
 
   ; handle creation of spectrograph keograms seperately
   if keyword_set(spectra) then begin
-    
-    instrument_type = 'spectrograph' 
-    
+    instrument_type = 'spectrograph'
+
     ; available automatic selections
     if isa(spect_emission) then begin
       wavelength_range = (hash('green', [557.0 - 1.5, 557.0 + 1.5], $
@@ -143,14 +140,14 @@ function aurorax_keogram_create, $
         'hbeta', [480.0 - 1.0, 480.0 + 1.0]))[spect_emission]
     endif else if isa(spect_band_signal) then begin
       ; manually supplied wavelength range for integration
-      if n_elements(spect_band_signal) ne 2 or (~ isa(spect_band_signal, /float) and ~ isa(spect_band_signal, /int)) then begin
+      if n_elements(spect_band_signal) ne 2 or (~isa(spect_band_signal, /float) and ~isa(spect_band_signal, /int)) then begin
         print, '[aurorax_keogram_create] Error: ''spect_band_signal'' must be a 2-element array of wavelengths'
         return, !null
       endif
       wavelength_range = spect_band_signal
 
       if isa(spect_band_bg) then begin
-        if n_elements(spect_band_bg) ne 2 or (~ isa(spect_band_bg, /float) and ~ isa(spect_band_bg, /int)) then begin
+        if n_elements(spect_band_bg) ne 2 or (~isa(spect_band_bg, /float) and ~isa(spect_band_bg, /int)) then begin
           print, '[aurorax_keogram_create] Error: ''spect_band_bg'' must be a 2-element array of wavelengths'
           return, !null
         endif
@@ -179,7 +176,7 @@ function aurorax_keogram_create, $
       print, '[aurorax_keogram_create] Warning: performing integration over wavelength range without background ' + $
         'subtraction - use ''spect_band_bg'' to set a background channel for integration.'
     endelse
-    
+
     ; ensure data dimensionality is consistent with supplied wavelengths and timestamps
     spectra_shape = size(images, /dimensions)
     n_wavelengths_in_spectra = spectra_shape[1]
@@ -187,47 +184,47 @@ function aurorax_keogram_create, $
     n_timestamps_in_spectra = spectra_shape[2]
     n_wavelengths = n_elements(wavelength)
     n_timestamps = n_elements(time_stamp)
-    
+
     if n_timestamps ne n_timestamps_in_spectra then begin
-      print, '[aurorax_keogram_create] Error: mismatched timestamp dimensions. Received '+strcompress(string(n_timestamps),/remove_all) + $
-             ' timestamps for spectrograph data with '+strcompress(string(n_timestamps_in_spectra),/remove_all)+' timestamps.'
+      print, '[aurorax_keogram_create] Error: mismatched timestamp dimensions. Received ' + strcompress(string(n_timestamps), /remove_all) + $
+        ' timestamps for spectrograph data with ' + strcompress(string(n_timestamps_in_spectra), /remove_all) + ' timestamps.'
       return, !null
     endif
-    
+
     if n_wavelengths ne n_wavelengths_in_spectra then begin
-      print, '[aurorax_keogram_create] Error: mismatched wavelength dimensions. Received '+strcompress(string(n_wavelengths),/remove_all) + $
-        ' wavelengths for spectrograph data with '+strcompress(string(n_wavelengths_in_spectra),/remove_all)+' wavelengths.'
+      print, '[aurorax_keogram_create] Error: mismatched wavelength dimensions. Received ' + strcompress(string(n_wavelengths), /remove_all) + $
+        ' wavelengths for spectrograph data with ' + strcompress(string(n_wavelengths_in_spectra), /remove_all) + ' wavelengths.'
       return, !null
     endif
-    
+
     ; set y-axis and keo index
     ccd_y = indgen(n_spatial_bins)
     keo_idx = 0
-    
+
     ; initialize keogram array
-    keo_arr = make_array([n_timestamps, n_spatial_bins], type=size(images, /type))
-    
+    keo_arr = make_array([n_timestamps, n_spatial_bins], type = size(images, /type))
+
     ; iterate through each timestamp and compute emissions for all spatial bins
-    for i=0, n_spatial_bins-1 do begin
-      for j=0, n_timestamps-1 do begin
+    for i = 0, n_spatial_bins - 1 do begin
+      for j = 0, n_timestamps - 1 do begin
         ; signal integration
-        rayleighs = int_tabulated(wavelength[int_w], reform(images[i,int_w,j]))
-        
+        rayleighs = int_tabulated(wavelength[int_w], reform(images[i, int_w, j]))
+
         ; background integration if specified
         if int_bg_w ne !null then begin
-          rayleighs -= int_tabulated(wavelength[int_bg_w], reform(images[i,int_bg_w,j]))
+          rayleighs -= int_tabulated(wavelength[int_bg_w], reform(images[i, int_bg_w, j]))
         endif
-        
+
         ; in case of non-physical values
         if ~finite(rayleighs) or rayleighs lt 0 then rayleighs = 0
-        
+
         ; insert into keogram array
-        keo_arr[j,i] = rayleighs
+        keo_arr[j, i] = rayleighs
       endfor
     endfor
-    
+
     ; Spectrograph keogram generation is complete, now create object like normal and return
-    ; 
+    ;
     ; Convert timestamp strings to UT decimal
     ut_decimal = list()
     for i = 0, n_elements(time_stamp) - 1 do begin
@@ -239,13 +236,12 @@ function aurorax_keogram_create, $
     endfor
     ut_decimal = ut_decimal.toArray()
 
-  ; Return keogram structure
+    ; Return keogram structure
     return, {data: keo_arr, ccd_y: ccd_y, slice_idx: keo_idx, timestamp: time_stamp, ut_decimal: ut_decimal, axis: axis, instrument_type: instrument_type}
-    
   endif
-  
-  instrument_type = 'asi' 
-  
+
+  instrument_type = 'asi'
+
   ; Extract the keogram slice, transpose and reshape for proper output shape
   if n_channels eq 1 then begin
     if axis eq 0 then begin

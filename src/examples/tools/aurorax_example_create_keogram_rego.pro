@@ -21,11 +21,11 @@ pro aurorax_example_create_keogram_rego
   ;
   ; Keograms are a useful data product that can be generated from ASI image data. A keogram is created
   ; by stacking slices of the middle column (a N-S slice for the orientation of the UCalgary imagers)
-  ; of pixels from ASI images over a period of time. 
-  ; 
+  ; of pixels from ASI images over a period of time.
+  ;
   ; Below, we'll work through the creation of a 1 hour keogram created from REGO data.
   ;
-  
+
   ; First, download and read an hour of THEMIS data
   d = aurorax_ucalgary_download('REGO_RAW', '2021-11-04T03:00:00', '2021-11-04T03:59:59', site_uid = 'gill')
   image_data = aurorax_ucalgary_read(d.dataset, d.filenames)
@@ -40,37 +40,38 @@ pro aurorax_example_create_keogram_rego
   ; If you wanted to further manipulate or manually plot the keogram
   ; array, you can grab it like this:
   keo_arr = keo.data
-  
-  ;------------------------------------
+  help, keo_arr
+
+  ; ------------------------------------
   ; Reference in geographic coordinates
-  ; 
+  ;
   ; For each camera, the UCalgary maintains a geospatial calibration dataset that maps pixel
   ; coordinates (detector X and Y) to local observer and geodetic coordinates (at altitudes
   ; of interest). We refer to this calibration as a 'skymap'. The skymaps may change due to
   ; the freeze-thaw cycle and changes in the building, or when the instrument is serviced.
   ; A skymap is valid for a range of dates. The metadata contained in a file includes the
   ; start and end dates of the period of its validity.
-  ; 
+  ;
   ; Be sure you choose the correct skymap for your data timeframe. The aurorax_download_best_skymap()
   ; function is there to help you, but for maximum flexibility you can download a range of skymap
   ; files and use whichever you prefer. For a complete breakdown of how to choose the correct
-  ; skymap for the data you are working with, refer to the crib sheet: 
-  ; 
-  ;     aurorax_example_skymaps.pro
-  ; 
+  ; skymap for the data you are working with, refer to the crib sheet:
+  ;
+  ; aurorax_example_skymaps.pro
+  ;
   ; All skymaps can be viewed by looking at the data tree for
   ; the imager you are using (see https://data.phys.ucalgary.ca/). If you believe the geospatial
   ; calibration may be incorrect, please contact the UCalgary team.
-  ; 
-  ; For more on the skymap files, please see the skymap file description document:
-  ;   https://data.phys.ucalgary.ca/sort_by_project/other/documentation/skymap_file_description.pdf
   ;
-  
+  ; For more on the skymap files, please see the skymap file description document:
+  ; https://data.phys.ucalgary.ca/sort_by_project/other/documentation/skymap_file_description.pdf
+  ;
+
   ; Download and read the corresponding skymap
   d = aurorax_ucalgary_download_best_skymap('REGO_SKYMAP_IDLSAV', 'gill', '2021-11-04T03:00:00')
   skymap_data = aurorax_ucalgary_read(d.dataset, d.filenames)
   skymap = skymap_data.data[0]
-  
+
   ; Add geographic, elevation, and geomagnetic axes to the keogram object
   keo = aurorax_keogram_add_axis(keo, skymap, /geo, /elev, /mag, altitude_km = 115)
 
@@ -78,10 +79,10 @@ pro aurorax_example_create_keogram_rego
   p1 = aurorax_keogram_plot(keo, title = 'Geographic', /geo, location = [0, 0], dimensions = [800, 400], colortable = 3)
   p2 = aurorax_keogram_plot(keo, title = 'Elevation', /elev, location = [800, 0], dimensions = [800, 400], colortable = 3)
   p3 = aurorax_keogram_plot(keo, title = 'Geomagnetic (AACGM)', /mag, location = [0, 450], dimensions = [800, 400], colortable = 3)
-  
+
   ; -------------------------
   ; Dealing with missing data
-  ; 
+  ;
   ; When a keogram is created with aurorax_keogram_create() it will, by default, only include timetamps
   ; for which data exists. You may want to indicate missing data in the keogram, and this can be easily
   ; achieved using the aurorax_keogram_inject_nans() function.
@@ -113,9 +114,9 @@ pro aurorax_example_create_keogram_rego
   ; Inspecting the shape reveals that indeed there was missing data, which
   ; has been filled using the aurorax_keogram_inject_nans() function
   print
-  print, "Original Keogram Shape:"
+  print, 'Original Keogram Shape:'
   print, original_shape
   print
-  print, "Keogram Shape after aurorax_keogram_inject_nans():"
+  print, 'Keogram Shape after aurorax_keogram_inject_nans():'
   print, new_shape
 end

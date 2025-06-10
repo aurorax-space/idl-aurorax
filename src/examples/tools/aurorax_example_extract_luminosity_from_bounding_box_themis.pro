@@ -19,17 +19,17 @@ pro aurorax_example_extract_luminosity_from_bounding_box_themis
   ; Working with Bounding Boxes - Single Channel Data
   ; -------------------------------------------------
   ;
-  ; When using ASI data, it is often advantageous to restrict your area of study to a 
+  ; When using ASI data, it is often advantageous to restrict your area of study to a
   ; particular region of the ASI. Perhaps you'd like to isolate one region of some patchy
   ; pulsating aurora or isolate an arc, or maybe you're only interested in a specific
   ; region of geomagnetic latitudes and longitudes.
-  ; 
+  ;
   ; The aurorax_bounding_box_extract_metric() functions provides various options for using
   ; bounding boxes to analyze regions of ASI data for a series of images. We'll explore
   ; some different things you can do below, using single-channel (monochromatic) ASI data,
   ; usng THEMIS ASI as an example.
   ;
-  
+
   ; Download an hour of THEMIS data
   d = aurorax_ucalgary_download('THEMIS_ASI_RAW', '2021-11-04T09:00:00', '2021-11-04T09:59:59', site_uid = 'fsim')
 
@@ -44,7 +44,6 @@ pro aurorax_example_extract_luminosity_from_bounding_box_themis
 
   ; Get images and timestamp arrays from the image data object
   images = image_data.data
-  timestamps = image_data.timestamp
 
   ; Grab the *last* skymap out of the skymap data struct as this is most recent to date of interest
   skymap = skymap_data.data[-1]
@@ -52,20 +51,23 @@ pro aurorax_example_extract_luminosity_from_bounding_box_themis
   ; Extract some data within bounds of azimuth, CCD, elevation, and geo lats
   azim_bounds = [134, 143]
   luminosity_in_azim = aurorax_bounding_box_extract_metric(images, 'azim', azim_bounds, skymap = skymap, /show_preview)
+  help, luminosity_in_azim
 
   ; For this one, lets get the mean, using the metric keyword. By default, the median
   ; is returned, but one can also obtain the mean or sum of data within the desired bounds
   ccd_bounds = [140, 173, 140, 160]
   luminosity_in_ccd = aurorax_bounding_box_extract_metric(images, 'ccd', ccd_bounds, metric = 'mean', skymap = skymap, /show_preview)
+  help, luminosity_in_ccd
 
   elev_bounds = [40, 60]
   luminosity_in_elev = aurorax_bounding_box_extract_metric(images, 'elev', elev_bounds, skymap = skymap, /show_preview)
+  help, luminosity_in_elev
 
   ; Using the percentile keyword indicates the use of a different metric, i.e.
   ; taking the value (e.g. 90th) percentile within the bounding box
   geo_bounds = [-120, -115, 61.5, 62.5]
   luminosity_in_geo = aurorax_bounding_box_extract_metric(images, 'geo', geo_bounds, percentile = 90, skymap = skymap, altitude_km = 112, /show_preview)
-  
+
   ; Geomagnetic (AACGM) coordinates may also be used to define a bounding box.
   ; This is done by setting the mode parameter to 'mag'
   mag_bounds = [-68, -63, 65.5, 67.5]
@@ -73,6 +75,6 @@ pro aurorax_example_extract_luminosity_from_bounding_box_themis
 
   ; Let's plot the data exctracted from the RGB images withing the geographic
   ; bounds, as well as that within the geomagnetic bounds
-  p_geo = plot(reform(luminosity_in_geo), color = 'green', title = '90th Percentile Luminosity within Lat/Lon', location=[800,0])
-  p_mag = plot(reform(luminosity_in_mag), color = 'blue', title = 'Median Luminosity within Geomagnetic Lat/Lon', location=[800,500])
+  p_geo = plot(reform(luminosity_in_geo), color = 'green', title = '90th Percentile Luminosity within Lat/Lon', location = [800, 0])
+  p_mag = plot(reform(luminosity_in_mag), color = 'blue', title = 'Median Luminosity within Geomagnetic Lat/Lon', location = [800, 500])
 end

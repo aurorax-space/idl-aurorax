@@ -115,6 +115,18 @@ end
 ;         value of aurorax_ucalgary_read(). Note that even if preparing a single
 ;         image data object, it must be enclosed in a list.
 ;
+; :Keywords:
+;       spect_emission: in, optional, String
+;         a string giving a known auroral emission to perform integration over,
+;         either ['hbeta', 'blue', 'green', 'red'], defaults to 'green'
+;       spect_band_signal: in, optional, Float
+;         a two-element array used to manually supply the wavelengths to use as the
+;         lower and upper bounds of integration of the spectrum
+;       spect_band_bg: in, optionial, Float
+;         a two-element array specifying the wavelengths to use as the lower and
+;         upper bounds of integration for a background channel, which is subtracted
+;         from the integration over spect_band for manual emission selection
+;
 ; :Returns:
 ;       Struct
 ;
@@ -126,7 +138,6 @@ function aurorax_mosaic_prep_images, $
   spect_emission = spect_emission, $
   spect_band_signal = spect_band_signal, $
   spect_band_bg = spect_band_bg
-
   ; Verify that image_list is indeed a list, not array
   if (typename(image_list) ne 'LIST') then begin
     print, '[aurorax_mosaic_prep_images] Error: image_list must be a list, i.e. ''list(img_data_1, img_data_2, ...)''.'
@@ -134,19 +145,19 @@ function aurorax_mosaic_prep_images, $
   endif
 
   ; check that input emissions are valid
-  if keyword_set(spect_emission) and (keyword_set(spect_band_signal) or keyword_set(spect_band_bg))then begin
+  if keyword_set(spect_emission) and (keyword_set(spect_band_signal) or keyword_set(spect_band_bg)) then begin
     print, '[aurorax_spectra_get_intensity] Error: only one of ''spect_emission'' and ''spect_band_signal''/''spect_band_bg'' may be set'
     return, !null
-  endif else if ~ keyword_set(spect_emission) and ~ keyword_set(spect_band_signal) then begin
+  endif else if ~keyword_set(spect_emission) and ~keyword_set(spect_band_signal) then begin
     spect_emission = 'green'
   endif else if keyword_set(spect_emission) then begin
-    if ~ isa(spect_emission, /string) then begin
+    if ~isa(spect_emission, /string) then begin
       print, '[aurorax_spectra_get_intensity] Error: ''spect_emission'' must be a string'
       return, !null
     endif
     if where(['hbeta', 'blue', 'green', 'red'] eq spect_emission, /null) eq !null then begin
-      print, '[aurorax_spectra_get_intensity] Error: input spect_emission='''+spect_emission+''' is not recognized... ' + $
-        'please select one of [''hbeta'', ''blue'', ''green'', ''red''], or pass in a manual wavelength range with ''spect_band_signal''
+      print, '[aurorax_spectra_get_intensity] Error: input spect_emission=''' + spect_emission + ''' is not recognized... ' + $
+        'please select one of [''hbeta'', ''blue'', ''green'', ''red''], or pass in a manual wavelength range with ''spect_band_signal'''
       return, !null
     endif
   endif
@@ -164,14 +175,14 @@ function aurorax_mosaic_prep_images, $
       'hbeta', [480.0 - 1.0, 480.0 + 1.0]))[spect_emission]
   endif else if isa(spect_band_signal) then begin
     ; manually supplied wavelength range for integration
-    if n_elements(spect_band_signal) ne 2 or (~ isa(spect_band_signal, /float) and ~ isa(spect_band_signal, /int)) then begin
+    if n_elements(spect_band_signal) ne 2 or (~isa(spect_band_signal, /float) and ~isa(spect_band_signal, /int)) then begin
       print, '[aurorax_spectra_get_intensity] Error: ''spect_band_signal'' must be a 2-element array of wavelengths'
       return, !null
     endif
     wavelength_range = spect_band_signal
 
     if isa(spect_band_bg) then begin
-      if n_elements(spect_band_bg) ne 2 or (~ isa(spect_band_bg, /float) and ~ isa(spect_band_bg, /int)) then begin
+      if n_elements(spect_band_bg) ne 2 or (~isa(spect_band_bg, /float) and ~isa(spect_band_bg, /int)) then begin
         print, '[aurorax_spectra_get_intensity] Error: ''spect_band_bg'' must be a 2-element array of wavelengths'
         return, !null
       endif
@@ -213,8 +224,8 @@ function aurorax_mosaic_prep_images, $
 
   if (is_burst eq 1) then begin
     caldat, expected_juldays, month, day, year, hour, minute, second
-    expected_timestamps = string(year, format='(I4.4)')+'-'+string(month, format='(I2.2)')+'-'+string(day, format='(I2.2)')+' '+ $
-                          string(hour, format='(I2.2)')+':'+string(minute, format='(I2.2)')+':'+string(fix(second), format='(I2.2)')+'.'+string((second-fix(second))*100, format='(I2.2)')
+    expected_timestamps = string(year, format = '(I4.4)') + '-' + string(month, format = '(I2.2)') + '-' + string(day, format = '(I2.2)') + ' ' + $
+      string(hour, format = '(I2.2)') + ':' + string(minute, format = '(I2.2)') + ':' + string(fix(second), format = '(I2.2)') + '.' + string((second - fix(second)) * 100, format = '(I2.2)')
   endif else begin
     expected_timestamps = string(expected_juldays, format = '(C(CYI, "-", CMOI2.2, "-", CDI2.2, " ", CHI2.2, ":", CMI2.2, ":", CSI2.2))')
   endelse
@@ -267,7 +278,7 @@ function aurorax_mosaic_prep_images, $
       ; set spect dimensions
       height = (size(site_data.spectra, /dimensions))[0]
       if where(dimensions_dict.keys() eq site_uid, /null) ne !null then begin
-        dimensions_dict[site_uid+'_spect'] = [height]
+        dimensions_dict[site_uid + '_spect'] = [height]
       endif else begin
         dimensions_dict[site_uid] = [height]
       endelse
@@ -284,7 +295,7 @@ function aurorax_mosaic_prep_images, $
         width = (size(site_data, /dimensions))[1]
       endelse
       if where(dimensions_dict.keys() eq site_uid, /null) ne !null then begin
-        dimensions_dict[site_uid+'_asi'] = [width, height]
+        dimensions_dict[site_uid + '_asi'] = [width, height]
       endif else begin
         dimensions_dict[site_uid] = [width, height]
       endelse
@@ -295,7 +306,7 @@ function aurorax_mosaic_prep_images, $
       ; We need to check if there is ASI and spect data from the same site, as that
       ; is fine to go into the same mosaic
 
-      d_keys = (images_dict.keys()).toarray()
+      d_keys = (images_dict.keys()).toArray()
       if data_type_list[where(d_keys eq site_uid)] ne current_data_type then begin
         site_uid += '_' + current_data_type
       endif else begin
@@ -316,20 +327,19 @@ function aurorax_mosaic_prep_images, $
 
     ; find the index in the data corresponding to each expected timestamp
     for i = 0, n_elements(expected_timestamps) - 1 do begin
-      
       ; for burst data, we need to just find the closest frame
       if (is_burst eq 1) then begin
         tts = (site_image_data.timestamp).toarray()
-        site_image_data_juldays = julday(fix(strmid(tts,5,2)), fix(strmid(tts,8,2)), fix(strmid(tts,0,4)), fix(strmid(tts,11,2)), fix(strmid(tts,14,2)), float(strmid(tts,17,5)))
+        site_image_data_juldays = julday(fix(strmid(tts, 5, 2)), fix(strmid(tts, 8, 2)), fix(strmid(tts, 0, 4)), fix(strmid(tts, 11, 2)), fix(strmid(tts, 14, 2)), float(strmid(tts, 17, 5)))
         tts = expected_timestamps[i]
-        expected_julday = julday(fix(strmid(tts,5,2)), fix(strmid(tts,8,2)), fix(strmid(tts,0,4)), fix(strmid(tts,11,2)), fix(strmid(tts,14,2)), float(strmid(tts,17,5)))
-        found_idx = (where(abs(site_image_data_juldays-expected_julday) eq min(abs(site_image_data_juldays-expected_julday)), /null))[0]
+        expected_julday = julday(fix(strmid(tts, 5, 2)), fix(strmid(tts, 8, 2)), fix(strmid(tts, 0, 4)), fix(strmid(tts, 11, 2)), fix(strmid(tts, 14, 2)), float(strmid(tts, 17, 5)))
+        found_idx = (where(abs(site_image_data_juldays - expected_julday) eq min(abs(site_image_data_juldays - expected_julday)), /null))[0]
       endif else begin
         found_idx = where(((strsplit(site_image_data.timestamp, '.', /extract)).toarray())[*, 0] eq expected_timestamps[i], /null)
       endelse
 
       if found_idx eq !null then begin
-        found_idx = where(strmid(((strsplit(site_image_data.timestamp, '.', /extract)).toarray())[*, 0],0,19) eq expected_timestamps[i], /null)
+        found_idx = where(strmid(((strsplit(site_image_data.timestamp, '.', /extract)).toarray())[*, 0], 0, 19) eq expected_timestamps[i], /null)
       endif
 
       ; didn't find the timestamp, just move on because there will be no data for this timestamp
@@ -343,17 +353,17 @@ function aurorax_mosaic_prep_images, $
           site_images[*, *, *, i] = site_data[*, *, *, found_idx]
         endelse
       endif else if current_data_type eq 'spect' then begin
-        spectra = site_data.spectra[*,*,found_idx]
-        rayleighs_arr = make_array((size(spectra,/dimensions))[0], /double, value=!values.f_nan)
+        spectra = site_data.spectra[*, *, found_idx]
+        rayleighs_arr = make_array((size(spectra, /dimensions))[0], /double, value = !values.f_nan)
 
         ; iterate through each spectrograph bin
-        for spect_bin=0, n_elements(rayleighs_arr)-1 do begin
+        for spect_bin = 0, n_elements(rayleighs_arr) - 1 do begin
           ; signal integration
-          rayleighs = int_tabulated(wavelength[int_w], reform(spectra[spect_bin,int_w]))
+          rayleighs = int_tabulated(wavelength[int_w], reform(spectra[spect_bin, int_w]))
 
           ; background integration if specified
           if int_bg_w ne !null then begin
-            rayleighs -= int_tabulated(wavelength[int_bg_w], reform(spectra[spect_bin,int_bg_w]))
+            rayleighs -= int_tabulated(wavelength[int_bg_w], reform(spectra[spect_bin, int_bg_w]))
           endif
 
           ; in case of non-physical values

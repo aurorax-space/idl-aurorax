@@ -20,19 +20,19 @@ pro aurorax_example_plot_fovs
   ; --------------------------------
   ;
   ; IDL-AuroraX include tools for plotting an instrument's field of view at specific sites,
-  ; across all site, or even for custom locations. 
-  ; 
+  ; across all site, or even for custom locations.
+  ;
   ; Using the aurorax_fov_oplot routine in combination with aurorax_ucalgary_list_observatories,
   ; it is straightforward to create maps of the field of view of:
-  ;   - Manually defined ASIs at custom locations
-  ;   - Manually defined spectrographs at custom locations
-  ;   - Specific cameras or entire arrays of ASIs (e.g. REGO)
-  ;   - Specific spectrographs or entire arrays of spectrographs (e.g. TREx Spectrograph)
-  ;   
+  ; - Manually defined ASIs at custom locations
+  ; - Manually defined spectrographs at custom locations
+  ; - Specific cameras or entire arrays of ASIs (e.g. REGO)
+  ; - Specific spectrographs or entire arrays of spectrographs (e.g. TREx Spectrograph)
+  ;
   ; This crib sheet walks through these functionalities, and how they can be combined
   ; to visualize instrument coverage.
   ;
-  
+
   ; First, we need to create a direct graphics map that the data can be plotted
   ; onto. Using, the map_set procedure (see IDL docs for info), create the map
   ; however you'd like. Below is an example
@@ -55,26 +55,25 @@ pro aurorax_example_plot_fovs
   polyfill, [map_win_loc[0], map_win_loc[2], map_win_loc[2], map_win_loc[0]], [map_win_loc[1], map_win_loc[1], map_win_loc[3], map_win_loc[3]], color = water_color, /normal
   map_set, ilat, ilon, 0, sat_p = [20, 0, 0], /satellite, limit = map_bounds, position = map_win_loc, /noerase, /noborder ; <---- (Change Projection)
   map_continents, /fill, /countries, color = land_color
-  map_continents, color = border_color, thick = border_thick
-  
+  map_continents, color = border_color, mlinethick = border_thick
+
   ; First, it is simple given any lat/lon site location, to plot an ASI FOV
   ; for a camera at that location
-  aurorax_fov_oplot, 55.0, -130.0, 110.0, thick=3, min_elevation=5, site_name="site", /label_site, label_color=aurorax_get_decomposed_color([255,0,0])
-  
+  aurorax_fov_oplot, 55.0, -130.0, 110.0, thick = 3, min_elevation = 5, site_name = 'site', /label_site, label_color = aurorax_get_decomposed_color([255, 0, 0])
+
   ; You can also pass in multiple sites at once, and change the altitude that FOVs are mapped at
-  aurorax_fov_oplot, [57.0, 62.5], [-118.0,-97.0], 230.0, thick=4, linestyle=1, site_name=["site2", "site3"], /label_site, color=aurorax_get_decomposed_color([0,160,0])
-  
+  aurorax_fov_oplot, [57.0, 62.5], [-118.0, -97.0], 230.0, thick = 4, linestyle = 1, site_name = ['site2', 'site3'], /label_site, color = aurorax_get_decomposed_color([0, 160, 0])
+
   ; Add a label for the map
   !p.font = 1
-  xyouts, 0.02, 0.02, "ASI FoVs", /normal, color=0, charthick=2, charsize=1.5
+  xyouts, 0.02, 0.02, 'ASI FoVs', /normal, color = 0, charthick = 2, charsize = 1.5
   !p.font = -1
-  
-  
+
   ; Plotting FoVs for an actual instrument
   ;
   ; The aurorax_fov_oplot routine can be used in combination with aurorax_list_observatories()
   ; to easily create maps of instrument arrays
-  
+
   ; First, create a new map
   land_color = aurorax_get_decomposed_color([186, 186, 186])
   water_color = aurorax_get_decomposed_color([64, 89, 120])
@@ -84,18 +83,18 @@ pro aurorax_example_plot_fovs
   map_bounds = [40, 220, 80, 290]
   ilon = 255
   ilat = 56
-  window, 1, xsize = 600, ysize = 400, xpos = 600, ypos=0
+  window, 1, xsize = 600, ysize = 400, xpos = 600, ypos = 0
   map_win_loc = [0., 0., 1., 1.]
   device, decomposed = 1
   polyfill, [0., 0., 1., 1.], [0., 1., 1., 0.], color = window_bg_color, /normal
   polyfill, [map_win_loc[0], map_win_loc[2], map_win_loc[2], map_win_loc[0]], [map_win_loc[1], map_win_loc[1], map_win_loc[3], map_win_loc[3]], color = water_color, /normal
   map_set, ilat, ilon, 0, sat_p = [20, 0, 0], /satellite, limit = map_bounds, position = map_win_loc, /noerase, /noborder ; <---- (Change Projection)
   map_continents, /fill, /countries, color = land_color
-  map_continents, color = border_color, thick = border_thick
-  
+  map_continents, color = border_color, mlinethick = border_thick
+
   ; Now, use aurorax_list_observatories to grab all THEMIS-ASI site locations
   all_themis_sites = aurorax_list_observatories('themis_asi')
-  
+
   ; Parse the list returned by aurorax_list_observatories
   themis_lats = []
   themis_lons = []
@@ -105,28 +104,27 @@ pro aurorax_example_plot_fovs
     themis_lons = [themis_lons, site.geodetic_longitude]
     themis_lats = [themis_lats, site.geodetic_latitude]
   endforeach
-  
+
   ; Plot some gridlines
   gridline_color = aurorax_get_decomposed_color([0, 0, 0])
   clats = [30, 40, 50, 60, 70, 80]
   clons = [200, 220, 240, 260, 280, 300, 320, 340]
   aurorax_mosaic_oplot, constant_lats = clats, constant_lons = clons, color = gridline_color, linestyle = 2
-  
+
   ; The aurorax_mosaic_oplot routine also includes a /mag option, to overplot contours
   ; that are defined in geomagnetic (AACGM) coordinates
   magnetic_gridline_color = aurorax_get_decomposed_color([255, 179, 0])
   clats = [63, 77]
   aurorax_mosaic_oplot, constant_lats = clats, color = magnetic_gridline_color, linestyle = 0, thick = 6, /mag
-  
+
   ; Now, call the aurorax_fov_oplot procedure with the themis site information
-  aurorax_fov_oplot, themis_lats, themis_lons, 110.0, thick=2, site_name=themis_uid
-  
+  aurorax_fov_oplot, themis_lats, themis_lons, 110.0, thick = 2, site_name = themis_uids
+
   ; Add a label for the map
   !p.font = 1
-  xyouts, 0.02, 0.02, "THEMIS-ASI SITES", /normal, color=0, charthick=2, charsize=1.5
+  xyouts, 0.02, 0.02, 'THEMIS-ASI SITES', /normal, color = 0, charthick = 2, charsize = 1.5
   !p.font = -1
-  
-  
+
   ; This process can be repeated for any instrument array
   ;
   ; Let's do another example, using REGO instruments
@@ -140,14 +138,14 @@ pro aurorax_example_plot_fovs
   map_bounds = [40, 220, 80, 290]
   ilon = 255
   ilat = 56
-  window, 2, xsize = 600, ysize = 400, xpos = 0, ypos=430
+  window, 2, xsize = 600, ysize = 400, xpos = 0, ypos = 430
   map_win_loc = [0., 0., 1., 1.]
   device, decomposed = 1
   polyfill, [0., 0., 1., 1.], [0., 1., 1., 0.], color = window_bg_color, /normal
   polyfill, [map_win_loc[0], map_win_loc[2], map_win_loc[2], map_win_loc[0]], [map_win_loc[1], map_win_loc[1], map_win_loc[3], map_win_loc[3]], color = water_color, /normal
   map_set, ilat, ilon, 0, sat_p = [20, 0, 0], /satellite, limit = map_bounds, position = map_win_loc, /noerase, /noborder ; <---- (Change Projection)
   map_continents, /fill, /countries, color = land_color
-  map_continents, color = border_color, thick = border_thick
+  map_continents, color = border_color, mlinethick = border_thick
 
   ; Now, use aurorax_list_observatories to grab all REGO site locations
   all_rego_sites = aurorax_list_observatories('rego')
@@ -167,28 +165,26 @@ pro aurorax_example_plot_fovs
   clats = [30, 40, 50, 60, 70, 80]
   clons = [200, 220, 240, 260, 280, 300, 320, 340]
   aurorax_mosaic_oplot, constant_lats = clats, constant_lons = clons, color = gridline_color, linestyle = 2
-  
-  
+
   ; Now, call the aurorax_fov_oplot procedure with the rego site information
   ;
   ; *** Since we are plotting REGO sites, we'll set the altitude_km parameter to 230.0
-  ;     as this is a commonly assumed altitude of the 630.0 nm redline emission
-  aurorax_fov_oplot, rego_lats, rego_lons, 230.0, thick=2, site_name=rego_uids, color=aurorax_get_decomposed_color([255,0,0]), /label_site
-  
+  ; as this is a commonly assumed altitude of the 630.0 nm redline emission
+  aurorax_fov_oplot, rego_lats, rego_lons, 230.0, thick = 2, site_name = rego_uids, color = aurorax_get_decomposed_color([255, 0, 0]), /label_site
+
   ; Add a label for the map
   !p.font = 1
-  xyouts, 0.02, 0.02, "REGO SITES", /normal, color=0, charthick=2, charsize=1.5
+  xyouts, 0.02, 0.02, 'REGO SITES', /normal, color = 0, charthick = 2, charsize = 1.5
   !p.font = -1
-  
-  
+
   ; Plotting spectrograph FOVs
   ;
   ; The aurorax_fov_oplot procedure also has the ability to plot the field-of-view
   ; of meridian scanning spectrographs, like those part of the TREx project.
-  ; 
-  ; As an example, let's plot the field of view of TREx RGB and TREx 
+  ;
+  ; As an example, let's plot the field of view of TREx RGB and TREx
   ; Spectrographs on the same map
-  ; 
+  ;
   ; First, create a new map
   land_color = aurorax_get_decomposed_color([186, 186, 186])
   water_color = aurorax_get_decomposed_color([64, 89, 120])
@@ -198,14 +194,14 @@ pro aurorax_example_plot_fovs
   map_bounds = [40, 220, 80, 290]
   ilon = 255
   ilat = 56
-  window, 3, xsize = 600, ysize = 400, xpos = 600, ypos=430
+  window, 3, xsize = 600, ysize = 400, xpos = 600, ypos = 430
   map_win_loc = [0., 0., 1., 1.]
   device, decomposed = 1
   polyfill, [0., 0., 1., 1.], [0., 1., 1., 0.], color = window_bg_color, /normal
   polyfill, [map_win_loc[0], map_win_loc[2], map_win_loc[2], map_win_loc[0]], [map_win_loc[1], map_win_loc[1], map_win_loc[3], map_win_loc[3]], color = water_color, /normal
   map_set, ilat, ilon, 0, sat_p = [20, 0, 0], /satellite, limit = map_bounds, position = map_win_loc, /noerase, /noborder ; <---- (Change Projection)
   map_continents, /fill, /countries, color = land_color
-  map_continents, color = border_color, thick = border_thick
+  map_continents, color = border_color, mlinethick = border_thick
 
   ; Now, use aurorax_list_observatories to grab all TREx RGB site locations
   all_rgb_sites = aurorax_list_observatories('trex_rgb')
@@ -227,8 +223,8 @@ pro aurorax_example_plot_fovs
   aurorax_mosaic_oplot, constant_lats = clats, constant_lons = clons, color = gridline_color, linestyle = 2
 
   ; Now, call the aurorax_fov_oplot procedure with the rgb site information
-  aurorax_fov_oplot, rgb_lats, rgb_lons, 110.0, thick=2, site_name=rgb_uids, color=aurorax_get_decomposed_color([0,200,0]), /label_site
-  
+  aurorax_fov_oplot, rgb_lats, rgb_lons, 110.0, thick = 2, site_name = rgb_uids, color = aurorax_get_decomposed_color([0, 200, 0]), /label_site
+
   ; Now, repeat the process for TREx spectrograph
   all_spect_sites = aurorax_list_observatories('trex_spectrograph')
 
@@ -251,11 +247,11 @@ pro aurorax_example_plot_fovs
   ; Now, call the aurorax_fov_oplot procedure with the spect site information
   ;
   ; *** Here, we use the /specotograph keyword
-  yellow = aurorax_get_decomposed_color([255,255,0])
-  aurorax_fov_oplot, spect_lats, spect_lons, 110.0, thick=2, site_name=spect_uids, color=yellow, /label_site, label_color=yellow, /spectrograph
-  
+  yellow = aurorax_get_decomposed_color([255, 255, 0])
+  aurorax_fov_oplot, spect_lats, spect_lons, 110.0, thick = 2, site_name = spect_uids, color = yellow, /label_site, label_color = yellow, /spectrograph
+
   ; Add a label for the map
   !p.font = 1
-  xyouts, 0.02, 0.02, "TREx RGB & SPECTROGRAPH FoV", /normal, color=0, charthick=2, charsize=1.5
+  xyouts, 0.02, 0.02, 'TREx RGB & SPECTROGRAPH FoV', /normal, color = 0, charthick = 2, charsize = 1.5
   !p.font = -1
 end

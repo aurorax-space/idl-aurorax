@@ -40,8 +40,9 @@ pro aurorax_example_create_keogram_themis
   ; If you wanted to further manipulate or manually plot the keogram
   ; array, you can grab it like this:
   keo_arr = keo.data
-  
-  ;------------------------------------
+  help, keo_arr
+
+  ; ------------------------------------
   ; Reference in geographic coordinates
   ;
   ; For each camera, the UCalgary maintains a geospatial calibration dataset that maps pixel
@@ -56,29 +57,29 @@ pro aurorax_example_create_keogram_themis
   ; files and use whichever you prefer. For a complete breakdown of how to choose the correct
   ; skymap for the data you are working with, refer to the crib sheet:
   ;
-  ;     aurorax_example_skymaps.pro
+  ; aurorax_example_skymaps.pro
   ;
   ; All skymaps can be viewed by looking at the data tree for
   ; the imager you are using (see https://data.phys.ucalgary.ca/). If you believe the geospatial
   ; calibration may be incorrect, please contact the UCalgary team.
   ;
   ; For more on the skymap files, please see the skymap file description document:
-  ;   https://data.phys.ucalgary.ca/sort_by_project/other/documentation/skymap_file_description.pdf
+  ; https://data.phys.ucalgary.ca/sort_by_project/other/documentation/skymap_file_description.pdf
   ;
-  
+
   ; Download and read the corresponding skymap
   d = aurorax_ucalgary_download_best_skymap('THEMIS_ASI_SKYMAP_IDLSAV', 'fsim', '2021-11-04T09:00:00')
   skymap_data = aurorax_ucalgary_read(d.dataset, d.filenames)
   skymap = skymap_data.data[0]
-  
+
   ; Add geographic, elevation, and geomagnetic axes to the keogram object
-  keo = aurorax_keogram_add_axis(keo, skymap, /geo, /elev, /mag, altitude_km=112)
-  
+  keo = aurorax_keogram_add_axis(keo, skymap, /geo, /elev, /mag, altitude_km = 112)
+
   ; Plot with aurorax function
   p1 = aurorax_keogram_plot(keo, title = 'Geographic', /geo, location = [0, 0], dimensions = [800, 400])
   p2 = aurorax_keogram_plot(keo, title = 'Elevation', /elev, location = [800, 0], dimensions = [800, 400])
   p3 = aurorax_keogram_plot(keo, title = 'Geomagnetic (AACGM)', /mag, location = [0, 450], dimensions = [800, 400], y_tick_interval = 25)
-  
+
   ; -------------------------
   ; Dealing with missing data
   ;
@@ -113,9 +114,9 @@ pro aurorax_example_create_keogram_themis
   ; Inspecting the shape reveals that indeed there was missing data, which
   ; has been filled using the aurorax_keogram_inject_nans() function
   print
-  print, "Original Keogram Shape:"
+  print, 'Original Keogram Shape:'
   print, original_shape
   print
-  print, "Keogram Shape after aurorax_keogram_inject_nans():"
+  print, 'Keogram Shape after aurorax_keogram_inject_nans():'
   print, new_shape
 end

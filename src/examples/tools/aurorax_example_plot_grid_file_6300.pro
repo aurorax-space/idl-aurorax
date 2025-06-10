@@ -22,17 +22,17 @@ pro aurorax_example_plot_grid_file_6300
   ; We are developing new array-wide standard grid data products for our data.
   ; We refer to these as 'grid files', since they are data organized into a common
   ; grid format:
-  ; 
-  ;   512 x 1024 latitude by longitude (~0.3 degrees per bin).
-  ; 
+  ;
+  ; 512 x 1024 latitude by longitude (~0.3 degrees per bin).
+  ;
   ; For the optical instruments, the grid files are a downsampled pre-computed mosaic.
   ; Preventing the need to download the raw data and generate your own mosaic which can
   ; be tedious and compute/network intensive. Of course, if these grid files are not
   ; good enough, you can always still download the raw data and generate your own mosaic
   ; as you'd like for full control.
-  ; 
+  ;
   ; Let's have a look at downloading and plotting a grid file for the REGO dataset.
-  ; 
+  ;
   ; Note that these grid files are created usng the common calibration procedure for
   ; REGO and thus each grid cell gives the 630.0 nm redline emission intensity.
   ;
@@ -43,7 +43,6 @@ pro aurorax_example_plot_grid_file_6300
 
   ; Grab the first frame and corresponding_timestamp
   grid = grid_data.data.grid[*, *, 0]
-  timestamp = grid_data.metadata.timestamp[0]
 
   ; The fill value used for cells with no data is stored in the metadata
   fill_val = float(grid_data.metadata.file_meta[0].fill_value)

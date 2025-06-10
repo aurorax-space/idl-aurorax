@@ -40,6 +40,9 @@
 ;         upper bounds of integration for a background channel, which is subtracted
 ;         from the integration over spect_band for manual emission selection
 ;
+;  :Returns:
+;       Float, giving the calculated intensity
+;
 ; :Examples:
 ;       i_4278 = aurorax_spectra_get_intensity(spect_data, '2021-02-16T09:30:00', 125, spect_emission='blue')
 ;       i_4861 = aurorax_spectra_get_intensity(spect_data, '2021-02-16T09:30:00', 125, spect_emission='hbeta')
@@ -53,30 +56,29 @@ function aurorax_spectra_get_intensity, $
   spect_emission = spect_emission, $
   spect_band_signal = spect_band_signal, $
   spect_band_bg = spect_band_bg
-  
   ; pull out spectra, timestamps, wavelength from spect_data_objects
   spectra = spect_data.data.spectra
   ts = spect_data.timestamp
   wavelength = spect_data.metadata.wavelength
-  
+
   ; check that input emissions are valid
-  if keyword_set(spect_emission) and (keyword_set(spect_band_signal) or keyword_set(spect_band_bg))then begin
+  if keyword_set(spect_emission) and (keyword_set(spect_band_signal) or keyword_set(spect_band_bg)) then begin
     print, '[aurorax_spectra_get_intensity] Error: only one of ''spect_emission'' and ''spect_band_signal''/''spect_band_bg'' may be set'
     return, !null
-  endif else if ~ keyword_set(spect_emission) and ~ keyword_set(spect_band_signal) then begin
+  endif else if ~keyword_set(spect_emission) and ~keyword_set(spect_band_signal) then begin
     spect_emission = 'green'
   endif else if keyword_set(spect_emission) then begin
-    if ~ isa(spect_emission, /string) then begin
+    if ~isa(spect_emission, /string) then begin
       print, '[aurorax_spectra_get_intensity] Error: ''spect_emission'' must be a string'
       return, !null
     endif
     if where(['hbeta', 'blue', 'green', 'red'] eq spect_emission, /null) eq !null then begin
-      print, '[aurorax_spectra_get_intensity] Error: input spect_emission='''+spect_emission+''' is not recognized... ' + $
-        'please select one of [''hbeta'', ''blue'', ''green'', ''red''], or pass in a manual wavelength range with ''spect_band_signal''
+      print, '[aurorax_spectra_get_intensity] Error: input spect_emission=''' + spect_emission + ''' is not recognized... ' + $
+        'please select one of [''hbeta'', ''blue'', ''green'', ''red''], or pass in a manual wavelength range with ''spect_band_signal'''
       return, !null
     endif
   endif
-  
+
   ; available automatic selections
   if isa(spect_emission) then begin
     wavelength_range = (hash('green', [557.0 - 1.5, 557.0 + 1.5], $
@@ -90,14 +92,14 @@ function aurorax_spectra_get_intensity, $
       'hbeta', [480.0 - 1.0, 480.0 + 1.0]))[spect_emission]
   endif else if isa(spect_band_signal) then begin
     ; manually supplied wavelength range for integration
-    if n_elements(spect_band_signal) ne 2 or (~ isa(spect_band_signal, /float) and ~ isa(spect_band_signal, /int)) then begin
+    if n_elements(spect_band_signal) ne 2 or (~isa(spect_band_signal, /float) and ~isa(spect_band_signal, /int)) then begin
       print, '[aurorax_spectra_get_intensity] Error: ''spect_band_signal'' must be a 2-element array of wavelengths'
       return, !null
     endif
     wavelength_range = spect_band_signal
 
     if isa(spect_band_bg) then begin
-      if n_elements(spect_band_bg) ne 2 or (~ isa(spect_band_bg, /float) and ~ isa(spect_band_bg, /int)) then begin
+      if n_elements(spect_band_bg) ne 2 or (~isa(spect_band_bg, /float) and ~isa(spect_band_bg, /int)) then begin
         print, '[aurorax_spectra_get_intensity] Error: ''spect_band_bg'' must be a 2-element array of wavelengths'
         return, !null
       endif
@@ -124,59 +126,44 @@ function aurorax_spectra_get_intensity, $
     print, '[aurorax_spectra_get_intensity] Warning: performing integration over wavelength range without background ' + $
       'subtraction - use ''spect_band_bg'' to set a background channel for integration.'
   endelse
-  
+
   ; Turn input plotting timestamp and spect loc into arrays if they're scalars
   if isa(time_stamp, /scalar) then time_stamp = [time_stamp]
-  if ~ isa(spect_loc, /scalar) or ~ isa(spect_loc, /int) then begin
-    print, '[aurorax_spectra_get_intensity] Error: ''spect_loc'' must be a scalar integer
+  if ~isa(spect_loc, /scalar) or ~isa(spect_loc, /int) then begin
+    print, '[aurorax_spectra_get_intensity] Error: ''spect_loc'' must be a scalar intege'
   endif
-  
+
   ; Obtain indices along time dimension of spectra corresponding to requested timestamp(s)
   ts_idx_arr = []
   foreach t, time_stamp do begin
     ; search for ts in metadata array
-    formatted_time_stamp = strjoin(strsplit(t, 'T', /regex, /extract), " ")+" UTC"
+    formatted_time_stamp = strjoin(strsplit(t, 'T', /regex, /extract), ' ') + ' UTC'
     idx = where(ts eq formatted_time_stamp, /null)
 
     ; raise error if timestamp doesn't exist in data
     if idx eq !null then begin
-      print, '[aurorax_spectra_plot] Error: could not find data in spect_data for requested timestamp '+t+'.'
+      print, '[aurorax_spectra_plot] Error: could not find data in spect_data for requested timestamp ' + t + '.'
       return, !null
     endif
     ts_idx_arr = [ts_idx_arr, idx]
   endforeach
-  
+
   ; Integrate spectral data for each timestamp at the requested bin and store resultant
   ; intensity (which is in Rayleighs) in array
   intensity_arr = []
   foreach ts_idx, ts_idx_arr do begin
-  
     ; extract spectrum for this timestamp
     spectrum = reform(spectra[spect_loc, *, ts_idx])
-    
+
     ; integrate over signal channel and if requested, subtract background channel integral
     rayleighs = int_tabulated(wavelength[int_w], spectrum[int_w])
     if int_bg_w ne !null then begin
       rayleighs -= int_tabulated(wavelength[int_bg_w], spectrum[int_bg_w])
     endif
-    
+
     ; append to array
     intensity_arr = [intensity_arr, rayleighs]
   endforeach
-  
+
   return, intensity_arr
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
