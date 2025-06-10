@@ -67,7 +67,7 @@ function __reorient_skymaps, dataset_name, skymap
     skymap.full_map_latitude = reverse(skymap.full_map_latitude, 1)
     skymap.full_map_longitude = reverse(skymap.full_map_longitude, 1)
   endif
-  
+
   if (dataset_name eq 'TREX_SPECT_SKYMAP_IDLSAV') then begin
     ; flip single axis mapping variables in spectrograph skymaps as
     ; they get read in a bit differently due to single dimension
@@ -112,15 +112,15 @@ end
 ;         list of files on the local computer to read in (can also be a single filename string)
 ;
 ; :Keywords:
-;       START_DT: in, optional, String
+;       start_dt: in, optional, String
 ;         string giving the start timestamp to read data for (format: 'yyyy-mm-ddTHH:MM:SS')
-;       END_DT: in, optional, String
+;       end_dt: in, optional, String
 ;         string giving the end timestamp to read data for (format: 'yyyy-mm-ddTHH:MM:SS')
-;       FIRST_RECORD: in, optional, Boolean
+;       first_record: in, optional, Boolean
 ;         only read the first record/frame/image in each file
-;       NO_METADATA: in, optional, Boolean
+;       no_meta: in, optional, Boolean
 ;         exclude reading of metadata
-;       QUIET: in, optional, Boolean
+;       quiet: in, optional, Boolean
 ;         read data silently, no print messages will be shown
 ;
 ; :Returns:
@@ -131,30 +131,30 @@ end
 ;       data = aurorax_ucalgary_read(d.dataset,f)
 ;       help,data
 ;+
-function aurorax_ucalgary_read, dataset, file_list, start_dt=start_dt, end_dt=end_dt, first_record = first_record, no_metadata = no_metadata, quiet = quiet
+function aurorax_ucalgary_read, dataset, file_list, start_dt = start_dt, end_dt = end_dt, first_record = first_record, no_metadata = no_metadata, quiet = quiet
   ; init
   timestamp_list = list()
   metadata_list = list()
   calibrated_data = ptr_new()
-  
+
   ; set keyword flags
   quiet_flag = 0
   if keyword_set(quiet) then quiet_flag = 1
 
   ; check if this dataset is supported for reading
   supported = aurorax_ucalgary_is_read_supported(dataset.name)
-  
+
   ; check that start_dt/end_dt are valid if they are passed
   if keyword_set(start_dt) then begin
     ; ensure string type
-    if ~ isa(start_dt, /string) then begin
-      print, '[aurorax_read] Start timestamp of type '+typename(start_dt)+' is invalid, expected string'
+    if ~isa(start_dt, /string) then begin
+      print, '[aurorax_read] Start timestamp of type ' + typename(start_dt) + ' is invalid, expected string'
       return, !null
-    endif else if ~ isa(end_dt, /string) then begin
-        print, '[aurorax_read] End timestamp of type '+typename(end_dt)+' is invalid, expected string'
-        return, !null
+    endif else if ~isa(end_dt, /string) then begin
+      print, '[aurorax_read] End timestamp of type ' + typename(end_dt) + ' is invalid, expected string'
+      return, !null
     endif
-    
+
     ; ensure string format
     if strlen(start_dt) eq 16 then start_dt += ':00'
     if strlen(end_dt) eq 16 then end_dt += ':00'
@@ -164,18 +164,18 @@ function aurorax_ucalgary_read, dataset, file_list, start_dt=start_dt, end_dt=en
       print, strlen(end_dt)
       return, !null
     endif
-    if strlen(start_dt) ne 19 or strmid(start_dt,4,1) ne '-' or strmid(start_dt,7,1) ne '-' or $ 
-      strmid(start_dt,10,1) ne 'T' or strmid(start_dt,13,1) ne ':' or strmid(start_dt,16,1) ne ':' then begin
-      print, '[aurorax_read] Start timetsamp must have format "yyyy-mm-ddTHH:MM" or "yyyy-mm-ddTHH:MM:SS", received'+start_dt
+    if strlen(start_dt) ne 19 or strmid(start_dt, 4, 1) ne '-' or strmid(start_dt, 7, 1) ne '-' or $
+      strmid(start_dt, 10, 1) ne 'T' or strmid(start_dt, 13, 1) ne ':' or strmid(start_dt, 16, 1) ne ':' then begin
+      print, '[aurorax_read] Start timetsamp must have format "yyyy-mm-ddTHH:MM" or "yyyy-mm-ddTHH:MM:SS", received' + start_dt
       return, !null
     endif
-    if strlen(end_dt) ne 19 or strmid(end_dt,4,1) ne '-' or strmid(end_dt,7,1) ne '-' or $ 
-      strmid(end_dt,10,1) ne 'T' or strmid(end_dt,13,1) ne ':' or strmid(end_dt,16,1) ne ':' then begin
-      print, '[aurorax_read] End timetsamp must have format "yyyy-mm-ddTHH:MM" or "yyyy-mm-ddTHH:MM:SS", received'+end_dt
+    if strlen(end_dt) ne 19 or strmid(end_dt, 4, 1) ne '-' or strmid(end_dt, 7, 1) ne '-' or $
+      strmid(end_dt, 10, 1) ne 'T' or strmid(end_dt, 13, 1) ne ':' or strmid(end_dt, 16, 1) ne ':' then begin
+      print, '[aurorax_read] End timetsamp must have format "yyyy-mm-ddTHH:MM" or "yyyy-mm-ddTHH:MM:SS", received' + end_dt
       return, !null
     endif
   endif
-    
+
   if (supported eq 0) then begin
     print, '[aurorax_read] Dataset ''' + dataset.name + ''' not supported for reading'
     return, !null
@@ -233,7 +233,7 @@ function aurorax_ucalgary_read, dataset, file_list, start_dt=start_dt, end_dt=en
     ; set the data
     data = img
     data = __reorient_asi_images(dataset.name, data)
-    
+
     ; set the timestamps
     for i = 0, n_elements(meta) - 1 do begin
       timestamp_list.add, meta[i].exposure_start_string
