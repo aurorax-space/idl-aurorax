@@ -86,7 +86,7 @@ setenv, 'IGRF_COEFFS=' + !package_path + path_sep() + $
 .run aurorax_movie
 ; check if there's a new version available
 print, '[idl-aurorax] Checking for new version ...'
-version_info = aurorax_check_version(/quiet)
+version_info = aurorax_check_version(/init_mode)
 version_info = hash(version_info, /lowercase)
 if (version_info['new_version_available'] eq 1) then print, '[idl-aurorax] ' + version_info['message'].replace('[aurorax_check_version] ', '')
 

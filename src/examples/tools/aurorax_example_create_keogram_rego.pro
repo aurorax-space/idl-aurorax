@@ -83,7 +83,7 @@ pro aurorax_example_create_keogram_rego
   ; -------------------------
   ; Dealing with missing data
   ;
-  ; When a keogram is created with aurorax_keogram_create() it will, by default, only include timetamps
+  ; When a keogram is created with aurorax_keogram_create() it will, by default, only include timestamps
   ; for which data exists. You may want to indicate missing data in the keogram, and this can be easily
   ; achieved using the aurorax_keogram_inject_nans() function.
   ;

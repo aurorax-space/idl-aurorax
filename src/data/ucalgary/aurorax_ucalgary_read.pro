@@ -118,7 +118,7 @@ end
 ;         string giving the end timestamp to read data for (format: 'yyyy-mm-ddTHH:MM:SS')
 ;       first_record: in, optional, Boolean
 ;         only read the first record/frame/image in each file
-;       no_meta: in, optional, Boolean
+;       no_metadata: in, optional, Boolean
 ;         exclude reading of metadata
 ;       quiet: in, optional, Boolean
 ;         read data silently, no print messages will be shown
@@ -127,9 +127,12 @@ end
 ;       Struct
 ;
 ; :Examples:
-;       download_obj = aurorax_ucalgary_download('THEMIS_ASI_RAW','2022-01-01T06:00:00','2022-01-01T06:59:59',site_uid='gill')
-;       data = aurorax_ucalgary_read(d.dataset,f)
+;       download_obj = aurorax_ucalgary_download('THEMIS_ASI_RAW', '2022-01-01T06:00:00', '2022-01-01T06:59:59', site_uid = 'gill')
+;       data = aurorax_ucalgary_read(d.dataset, d.filenames)
 ;       help,data
+;
+;       data = aurorax_ucalgary_read(d.dataset, d.filenames, start_dt = '2022-01-01T06:13:00', end_dt = '2022-01-01T06:40:00')
+;       help, data
 ;+
 function aurorax_ucalgary_read, dataset, file_list, start_dt = start_dt, end_dt = end_dt, first_record = first_record, no_metadata = no_metadata, quiet = quiet
   ; init
@@ -159,7 +162,7 @@ function aurorax_ucalgary_read, dataset, file_list, start_dt = start_dt, end_dt 
     if strlen(start_dt) eq 16 then start_dt += ':00'
     if strlen(end_dt) eq 16 then end_dt += ':00'
     if strlen(start_dt) ne strlen(end_dt) then begin
-      print, '[aurorax_read] Start and end timetsamp must have the same format'
+      print, '[aurorax_read] Start and end timestamp must have the same format'
       print, strlen(start_dt)
       print, strlen(end_dt)
       return, !null
@@ -189,14 +192,16 @@ function aurorax_ucalgary_read, dataset, file_list, start_dt = start_dt, end_dt 
     'TREX_BLUE_RAW', $
     'TREX_RGB_RAW_NOMINAL', $
     'TREX_RGB_RAW_BURST', $
-    'TREX_SPECT_RAW')
+    'TREX_SPECT_RAW', $
+    'SMILE_ASI_RAW')
   skymap_readfile_datasets = list( $
     'REGO_SKYMAP_IDLSAV', $
     'THEMIS_ASI_SKYMAP_IDLSAV', $
     'TREX_NIR_SKYMAP_IDLSAV', $
     'TREX_RGB_SKYMAP_IDLSAV', $
     'TREX_BLUE_SKYMAP_IDLSAV', $
-    'TREX_SPECT_SKYMAP_IDLSAV')
+    'TREX_SPECT_SKYMAP_IDLSAV', $
+    'SMILE_ASI_SKYMAP_IDLSAV')
   calibration_readfile_datasets = list( $
     'REGO_CALIBRATION_RAYLEIGHS_IDLSAV', $
     'REGO_CALIBRATION_FLATFIELD_IDLSAV', $

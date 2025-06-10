@@ -19,7 +19,14 @@ pro aurorax_example_read_data
   d = aurorax_ucalgary_download('THEMIS_ASI_RAW', '2022-01-01T06:00:00', '2022-01-01T06:59:59', site_uid = 'gill')
 
   ; set list of files to read
+  ;
+  ; NOTE: this is not necessary in practice, but we show here to illustrate where the filename information is in a
+  ; download return variable
   f = d.filenames
+
+  ; read the data
+  data = aurorax_ucalgary_read(d.dataset, f)
+  help, data
 
   ; read only some of the data using start_dt and end_dt
   data = aurorax_ucalgary_read(d.dataset, f, start_dt = '2022-01-01T06:13:00', end_dt = '2022-01-01T06:40:00')

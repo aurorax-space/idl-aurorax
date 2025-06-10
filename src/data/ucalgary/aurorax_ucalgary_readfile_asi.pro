@@ -393,6 +393,9 @@ function __aurorax_asi_h5_readfile, $
   compile_opt hidden
 
   ; init
+  ;
+  ; NOTE: the verbose flag it not used presently, and that is OK. All verbose output is one
+  ; function up in the main ASI readfile routine
   n_frames = 0
   n_bytes = 0
   dimension_details = [0, 0, 0, 1] ; the '1' is to designate BYTE type, the other fields get filled in when data is read
@@ -478,6 +481,14 @@ function __aurorax_asi_h5_readfile, $
   meta_data = replicate({Aurorax_Asi_H5_Metadata}, n_frames)
   if not keyword_set(no_metadata) then begin
     !null = __aurorax_asi_parse_h5_metadata(attributes, meta_data, dimension_details, minimal_metadata = minimal_metadata)
+  endif
+
+  ; trim out first record if we want
+  if (first_frame eq 1) then begin
+    image_data = image_data[*, *, *, 0]
+    dimension_details[3] = 1
+    n_frames = 1
+    meta_data = meta_data[0]
   endif
 
   ; normal return
@@ -668,6 +679,9 @@ pro __aurorax_ucalgary_readfile_asi, $
   if (n_elements(no_untar_cleanup) eq 0) then no_untar_cleanup = 0
 
   ; set verbosity
+  ;
+  ; NOTE: the `very_verbose` parameter is currently not utilized one level higher, and
+  ; that is OK. We include it here just in case we need it for later debugging.
   if (n_elements(verbose) eq 0) then verbose = 0
   if (n_elements(very_verbose) eq 0) then very_verbose = 0
   if (very_verbose ne 0) then verbose = 2
@@ -781,7 +795,6 @@ pro __aurorax_ucalgary_readfile_asi, $
 
   ; sort filenames
   if (n_elements(filenames) gt 1) then filenames = filenames[sort(filenames)]
-  ; if (verbose gt 0) then print,'[aurorax_read] Reading ' + strcompress(fix(n_elements(filenames)),/remove_all) + ' files'
 
   ; set values for pre-allocating memory (significantly increases speed)
   n_chunk = 20

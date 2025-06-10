@@ -23,7 +23,7 @@
 ; :Parameters:
 ;       instrument_array: in, required, String
 ;         the instrument array. Possible values are 'themis_asi', 'rego', 'trex_rgb',
-;         'trex_nir', and 'trex_blue'.
+;         'trex_nir', 'trex_blue', 'trex_spectrograph', and 'smile_asi'.
 ;
 ; :Keywords:
 ;       uid: in, optional, String

@@ -31,6 +31,8 @@ end
 ; :Keywords:
 ;       quiet: in, optional, Boolean
 ;         Do not output any print statements
+;       init_mode: in, optional, Boolean
+;         Indicate that the function is being run during the IDL-AuroraX initialization phase
 ;
 ; :Returns:
 ;       Struct
@@ -38,10 +40,12 @@ end
 ; :Examples:
 ;       aurorax_check_version
 ;+
-function aurorax_check_version, quiet = quiet
+function aurorax_check_version, quiet = quiet, init_mode = init_mode
   ; init
   quiet_flag = 0
+  print_prefix = 'aurorax_check_version'
   if (keyword_set(quiet)) then quiet_flag = 1
+  if (keyword_set(init_mode)) then print_prefix = 'idl-aurorax'
 
   ; get current version
   curr_version = __aurorax_version()
@@ -64,9 +68,9 @@ function aurorax_check_version, quiet = quiet
     ; evaluate error code
     if (quiet_flag ne 1) then begin
       if (status_code eq 28) then begin
-        print, '[aurorax_check_version] Timeout encountered when reaching out to Github. Perhaps check your internet connection, or connection to Github.'
+        print, '[' + print_prefix + '] Timeout encountered when reaching out to Github. Perhaps check your internet connection, or connection to Github.'
       endif else begin
-        print, '[aurorax_check_version] Unknown error encountered when reaching out to Github (error code ' + string(status_code, format = '(I0)') + ')'
+        print, '[' + print_prefix + '] Unknown error encountered when reaching out to Github (error code ' + string(status_code, format = '(I0)') + ')'
       endelse
     endif
 
@@ -102,13 +106,13 @@ function aurorax_check_version, quiet = quiet
   ; print
   message = ''
   if (new_version_available eq 0) then begin
-    message = '[aurorax_check_version] No new version is available. Your version, ' + curr_version + ', is the ' + $
+    message = '[' + print_prefix + '] No new version is available. Your version, ' + curr_version + ', is the ' + $
       'latest. More information can be found at https://github.com/aurorax-space/idl-aurorax/releases'
     if (quiet_flag ne 1) then begin
       print, message
     endif
   endif else begin
-    message = '[aurorax_check_version] New version is available! Version ' + latest_version + ' can be installed (' + $
+    message = '[' + print_prefix + '] New version is available! Version ' + latest_version + ' can be installed (' + $
       'currently have ' + curr_version + '). Upgrade information can be found at ' + $
       'https://github.com/aurorax-space/idl-aurorax?tab=readme-ov-file#updating'
     if (quiet_flag ne 1) then begin
