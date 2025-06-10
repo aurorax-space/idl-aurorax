@@ -71,7 +71,7 @@ Alternatively, you can install the idl-aurorax library manually by downloading t
 
 If you used `ipm` to install idl-aurorax, you can update it using:
 
-> [!WARNING]
+> [!IMPORTANT]
 > The startup file contents needed to initialize the IDL-AuroraX library changed in version 1.5.0. If you are upgrading from 1.4.0 or below up to 1.5.0 or above, please ensure you change your startup file accordingly. See step 3 of the install process for what it should be now.
 
 ```idl
