@@ -206,14 +206,31 @@ function __aurorax_asi_parse_h5_metadata, attributes, metadata, img_dims, minima
         metadata[i].ccd_binning = [0, 0]
         metadata[i].frame_size = [img_dims[1], img_dims[2]]
       endif
-      value = attributes['frame', 'frame' + strtrim(i, 2), 'image_effective_exposure_length']
-      metadata[i].exposure_duration_actual = float(strmid(value, 6, strlen(value) - 6 - 3)) * 1000.0
-      if (attributes.hasKey('exposure_length') eq 1) then begin
-        metadata[i].exposure_duration_request = float(strmid(attributes['exposure_length'], 0, 1)) * 1000.0
-      endif else if (attributes.hasKey('exposure_length_ms') eq 1) then begin
-        metadata[i].exposure_duration_request = float(attributes['exposure_length_ms'])
+
+      ; set exposure values, depending on data type
+      if (metadata[i].imager_uid.contains('smile-') eq 1) then begin
+        ; SMILE data
+        ;
+        ; set exposure duration actual
+        metadata[i].exposure_duration_actual = (float(strmid(attributes['frame', 'frame' + strtrim(i, 2), 'image_readout_start'], 17, 10)) * 1000.0) - (float(strmid(attributes['frame', 'frame' + strtrim(i, 2), 'image_request_start'], 17, 10)) * 1000.0)
+
+        ; set exposure duration request
+        metadata[i].exposure_duration_request = float(attributes['exposure_length']) * 1000.0
       endif else begin
-        metadata[i].exposure_duration_request = 0.0
+        ; TREx RGB data
+        ;
+        ; set exposure duration actual
+        value = attributes['frame', 'frame' + strtrim(i, 2), 'image_effective_exposure_length']
+        metadata[i].exposure_duration_actual = float(strmid(value, 6, strlen(value) - 6 - 3)) * 1000.0
+
+        ; set exposure duration request
+        if (attributes.hasKey('exposure_length') eq 1) then begin
+          metadata[i].exposure_duration_request = float(strmid(attributes['exposure_length'], 0, 1)) * 1000.0
+        endif else if (attributes.hasKey('exposure_length_ms') eq 1) then begin
+          metadata[i].exposure_duration_request = float(attributes['exposure_length_ms'])
+        endif else begin
+          metadata[i].exposure_duration_request = 0.0
+        endelse
       endelse
 
       ; combine global and frame metadata together into the comments hash

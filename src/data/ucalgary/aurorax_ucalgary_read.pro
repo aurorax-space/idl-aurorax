@@ -128,10 +128,10 @@ end
 ;
 ; :Examples:
 ;       download_obj = aurorax_ucalgary_download('THEMIS_ASI_RAW', '2022-01-01T06:00:00', '2022-01-01T06:59:59', site_uid = 'gill')
-;       data = aurorax_ucalgary_read(d.dataset, d.filenames)
+;       data = aurorax_ucalgary_read(download_obj.dataset, download_obj.filenames)
 ;       help,data
 ;
-;       data = aurorax_ucalgary_read(d.dataset, d.filenames, start_dt = '2022-01-01T06:13:00', end_dt = '2022-01-01T06:40:00')
+;       data = aurorax_ucalgary_read(download_obj.dataset, download_obj.filenames, start_dt = '2022-01-01T06:13:00', end_dt = '2022-01-01T06:40:00')
 ;       help, data
 ;+
 function aurorax_ucalgary_read, dataset, file_list, start_dt = start_dt, end_dt = end_dt, first_record = first_record, no_metadata = no_metadata, quiet = quiet
