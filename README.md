@@ -44,8 +44,7 @@ Since IDL 8.7.1, there exists an IDL package manager called [ipm](https://www.l3
     @aurorax_startup
     ```
 
-    > [!NOTE]
-    > This step was slightly changed in version 1.5.0.
+    NOTE: This step was slightly changed in version 1.5.0.
 
 3. [OPTIONAL] If you added the above line to your startup file, you must reset your IDL session. Do this by either clicking the Reset button in the IDL editor or by typing `.reset` into the IDL command prompt.
 
