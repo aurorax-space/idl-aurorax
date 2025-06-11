@@ -16,7 +16,7 @@
 
 pro aurorax_example_create_keogram_trex_spectrograph
   ; ---------------------------------
-  ; Creating a TREx Specrograph keogram
+  ; Creating a TREx Spectrograph keogram
   ; ---------------------------------
   ;
   ; Like with ASI data, keograms can be a helpful data product for summarizing spectrograph
