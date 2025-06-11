@@ -169,12 +169,12 @@ function aurorax_ucalgary_read, dataset, file_list, start_dt = start_dt, end_dt 
     endif
     if strlen(start_dt) ne 19 or strmid(start_dt, 4, 1) ne '-' or strmid(start_dt, 7, 1) ne '-' or $
       strmid(start_dt, 10, 1) ne 'T' or strmid(start_dt, 13, 1) ne ':' or strmid(start_dt, 16, 1) ne ':' then begin
-      print, '[aurorax_read] Start timetsamp must have format "yyyy-mm-ddTHH:MM" or "yyyy-mm-ddTHH:MM:SS", received' + start_dt
+      print, '[aurorax_read] Start timestamp must have format "yyyy-mm-ddTHH:MM" or "yyyy-mm-ddTHH:MM:SS", received' + start_dt
       return, !null
     endif
     if strlen(end_dt) ne 19 or strmid(end_dt, 4, 1) ne '-' or strmid(end_dt, 7, 1) ne '-' or $
       strmid(end_dt, 10, 1) ne 'T' or strmid(end_dt, 13, 1) ne ':' or strmid(end_dt, 16, 1) ne ':' then begin
-      print, '[aurorax_read] End timetsamp must have format "yyyy-mm-ddTHH:MM" or "yyyy-mm-ddTHH:MM:SS", received' + end_dt
+      print, '[aurorax_read] End timestamp must have format "yyyy-mm-ddTHH:MM" or "yyyy-mm-ddTHH:MM:SS", received' + end_dt
       return, !null
     endif
   endif
