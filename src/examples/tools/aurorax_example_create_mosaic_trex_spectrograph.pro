@@ -16,7 +16,7 @@
 
 pro aurorax_example_create_mosaic_trex_spectrograph
   ; --------------------------------
-  ; Creating TREx Spectrogaph Mosaic
+  ; Creating TREx Spectrogaph + RGB Mosaic
   ; --------------------------------
   ;
   ; Generating Spectrograph mosaics is very similar to making them for all-sky imagers like THEMIS,
