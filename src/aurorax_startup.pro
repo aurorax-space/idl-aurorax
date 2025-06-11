@@ -84,6 +84,7 @@ setenv, 'IGRF_COEFFS=' + !package_path + path_sep() + $
 .run aurorax_fov_oplot
 .run aurorax_get_decomposed_color
 .run aurorax_movie
+
 ; check if there's a new version available
 print, '[idl-aurorax] Checking for new version ...'
 version_info = aurorax_check_version(/init_mode)
