@@ -27,8 +27,8 @@ pro aurorax_example_create_keogram_trex_spectrograph
   ; emissions. Because of this, the aurorax_keogram_create() function has built in options
   ; for handling spectrograph data.
   ;
-  ; Below, we'll work through the creation of a 5 minute keogram created from
-  ; TREx-RGB 3 Hz Burst Mode data.
+  ; Below, we'll work through the creation of a 5 minute keogram created from TREx Spectrograph 
+  ; L1 processed data.
   ;
   
   ; First, read one hour of processed (L1) spectrograph data
