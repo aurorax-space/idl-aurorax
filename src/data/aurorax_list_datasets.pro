@@ -32,8 +32,8 @@
 ;       List(Structure)
 ;
 ; :Examples:
-;       datasets = aurorax_list_datasets('themis_asi')
-;       datasets = aurorax_list_datasets('trex')
+;       datasets = aurorax_list_datasets(name='themis_asi')
+;       datasets = aurorax_list_datasets(name='trex')
 ;+
 function aurorax_list_datasets, name = name, level = level
   ; set params
