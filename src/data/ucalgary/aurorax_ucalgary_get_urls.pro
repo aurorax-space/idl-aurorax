@@ -44,7 +44,8 @@
 ;+
 function aurorax_ucalgary_get_urls, dataset_name, start_ts, end_ts, site_uid = site_uid, device_uid = device_uid
   ; set required params
-  param_str = '?name=' + dataset_name
+  param_str = '?include_total_bytes=true'
+  param_str += '&name=' + dataset_name
   param_str += '&start=' + start_ts
   param_str += '&end=' + end_ts
 
