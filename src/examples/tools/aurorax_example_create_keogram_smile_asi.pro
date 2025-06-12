@@ -14,20 +14,20 @@
 ; limitations under the License.
 ; -------------------------------------------------------------
 
-pro aurorax_example_create_keogram_trex_rgb
-  ; ---------------------------
-  ; Creating a TREx RGB Keogram
-  ; ---------------------------
+pro aurorax_example_create_keogram_smile_asi
+  ; ----------------------------
+  ; Creating a SMILE ASI Keogram
+  ; ----------------------------
   ;
   ; Keograms are a useful data product that can be generated from ASI image data. A keogram is created
   ; by stacking slices of the middle column (a N-S slice for the orientation of the UCalgary imagers)
   ; of pixels from ASI images over a period of time.
   ;
-  ; Below, we'll work through the creation of a 1 hour keogram created from TREx-RGB raw data.
+  ; Below, we'll work through the creation of a 1 hour keogram created from SMILE ASI raw data.
   ;
 
-  ; First, download and read an hour of TREx RGB data
-  d = aurorax_ucalgary_download('TREX_RGB_RAW_NOMINAL', '2023-02-24T06:00:00', '2023-02-24T06:59:59', site_uid = 'rabb')
+  ; First, download and read an hour of SMILE ASI data
+  d = aurorax_ucalgary_download('SMILE_ASI_RAW', '2025-01-01T09:00:00', '2025-01-01T09:59:59', site_uid = 'luck')
   image_data = aurorax_ucalgary_read(d.dataset, d.filenames)
 
   ; Now extract the image array and timestamps from the image data structure
@@ -68,7 +68,7 @@ pro aurorax_example_create_keogram_trex_rgb
   ;
 
   ; Download and read the corresponding skymap
-  d = aurorax_ucalgary_download_best_skymap('TREX_RGB_SKYMAP_IDLSAV', 'rabb', '2023-02-24T06:00:00')
+  d = aurorax_ucalgary_download_best_skymap('SMILE_ASI_SKYMAP_IDLSAV', 'luck', '2025-01-01T09:00:00')
   skymap_data = aurorax_ucalgary_read(d.dataset, d.filenames)
   skymap = skymap_data.data[0]
 
@@ -90,8 +90,8 @@ pro aurorax_example_create_keogram_trex_rgb
   ; As an example, the below code creates a keogram for a different date with some missing data, and
   ; then calls the aurorax_keogram_inject_nans() function before plotting.
 
-  ; Download and read some more TREx RGB image data
-  d = aurorax_ucalgary_download('TREX_RGB_RAW_NOMINAL', '2022-03-12T10:00:00', '2022-03-12T10:59:59', site_uid = 'gill')
+  ; Download and read some more SMILE ASI image data
+  d = aurorax_ucalgary_download('SMILE_ASI_RAW', '2025-05-09T04:15:59', '2025-05-09T05:44:59', site_uid = 'luck')
   image_data = aurorax_ucalgary_read(d.dataset, d.filenames)
   img = image_data.data
   time_stamp = image_data.timestamp
@@ -109,7 +109,7 @@ pro aurorax_example_create_keogram_trex_rgb
   new_shape = size(keo.data, /dimensions)
 
   ; Plot the keogram with missing data indicated as you normally would
-  p4 = aurorax_keogram_plot(keo, title = 'Keogram with Missing Data', location = [800, 450], dimensions = [800, 400], colortable = 0)
+  p4 = aurorax_keogram_plot(keo, title = 'SMILE ASI - Keogram with Missing Data', location = [800, 450], dimensions = [800, 400], colortable = 0)
 
   ; Inspecting the shape reveals that indeed there was missing data, which
   ; has been filled using the aurorax_keogram_inject_nans() function

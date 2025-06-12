@@ -42,6 +42,10 @@ function __reorient_asi_images, dataset_name, data
     ; trex rgb - flip vertically
     data = reverse(data, 3)
   endif
+  if (dataset_name eq 'SMILE_ASI_RAW') then begin
+    ; smile - flip vertically
+    data = reverse(data, 3)
+  endif
 
   ; return
   return, data

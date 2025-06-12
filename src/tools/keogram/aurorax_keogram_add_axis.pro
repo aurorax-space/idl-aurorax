@@ -216,13 +216,13 @@ function aurorax_keogram_add_axis, $
         if keogram_struct.axis eq 0 then begin
           lat = lats[slice_idx, row_idx, alt_idx]
           lon = lons[slice_idx, row_idx, alt_idx]
-          mag_pos = cnvcoord_v2(lat, lon, aacgm_height)
+          mag_pos = cnvcoord_v2(lat, lon, aacgm_height, verbose=-1)
           lat = mag_pos[0]
           mag_y = [mag_y, lat]
         endif else begin
           lat = lats[row_idx, slice_idx, alt_idx]
           lon = lons[row_idx, slice_idx, alt_idx]
-          mag_pos = cnvcoord_v2(lat, lon, aacgm_height)
+          mag_pos = cnvcoord_v2(lat, lon, aacgm_height, verbose=-1)
           lon = mag_pos[1]
           mag_y = [mag_y, lon]
         endelse
@@ -243,13 +243,13 @@ function aurorax_keogram_add_axis, $
         if keogram_struct.axis eq 0 then begin
           lat = interpol(reform(lats[slice_idx, row_idx, *]), interp_alts, altitude_km)
           lon = interpol(reform(lons[slice_idx, row_idx, *]), interp_alts, altitude_km)
-          mag_pos = cnvcoord_v2(lat, lon, aacgm_height)
+          mag_pos = cnvcoord_v2(lat, lon, aacgm_height, verbose=-1)
           lat = mag_pos[0]
           mag_y = [mag_y, lat]
         endif else begin
           lat = interpol(reform(lats[row_idx, slice_idx, *]), interp_alts, altitude_km)
           lon = interpol(reform(lons[row_idx, slice_idx, *]), interp_alts, altitude_km)
-          mag_pos = cnvcoord_v2(lat, lon, aacgm_height)
+          mag_pos = cnvcoord_v2(lat, lon, aacgm_height, verbose=-1)
           lon = mag_pos[1]
           mag_y = [mag_y, lon]
         endelse
