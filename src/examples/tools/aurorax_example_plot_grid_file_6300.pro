@@ -23,7 +23,7 @@ pro aurorax_example_plot_grid_file_6300
   ; We refer to these as 'grid files', since they are data organized into a common
   ; grid format:
   ;
-  ; 512 x 1024 latitude by longitude (~0.3 degrees per bin).
+  ;   512 x 1024 latitude by longitude (~0.3 degrees per bin).
   ;
   ; For the optical instruments, the grid files are a downsampled pre-computed mosaic.
   ; Preventing the need to download the raw data and generate your own mosaic which can
@@ -71,5 +71,5 @@ pro aurorax_example_plot_grid_file_6300
   t = text(0.235, 0.165, '2023/03/24', font_size = 20, color = 'white', font_style = 1)
   t = text(0.235, 0.105, '04:45:00 UT', font_size = 20, color = 'white', font_style = 1)
   cbar = colorbar(range = rayleighs_scale, orientation = 1, position = [0.73, 0.1, 0.74, 0.9], textpos = 1, tickdir = 1, font_style = 1, font_size = 10, $
-    border_on = 1, color = 'white', rgb_table = 3, tickname = ['0 kR', '1 kR', '2 kR', '3 kR', '4 kR', '5+ kR'])
+                  border_on = 1, color = 'white', rgb_table = 3, tickname = ['0 kR', '1 kR', '2 kR', '3 kR', '4 kR', '5+ kR'])
 end
