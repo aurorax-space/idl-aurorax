@@ -123,12 +123,12 @@ function aurorax_atm_forward, $
   
   ; Print warning if no ATM model version is selected, and default to 2.0
   if (not isa(atm_model_version)) then begin
-    print, '[aurorax_atm_forward] Warning: No version set for keyword ''atm_model_version'', defaulting to ''2.0'''
     atm_model_version = '2.0'
   endif
   
   ; Check that no version 2.0 params were passed if version 1.0 was requested
   if (atm_model_version eq '1.0') then begin
+    url_version_str = 'v1'
     if (isa(kappa_energy_flux) eq 1) then begin
       print, '[aurorax_atm_forward] Error: atm model version 1.0 does not support input ''kappa_energy_flux'''
       return, !null
@@ -157,7 +157,12 @@ function aurorax_atm_forward, $
       print, '[aurorax_atm_forward] Error: atm model version 1.0 does not support input ''d_region'''
       return, !null
     endif
-  endif
+  endif else if (atm_model_version eq '2.0') then begin
+    url_version_str = 'v2'
+  endif else begin
+    print, '[aurorax_atm_forward] Error : atm model version '+atm_model_version+' is not currently accepted.'
+    return, !null
+  endelse
   
   ; set params
   request_hash = hash()
@@ -175,17 +180,16 @@ function aurorax_atm_forward, $
   if (isa(oxygen_correction_factor) eq 1) then request_hash['oxygen_correction_factor'] = oxygen_correction_factor
   if (isa(timescale_auroral) eq 1) then request_hash['timescale_auroral'] = timescale_auroral
   if (isa(timescale_transport) eq 1) then request_hash['timescale_transport'] = timescale_transport
-;  if (isa(atm_model_version) eq 1) then request_hash['atm_model_version'] = atm_model_version
   if (isa(custom_spectrum) eq 1) then request_hash['custom_spectrum'] = custom_spectrum
-  if (isa(kappa_energy_flux) eq 1) then request_hash['kappa_energy_flux'] = custom_spectrum
-  if (isa(kappa_mean_energy) eq 1) then request_hash['kappa_mean_energy'] = custom_spectrum
-  if (isa(kappa_k_index) eq 1) then request_hash['kappa_k_index'] = custom_spectrum
-  if (isa(exponential_energy_flux) eq 1) then request_hash['exponential_energy_flux'] = custom_spectrum
-  if (isa(exponential_characteristic_energy) eq 1) then request_hash['exponential_characteristic_energy'] = custom_spectrum
-  if (isa(exponential_starting_energy) eq 1) then request_hash['exponential_starting_energy'] = custom_spectrum
-  if (isa(proton_energy_flux) eq 1) then request_hash['proton_energy_flux'] = custom_spectrum
-  if (isa(proton_characteristic_energy) eq 1) then request_hash['proton_characteristic_energy'] = custom_spectrum
-  if (isa(d_region) eq 1) then request_hash['d_region'] = custom_spectrum
+  if (isa(kappa_energy_flux) eq 1) then request_hash['kappa_energy_flux'] = kappa_energy_flux
+  if (isa(kappa_mean_energy) eq 1) then request_hash['kappa_mean_energy'] = kappa_mean_energy
+  if (isa(kappa_k_index) eq 1) then request_hash['kappa_k_index'] = kappa_k_index
+  if (isa(exponential_energy_flux) eq 1) then request_hash['exponential_energy_flux'] = exponential_energy_flux
+  if (isa(exponential_characteristic_energy) eq 1) then request_hash['exponential_characteristic_energy'] = exponential_characteristic_energy
+  if (isa(exponential_starting_energy) eq 1) then request_hash['exponential_starting_energy'] = exponential_starting_energy
+  if (isa(proton_energy_flux) eq 1) then request_hash['proton_energy_flux'] = proton_energy_flux
+  if (isa(proton_characteristic_energy) eq 1) then request_hash['proton_characteristic_energy'] = proton_characteristic_energy
+  if (isa(d_region) eq 1) then request_hash['d_region'] = d_region
 
   ; create post struct and serialize into a string
   post_str = json_serialize(request_hash, /lowercase)
@@ -195,7 +199,7 @@ function aurorax_atm_forward, $
   req.setProperty, url_scheme = 'https'
   req.setProperty, url_port = 443
   req.setProperty, url_host = 'api.phys.ucalgary.ca'
-  req.setProperty, url_path = 'api/v1/atm/forward'
+  req.setProperty, url_path = 'api/'+url_version_str+'/atm/forward'
   req.setProperty, headers = ['Content-Type: application/json', 'User-Agent: idl-aurorax/' + __aurorax_version()]
 
   ; make request

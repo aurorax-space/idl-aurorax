@@ -87,13 +87,13 @@ pro aurorax_example_atm_forward1
 
   ; make the request
   print, '[Simple example] Performing calculation'
-  data = aurorax_atm_forward(time_stamp, latitude, longitude, output_flags, atm_model_version='2.0')
+  data = aurorax_atm_forward(time_stamp, latitude, longitude, output_flags, atm_model_version='1.0')
   print, '[Simple example] Calculation received'
 
   ; print results
   help, data
   print, ''
-
+  
   ; print the information we asked for
   print, 'Height-integrated Rayleighs:'
   print, '  427.8nm: ' + strcompress(string(data.data.height_integrated_rayleighs_4278))
@@ -119,7 +119,7 @@ pro aurorax_example_atm_forward2
   ; do a ATM forward request and get ALL output values back
   ;
   ; set up params
-  time_stamp = '2024-01-01T06:00:00'
+  time_stamp = '2021-11-04T06:00:00'
   latitude = 58.227808
   longitude = -103.680631
 
@@ -133,4 +133,5 @@ pro aurorax_example_atm_forward2
 
   ; show results
   help, data.data
+  print, data.data.production_rate_oplus[0:5]
 end
