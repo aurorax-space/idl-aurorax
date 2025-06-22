@@ -87,7 +87,7 @@ pro aurorax_example_atm_forward1
 
   ; make the request
   print, '[Simple example] Performing calculation'
-  data = aurorax_atm_forward(time_stamp, latitude, longitude, output_flags)
+  data = aurorax_atm_forward(time_stamp, latitude, longitude, output_flags, atm_model_version='2.0')
   print, '[Simple example] Calculation received'
 
   ; print results

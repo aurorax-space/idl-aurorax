@@ -92,10 +92,19 @@ function aurorax_atm_forward, $
   geo_lon, $
   output_flags, $
   maxwellian_energy_flux = maxwellian_energy_flux, $
-  gaussian_energy_flux = gaussian_energy_flux, $
   maxwellian_characteristic_energy = maxwellian_characteristic_energy, $
+  gaussian_energy_flux = gaussian_energy_flux, $
   gaussian_peak_energy = gaussian_peak_energy, $
   gaussian_spectral_width = gaussian_spectral_width, $
+  kappa_energy_flux = kappa_energy_flux, $
+  kappa_mean_energy = kappa_mean_energy, $
+  kappa_k_index = kappa_k_index, $
+  exponential_energy_flux = exponential_energy_flux, $
+  exponential_characteristic_energy = exponential_characteristic_energy, $
+  exponential_starting_energy = exponential_starting_energy, $
+  proton_energy_flux = proton_energy_flux, $
+  proton_characteristic_energy = proton_characteristic_energy, $ 
+  d_region = d_region, $ 
   nrlmsis_model_version = nrlmsis_model_version, $
   oxygen_correction_factor = oxygen_correction_factor, $
   timescale_auroral = timescale_auroral, $
@@ -111,7 +120,45 @@ function aurorax_atm_forward, $
   foreach value, output_flags, key do begin
     output_flags[key] = boolean(value)
   endforeach
-
+  
+  ; Print warning if no ATM model version is selected, and default to 2.0
+  if (not isa(atm_model_version)) then begin
+    print, '[aurorax_atm_forward] Warning: No version set for keyword ''atm_model_version'', defaulting to ''2.0'''
+    atm_model_version = '2.0'
+  endif
+  
+  ; Check that no version 2.0 params were passed if version 1.0 was requested
+  if (atm_model_version eq '1.0') then begin
+    if (isa(kappa_energy_flux) eq 1) then begin
+      print, '[aurorax_atm_forward] Error: atm model version 1.0 does not support input ''kappa_energy_flux'''
+      return, !null
+    endif else if (isa(kappa_mean_energy) eq 1) then begin
+      print, '[aurorax_atm_forward] Error: atm model version 1.0 does not support input ''kappa_mean_energy'''
+      return, !null
+    endif else if (isa(kappa_k_index) eq 1) then begin
+      print, '[aurorax_atm_forward] Error: atm model version 1.0 does not support input ''kappa_k_index'''
+      return, !null
+    endif else if (isa(exponential_energy_flux) eq 1) then begin
+      print, '[aurorax_atm_forward] Error: atm model version 1.0 does not support input ''exponential_energy_flux'''
+      return, !null
+    endif else if (isa(exponential_characteristic_energy) eq 1) then begin
+      print, '[aurorax_atm_forward] Error: atm model version 1.0 does not support input ''exponential_characteristic_energy'''
+      return, !null
+    endif else if (isa(exponential_starting_energy) eq 1) then begin
+      print, '[aurorax_atm_forward] Error: atm model version 1.0 does not support input ''exponential_starting_energy'''
+      return, !null
+    endif else if (isa(proton_energy_flux) eq 1) then begin
+      print, '[aurorax_atm_forward] Error: atm model version 1.0 does not support input ''proton_energy_flux'''
+      return, !null
+    endif else if (isa(proton_characteristic_energy) eq 1) then begin
+      print, '[aurorax_atm_forward] Error: atm model version 1.0 does not support input ''proton_characteristic_energy'''
+      return, !null
+    endif else if (isa(d_region) eq 1) then begin
+      print, '[aurorax_atm_forward] Error: atm model version 1.0 does not support input ''d_region'''
+      return, !null
+    endif
+  endif
+  
   ; set params
   request_hash = hash()
   request_hash['timestamp'] = time_stamp
@@ -128,8 +175,17 @@ function aurorax_atm_forward, $
   if (isa(oxygen_correction_factor) eq 1) then request_hash['oxygen_correction_factor'] = oxygen_correction_factor
   if (isa(timescale_auroral) eq 1) then request_hash['timescale_auroral'] = timescale_auroral
   if (isa(timescale_transport) eq 1) then request_hash['timescale_transport'] = timescale_transport
-  if (isa(atm_model_version) eq 1) then request_hash['atm_model_version'] = atm_model_version
+;  if (isa(atm_model_version) eq 1) then request_hash['atm_model_version'] = atm_model_version
   if (isa(custom_spectrum) eq 1) then request_hash['custom_spectrum'] = custom_spectrum
+  if (isa(kappa_energy_flux) eq 1) then request_hash['kappa_energy_flux'] = custom_spectrum
+  if (isa(kappa_mean_energy) eq 1) then request_hash['kappa_mean_energy'] = custom_spectrum
+  if (isa(kappa_k_index) eq 1) then request_hash['kappa_k_index'] = custom_spectrum
+  if (isa(exponential_energy_flux) eq 1) then request_hash['exponential_energy_flux'] = custom_spectrum
+  if (isa(exponential_characteristic_energy) eq 1) then request_hash['exponential_characteristic_energy'] = custom_spectrum
+  if (isa(exponential_starting_energy) eq 1) then request_hash['exponential_starting_energy'] = custom_spectrum
+  if (isa(proton_energy_flux) eq 1) then request_hash['proton_energy_flux'] = custom_spectrum
+  if (isa(proton_characteristic_energy) eq 1) then request_hash['proton_characteristic_energy'] = custom_spectrum
+  if (isa(d_region) eq 1) then request_hash['d_region'] = custom_spectrum
 
   ; create post struct and serialize into a string
   post_str = json_serialize(request_hash, /lowercase)

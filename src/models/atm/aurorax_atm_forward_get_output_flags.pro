@@ -45,6 +45,13 @@ function aurorax_atm_forward_get_output_flags, $
   enable_only_height_integrated_rayleighs = enable_only_height_integrated_rayleighs
   ; create hash
   output_flags = hash()
+  output_flags['height_integrated_rayleighs_1304'] = 0
+  output_flags['height_integrated_rayleighs_1356'] = 0
+  output_flags['height_integrated_rayleighs_4278'] = 0
+  output_flags['height_integrated_rayleighs_5577'] = 0
+  output_flags['height_integrated_rayleighs_6300'] = 0
+  output_flags['height_integrated_rayleighs_8446'] = 0
+  output_flags['height_integrated_rayleighs_lbh'] = 0
   output_flags['altitudes'] = 0
   output_flags['emission_1304'] = 0
   output_flags['emission_1356'] = 0
@@ -53,27 +60,28 @@ function aurorax_atm_forward_get_output_flags, $
   output_flags['emission_6300'] = 0
   output_flags['emission_8446'] = 0
   output_flags['emission_lbh'] = 0
-  output_flags['height_integrated_rayleighs_1304'] = 0
-  output_flags['height_integrated_rayleighs_1356'] = 0
-  output_flags['height_integrated_rayleighs_4278'] = 0
-  output_flags['height_integrated_rayleighs_5577'] = 0
-  output_flags['height_integrated_rayleighs_6300'] = 0
-  output_flags['height_integrated_rayleighs_8446'] = 0
-  output_flags['height_integrated_rayleighs_lbh'] = 0
   output_flags['neutral_n2_density'] = 0
   output_flags['neutral_n_density'] = 0
   output_flags['neutral_o2_density'] = 0
   output_flags['neutral_o_density'] = 0
-  output_flags['neutral_temperature'] = 0
-  output_flags['plasma_electron_density'] = 0
-  output_flags['plasma_electron_temperature'] = 0
-  output_flags['plasma_hall_conductivity'] = 0
-  output_flags['plasma_ion_temperature'] = 0
-  output_flags['plasma_ionisation_rate'] = 0
   output_flags['plasma_noplus_density'] = 0
   output_flags['plasma_o2plus_density'] = 0
   output_flags['plasma_oplus_density'] = 0
+  output_flags['plasma_electron_density'] = 0
+  output_flags['neutral_temperature'] = 0
+  output_flags['plasma_electron_temperature'] = 0
+  output_flags['plasma_ion_temperature'] = 0
+  output_flags['plasma_hall_conductivity'] = 0
   output_flags['plasma_pederson_conductivity'] = 0
+  output_flags['plasma_ionisation_rate'] = 0
+  output_flags['production_rate_o2plus'] = 0
+  output_flags['production_rate_oplus'] = 0
+  output_flags['production_rate_oneg'] = 0
+  output_flags['production_rate_o'] = 0
+  output_flags['production_rate_nplus'] = 0
+  output_flags['production_rate_n2plus'] = 0
+  output_flags['production_rate_n'] = 0
+  output_flags['production_rate_n2d'] = 0
 
   ; set all true, if necessary
   if keyword_set(set_all_true) then begin
