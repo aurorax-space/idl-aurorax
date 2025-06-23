@@ -1,8 +1,23 @@
-Version 1.5.0
+Version 1.5.0 (2025-03-23)
 -------------------------
-- added AACGM as dependency
 - changed initialization process (refer to README)
+- added AACGM integration, including adding support for magentic coordinates in several functions (keograms, mosaics, contours, bounding box)
+- added support for TREx Spectrograph data
+- added support for SMILE ASI data
+- added ability to create field-of-view (FoV) maps for any instrument network
+- added support for TREx RGB 'burst' data, added crib sheet
+- added `percentile` parameter to custom keogram function
+- added `aurorax_keogram_inject_nans()` function to allow for dynamic handling of missing data, updated crib sheets to show usage
+- added `aurorax_ucalgary_download_best_calibration()` function
+- added support to reading functions to handle `start_dt` and `end_dt` parameters
+- added support for the `first_record` keyword when reading ASI data in H5 format (TREx RGB nominal, SMILE ASI)
+- updated all plotting functions to return graphics object if applicable
+- improvement to grid file read function to optimize memory usage and increase performance
+- bugfix for contour line orientation
+- created several additional crib sheets, updated existing crib sheets
+- code cleanup, docstring updates
 - changed `aurorax_check_version()` function to return a struct instead of an integer
+- updated `aurorax_ucalgary_get_urls()` function to include total bytes of returned URLs
 
 
 Version 1.4.1 (2025-03-06)
