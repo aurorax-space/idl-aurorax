@@ -297,6 +297,9 @@ function aurorax_keogram_create_custom, $
   endif else if coordinate_system eq 'mag' then begin
     print, '(aurorax_keogram_create_custom) Warning: Magnetic coordinates are not currently supported for this routine.'
     return, !null
+  endif else if coordinate_system eq 'ccd' then begin
+    local_x_locs = x_locs
+    local_y_locs = y_locs
   endif
 
   ; At this point, we work exclusively in CCD coordinates, everything has been converted
