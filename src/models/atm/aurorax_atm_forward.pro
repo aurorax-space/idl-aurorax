@@ -68,8 +68,7 @@
 ;         Defined by L/v0, in which L is the dimension of the auroral structure, and v0 is
 ;         the cross-structure drift speed. Represented in seconds. Default is 600 (10 minutes).
 ;       atm_model_version: in, optional, String
-;         ATM model version number. Possible values are only '1.0' at this time, but will have
-;         additional possible values in the future.
+;         ATM model version number. Possible values are '1.0' and '2.0'. Default is '2.0'.
 ;       custom_spectrum: in, optional, Struct
 ;         A struct containing two 1D float arrays. One array containing values representing the
 ;         energy in eV, and another representing flux in 1/cm2/sr/eV. Note that this array
@@ -103,14 +102,15 @@ function aurorax_atm_forward, $
   exponential_characteristic_energy = exponential_characteristic_energy, $
   exponential_starting_energy = exponential_starting_energy, $
   proton_energy_flux = proton_energy_flux, $
-  proton_characteristic_energy = proton_characteristic_energy, $ 
-  d_region = d_region, $ 
+  proton_characteristic_energy = proton_characteristic_energy, $
+  d_region = d_region, $
   nrlmsis_model_version = nrlmsis_model_version, $
   oxygen_correction_factor = oxygen_correction_factor, $
   timescale_auroral = timescale_auroral, $
   timescale_transport = timescale_transport, $
   atm_model_version = atm_model_version, $
   custom_spectrum = custom_spectrum, $
+  custom_neutral_profile = custom_neutral_profile, $
   no_cache = no_cache
   ; set keyword flags
   no_cache_flag = 0
@@ -120,12 +120,12 @@ function aurorax_atm_forward, $
   foreach value, output_flags, key do begin
     output_flags[key] = boolean(value)
   endforeach
-  
-  ; Print warning if no ATM model version is selected, and default to 2.0
+
+  ; default to model version 2.0
   if (not isa(atm_model_version)) then begin
     atm_model_version = '2.0'
   endif
-  
+
   ; Check that no version 2.0 params were passed if version 1.0 was requested
   if (atm_model_version eq '1.0') then begin
     url_version_str = 'v1'
@@ -156,14 +156,17 @@ function aurorax_atm_forward, $
     endif else if (isa(d_region) eq 1) then begin
       print, '[aurorax_atm_forward] Error: atm model version 1.0 does not support input ''d_region'''
       return, !null
+    endif else if (isa(custom_neutral_profile) eq 1) then begin
+      print, '[aurorax_atm_forward] Error: atm model version 1.0 does not support input ''custom_neutral_profile'''
+      return, !null
     endif
   endif else if (atm_model_version eq '2.0') then begin
     url_version_str = 'v2'
   endif else begin
-    print, '[aurorax_atm_forward] Error : atm model version '+atm_model_version+' is not currently accepted.'
+    print, '[aurorax_atm_forward] Error : atm model version ' + atm_model_version + ' is not currently accepted.'
     return, !null
   endelse
-  
+
   ; set params
   request_hash = hash()
   request_hash['timestamp'] = time_stamp
@@ -181,6 +184,7 @@ function aurorax_atm_forward, $
   if (isa(timescale_auroral) eq 1) then request_hash['timescale_auroral'] = timescale_auroral
   if (isa(timescale_transport) eq 1) then request_hash['timescale_transport'] = timescale_transport
   if (isa(custom_spectrum) eq 1) then request_hash['custom_spectrum'] = custom_spectrum
+  if (isa(custom_neutral_profile) eq 1) then request_hash['custom_neutral_profile'] = custom_neutral_profile
   if (isa(kappa_energy_flux) eq 1) then request_hash['kappa_energy_flux'] = kappa_energy_flux
   if (isa(kappa_mean_energy) eq 1) then request_hash['kappa_mean_energy'] = kappa_mean_energy
   if (isa(kappa_k_index) eq 1) then request_hash['kappa_k_index'] = kappa_k_index
@@ -199,11 +203,11 @@ function aurorax_atm_forward, $
   req.setProperty, url_scheme = 'https'
   req.setProperty, url_port = 443
   req.setProperty, url_host = 'api.phys.ucalgary.ca'
-  req.setProperty, url_path = 'api/'+url_version_str+'/atm/forward'
+  req.setProperty, url_path = 'api/' + url_version_str + '/atm/forward'
   req.setProperty, headers = ['Content-Type: application/json', 'User-Agent: idl-aurorax/' + __aurorax_version()]
 
   ; make request
-  r = __aurorax_perform_api_request('post', 'aurorax_atm_forward', req, post_str = post_str) 
+  r = __aurorax_perform_api_request('post', 'aurorax_atm_forward', req, post_str = post_str)
   if (r.status_code ne 200) then return, !null
   output = r.output
 

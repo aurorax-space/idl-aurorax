@@ -51,7 +51,7 @@
 ;       atmospheric_attenuation_correction: in, optional, Integer
 ;         Apply an atmospheric attenuation correction factor. Default is 0. Set to 1 to enable.
 ;       atm_model_version: in, optional, String
-;         ATM model version number. Possible values are only '1.0' at this time, but will have additional possible values in the future.
+;         ATM model version number. Possible values are '1.0' and '2.0'. Default is '2.0'.
 ;       no_cache: in, optional, Boolean
 ;         The UCalgary Space Remote Sensing API utilizes a caching layer for performing ATM
 ;         calculations. If this variation of input parameters has been run before (and the
@@ -87,6 +87,16 @@ function aurorax_atm_inverse, $
     output_flags[key] = boolean(value)
   endforeach
 
+  ; default to model version 2.0
+  if (not isa(atm_model_version)) then begin
+    atm_model_version = '2.0'
+  endif
+  if (atm_model_version eq '1.0') then begin
+    url_version_str = 'v1'
+  endif else begin
+    url_version_str = 'v2'
+  endelse
+
   ; set params
   request_hash = hash()
   request_hash['timestamp'] = time_stamp
@@ -101,7 +111,6 @@ function aurorax_atm_inverse, $
   if (isa(precipitation_flux_spectral_type) eq 1) then request_hash['precipitation_flux_spectral_type'] = precipitation_flux_spectral_type
   if (isa(nrlmsis_model_version) eq 1) then request_hash['nrlmsis_model_version'] = nrlmsis_model_version
   if (isa(atmospheric_attenuation_correction) eq 1) then request_hash['atmospheric_attenuation_correction'] = atmospheric_attenuation_correction
-  if (isa(atm_model_version) eq 1) then request_hash['atm_model_version'] = atm_model_version
 
   ; create post struct and serialize into a string
   post_str = json_serialize(request_hash, /lowercase)
@@ -111,7 +120,7 @@ function aurorax_atm_inverse, $
   req.setProperty, url_scheme = 'https'
   req.setProperty, url_port = 443
   req.setProperty, url_host = 'api.phys.ucalgary.ca'
-  req.setProperty, url_path = 'api/v1/atm/inverse'
+  req.setProperty, url_path = 'api/' + url_version_str + '/atm/inverse'
   req.setProperty, headers = ['Content-Type: application/json', 'User-Agent: idl-aurorax/' + __aurorax_version()]
 
   ; make request
