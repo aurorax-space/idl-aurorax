@@ -214,6 +214,10 @@ end
 ;         the 99th percentile should be computed to fill each keogram bin)
 ;       show_preview: in, optional, Boolean
 ;         plot a preview of the keogram slice on top of the first image frame
+;       preview_scl_min: in, optional, Int
+;         the minimum value to use for scaling the preview image
+;       preview_scl_max: in, optional, Int
+;         the maximum value to use for scaling the preview image
 ;
 ; :Returns:
 ;       Struct
@@ -233,7 +237,9 @@ function aurorax_keogram_create_custom, $
   altitude_km = altitude_km, $
   metric = metric, $
   percentile = percentile, $
-  show_preview = show_preview
+  show_preview = show_preview, $
+  preview_scl_min = preview_scl_min, $
+  preview_scl_max = preview_scl_max
   ; check that coord system is valid
   coord_options = ['ccd', 'geo', 'mag']
   if where(coordinate_system eq coord_options, /null) eq !null then begin
@@ -286,7 +292,21 @@ function aurorax_keogram_create_custom, $
 
   ; Extract preview image if desired
   if keyword_set(show_preview) then begin
-    if n_channels eq 1 then preview_img = bytscl(images[*, *, 0], top = 230) else preview_img = images[*, *, *, 0]
+    if ~ keyword_set(preview_scl_min) then local_scl_min = 0 else local_scl_min = preview_scl_min
+    
+    if keyword_set(preview_scl_max) then begin
+      if n_channels eq 1 then begin
+        preview_img = bytscl(images[*, *, 0], min=local_scl_min, max=preview_scl_max, top = 230)
+      endif else begin
+        preview_img = bytscl(images[*, *, *, 0], min=local_scl_min, max=preview_scl_max, top = 230)
+      endelse
+    endif else begin
+      if n_channels eq 1 then begin
+        preview_img = bytscl(images[*, *, 0], top = 230)
+      endif else begin
+        preview_img = bytscl(images[*, *, *, 0], top = 230)
+      endelse
+    endelse
   endif
 
   ; Convert lat/lons to CCD coordinates
