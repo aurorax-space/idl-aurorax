@@ -58,6 +58,35 @@
 ;       gaussian_spectral_width: in, optional, Float
 ;         Gaussian spectral width in eV. Default is 100. Note this parameter must be specified
 ;         if the gaussian_energy_flux is not 0.
+;       kappa_energy_flux: in, optional, Float
+;         Kappa energy flux in erg/cm2/s. Default is 0, meaning all kappa parameters will be disabled. Note that
+;         `kappa_mean_energy` and `kappa_k_index` should be specified if `kappa_energy_flux` is not 0. If they are not, then
+;         their defaults will be used. This parameter is optional.
+;       kappa_mean_energy: in, optional, Float
+;         Kappa mean energy in eV. Default is 30000. Note this parameter should be specified if the `kappa_energy_flux`
+;         is not 0. This parameter is optional.
+;       kappa_k_index: in, optional, Float
+;         Kappa k-index. Default is 5. Note this parameter should be specified if the `kappa_energy_flux` is not 0. This
+;         parameter is optional.
+;       exponential_energy_flux: in, optional, Float
+;         Exponential energy flux, in erg/cm2/s. Default is 0, meaning all exponential parameters will be disabled. Note that
+;         `exponential_characteristic_energy` and `exponential_starting_energy` should be specified if `exponential_energy_flux`
+;         is not 0. If it is not, then the default will be used. This parameter is optional.
+;       exponential_characteristic_energy: in, optional, Float
+;         Exponential characteristic energy, in eV. Default is 50000. Note this parameter should be specified if the
+;         `exponential_energy_flux` is not 0. This parameter is optional.
+;       exponential_starting_energy: in, optional, Float
+;         Exponential starting energy, in eV. Default is 50000. Note this parameter should be specified if the
+;         `exponential_energy_flux` is not 0. This parameter is optional.
+;       proton_energy_flux: in, optional, Float
+;         Proton energy flux, in erg/cm2/s. Default is 0, meaning all proton parameters will be disabled. Note that
+;         `proton_characteristic_energy` should be specified if `proton_energy_flux` is not 0. If it is not, then the default
+;         will be used. This parameter is optional.
+;       proton_characteristic_energy: in, optionial, Float
+;         Proton characteristic energy, in eV. Default is 10000. Not this parameter should be specified if the
+;         `proton_energy_flux` is not 0. This parameter is optional.
+;       d_region: in, optional, Boolean
+;         Flag to enable D-region evaluation. Default is False. 
 ;       nrlmsis_model_version: in, optional, String
 ;         NRLMSIS version number. Possible values are 00 or 2.0. Default is 2.0.
 ;       oxygen_correction_factor: in, optional, Float
@@ -73,6 +102,15 @@
 ;         A struct containing two 1D float arrays. One array containing values representing the
 ;         energy in eV, and another representing flux in 1/cm2/sr/eV. Note that this array
 ;         cannot contain negative values.
+;       custom_neutral_profile: in, optional, Float
+;         A 2-dimensional float array containing values representing the energy in eV, and flux
+;         in 1/cm2/sr/eV. The shape is expected to be [N, 2], with energy in [*, 0] and flux
+;         in [*, 1].
+;         Note that this array cannot contain negative values (API Error 
+;         will be raised if so). This parameter is optional.
+;         Users are responsible for fully covering the altitude range of interest in the
+;         provided profile (80-800 km if d_region_flag=0, or 50-500 km if d_region_flag=1). The
+;         model only performs interpolation, not extrapolation.
 ;       no_cache: in, optional, Boolean
 ;         The UCalgary Space Remote Sensing API utilizes a caching layer for performing ATM
 ;         calculations. If this variation of input parameters has been run before (and the
@@ -184,7 +222,6 @@ function aurorax_atm_forward, $
   if (isa(timescale_auroral) eq 1) then request_hash['timescale_auroral'] = timescale_auroral
   if (isa(timescale_transport) eq 1) then request_hash['timescale_transport'] = timescale_transport
   if (isa(custom_spectrum) eq 1) then request_hash['custom_spectrum'] = custom_spectrum
-  if (isa(custom_neutral_profile) eq 1) then request_hash['custom_neutral_profile'] = custom_neutral_profile
   if (isa(kappa_energy_flux) eq 1) then request_hash['kappa_energy_flux'] = kappa_energy_flux
   if (isa(kappa_mean_energy) eq 1) then request_hash['kappa_mean_energy'] = kappa_mean_energy
   if (isa(kappa_k_index) eq 1) then request_hash['kappa_k_index'] = kappa_k_index
@@ -194,7 +231,19 @@ function aurorax_atm_forward, $
   if (isa(proton_energy_flux) eq 1) then request_hash['proton_energy_flux'] = proton_energy_flux
   if (isa(proton_characteristic_energy) eq 1) then request_hash['proton_characteristic_energy'] = proton_characteristic_energy
   if (isa(d_region) eq 1) then request_hash['d_region'] = d_region
-
+  
+  if (isa(custom_neutral_profile) eq 1) then begin
+    custom_neutral_profile_hash = hash('altitude', reform(custom_neutral_profile[0, *]), $
+                                       'o_density', reform(custom_neutral_profile[1, *]), $
+                                       'o2_density', reform(custom_neutral_profile[2, *]), $
+                                       'n2_density', reform(custom_neutral_profile[3, *]), $
+                                       'n_density', reform(custom_neutral_profile[4, *]), $
+                                       'no_density', reform(custom_neutral_profile[5, *]), $
+                                       'temperature', reform(custom_neutral_profile[6, *]))
+                                       
+    request_hash['custom_neutral_profile'] = custom_neutral_profile_hash
+  endif
+  
   ; create post struct and serialize into a string
   post_str = json_serialize(request_hash, /lowercase)
 

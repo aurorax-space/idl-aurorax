@@ -58,7 +58,7 @@ pro aurorax_example_atm_inverse1
   output_flags['oxygen_correction_factor'] = 1
 
   ; we'll ask for the basic information: energy flux, characteristic energy, and oxygen correction factor
-  time_stamp = '2021-10-12T06:00:00'
+  time_stamp = '2021-11-04T06:00:00'
   latitude = 58.227808
   longitude = -103.680631
 
@@ -99,7 +99,7 @@ pro aurorax_example_atm_inverse2
   output_flags = aurorax_atm_inverse_get_output_flags(/set_all_true)
 
   ; set up time and location
-  time_stamp = '2021-10-12T06:00:00'
+  time_stamp = '2021-11-04T06:00:00'
   latitude = 58.227808
   longitude = -103.680631
 
