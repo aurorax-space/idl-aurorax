@@ -1,4 +1,11 @@
-Version 1.5.0 (2025-03-23)
+Version 1.6.0 (2025-07-07)
+-------------------------
+- added support for TREx ATM model version 2.0, enabled by default
+  - This includes additional 'forward' parameters, and an expanded inversion region which now includes the area around Poker Flat.
+- docstring updates
+
+
+Version 1.5.0 (2025-06-23)
 -------------------------
 - changed initialization process (refer to README)
 - added AACGM integration, including adding support for magentic coordinates in several functions (keograms, mosaics, contours, bounding box)
