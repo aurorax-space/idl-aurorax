@@ -202,6 +202,10 @@ end
 ;         label FoV with the parameter supplied by site_name
 ;       label_color: in, optional, Long Integer
 ;         long integer giving the color to label in (default is 0 i.e. black)
+;       return_coords: out, optional
+;         a named variable for which an list of lat/lon coordinate arrays 
+;         will be returned, defining the FoV. If set, no plotting will be
+;         performed
 ;
 ; :Examples:
 ;       aurorax_fov_oplot, themis_lats, themis_lons, 110.0
@@ -218,7 +222,8 @@ pro aurorax_fov_oplot, $
   linestyle = linestyle, $
   thick = thick, $
   label_site = label_site, $
-  label_color = label_color
+  label_color = label_color, $
+  return_coords = return_coords
   ; First, check that required inputs are valid
 
   ; convert scalar inputs to arrays
@@ -340,29 +345,45 @@ pro aurorax_fov_oplot, $
       goto, error_jump
     endif
   endif else label_color = 0
-
+  
+  ; Initalize list to hold all data
+  coordinates_to_return = list()
+  
+  ; Iterate through each FoV
   for site_idx = 0, n_elements(site_lat) - 1 do begin
     lat = site_lat[site_idx]
     lon = site_lon[site_idx]
 
+    ; Obtain the coordinates
     if keyword_set(spectrograph) then begin
       contour_latlon = __aurorax_compute_fov_contour(lat, lon, altitude_km, min_elevation, /spectrograph)
     endif else begin
       contour_latlon = __aurorax_compute_fov_contour(lat, lon, altitude_km, min_elevation)
     endelse
-
-    contour_lats = contour_latlon[*, 0]
-    contour_lons = contour_latlon[*, 1]
-
-    plots, contour_lons, contour_lats, color = color, linestyle = linestyle, thick = thick
-
-    if keyword_set(label_site) eq 1 then begin
-      site_uid = site_name[site_idx]
-      !p.font = 1
-      device, set_font = 'Helvetica Bold', /tt_font, set_character_size = [12, 12]
-      xyouts, mean(contour_lons), mean(contour_lats), site_uid, color = label_color, alignment = 0.5
-      !p.font = -1
+    
+    ; Append to coordinate list
+    coordinates_to_return.add, contour_latlon
+    
+    ; Skip plotting if /return_coords keyword is present
+    if ~ arg_present(return_coords) then begin
+        
+        contour_lats = contour_latlon[*, 0]
+        contour_lons = contour_latlon[*, 1]
+        
+        ; Plot FoV contour
+        plots, contour_lons, contour_lats, color = color, linestyle = linestyle, thick = thick
+    
+        ; Add labels if requested
+        if keyword_set(label_site) eq 1 then begin
+          site_uid = site_name[site_idx]
+          !p.font = 1
+          device, set_font = 'Helvetica Bold', /tt_font, set_character_size = [12, 12]
+          xyouts, mean(contour_lons), mean(contour_lats), site_uid, color = label_color, alignment = 0.5
+          !p.font = -1
+        endif
     endif
   endfor
+  
+  if arg_present(return_coords) then return_coords = coordinates_to_return
   error_jump:
 end
