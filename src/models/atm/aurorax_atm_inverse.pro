@@ -18,9 +18,14 @@
 ; :Description:
 ;       Perform TREx Auroral Transport Model (ATM) 'inverse' calculations.
 ;
-;       Perform an inverse calculation using the TREx Auroral Transport Model
-;       and the supplied input parameters. Note that this function utilizes the
-;       UCalgary Space Remote Sensing API to perform the calculation.
+;       Perform an inverse calculation using the TREx Auroral Transport Model and the supplied input
+;       parameters. Note that this function utilizes the UCalgary Space Remote Sensing API to perform
+;       the calculation.
+;
+;       Note -- The `atmospheric_attenuation_correction` parameter was deprecated in v1.6.0, and removed
+;       in v1.7.0. Please ensure you perform this conversion yourself on the results, if desired.
+;
+;       Note -- As of v1.7.0, the output flag `characteristic_energy` was renamed to `mean_energy`.
 ;
 ; :Parameters:
 ;       time_stamp: in, required, String
@@ -48,8 +53,9 @@
 ;         The precipitation flux spectral type to use. Possible values are gaussian or maxwellian. The default is gaussian.
 ;       nrlmsis_model_version: in, optional, String
 ;         NRLMSIS version number. Possible values are 00 or 2.0. Default is 2.0.
-;       atmospheric_attenuation_correction: in, optional, Integer
-;         Apply an atmospheric attenuation correction factor. Default is 0. Set to 1 to enable.
+;       special_logic_keyword: in, optional, String
+;         Use a special keyword provided by UCalgary staff to apply alternative logic during
+;         an ATM inversion request.
 ;       atm_model_version: in, optional, String
 ;         ATM model version number. Possible values are '1.0' and '2.0'. Default is '2.0'.
 ;       no_cache: in, optional, Boolean
@@ -75,7 +81,7 @@ function aurorax_atm_inverse, $
   output_flags, $
   precipitation_flux_spectral_type = precipitation_flux_spectral_type, $
   nrlmsis_model_version = nrlmsis_model_version, $
-  atmospheric_attenuation_correction = atmospheric_attenuation_correction, $
+  special_logic_keyword = special_logic_keyword, $
   atm_model_version = atm_model_version, $
   no_cache = no_cache
   ; set keyword flags
@@ -110,7 +116,7 @@ function aurorax_atm_inverse, $
   if (isa(intensity_8446) eq 1) then request_hash['intensity_8446'] = intensity_8446
   if (isa(precipitation_flux_spectral_type) eq 1) then request_hash['precipitation_flux_spectral_type'] = precipitation_flux_spectral_type
   if (isa(nrlmsis_model_version) eq 1) then request_hash['nrlmsis_model_version'] = nrlmsis_model_version
-  if (isa(atmospheric_attenuation_correction) eq 1) then request_hash['atmospheric_attenuation_correction'] = atmospheric_attenuation_correction
+  if (isa(special_logic_keyword) eq 1) then request_hash['special_logic_keyword'] = special_logic_keyword
 
   ; create post struct and serialize into a string
   post_str = json_serialize(request_hash, /lowercase)
@@ -145,10 +151,18 @@ function aurorax_atm_inverse, $
 
   ; serialize any List() objects to float arrays
   foreach value, data['data'], key do begin
+    ; add to data
     if (isa(value, 'List') eq 1) then begin
       data['data', key] = value.toArray(type = 'float')
     endif
   endforeach
+
+  ; remove characteristic_energy
+  ;
+  ; NOTE: we can remove this later once it is fully removed from the
+  ; API (after an acceptable deprecation duration for the Python library
+  ; too)
+  data['data'].REMOVE,'characteristic_energy'
 
   ; finally convert to struct
   data = data.toStruct(/recursive)
