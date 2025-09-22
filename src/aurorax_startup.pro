@@ -20,9 +20,9 @@ print, '[idl-aurorax] Compiling routines'
 ; aacgm
 ; 
 ; NOTE: utilize second set for development, remember to uncomment when ready to package a release
-setenv, 'AACGM_v2_DAT_PREFIX=' + !package_path + path_sep() + 'idl-aurorax' + path_sep() + $
+setenv, 'AACGM_v2_DAT_PREFIX=' + !package_path + path_sep() + 'idl_aurorax' + path_sep() + $
   'libs' + path_sep() + 'aacgm' + path_sep() + 'coeffs' + path_sep() + 'aacgm_coeffs-14-'
-setenv, 'IGRF_COEFFS=' + !package_path + path_sep() + 'idl-aurorax' + path_sep() + $
+setenv, 'IGRF_COEFFS=' + !package_path + path_sep() + 'idl_aurorax' + path_sep() + $
   'libs' + path_sep() + 'aacgm' + path_sep() + 'magmodel_1590-2025.txt'
 ;setenv, 'AACGM_v2_DAT_PREFIX=' + 'C:\Users\darrenc\Documents\GitHub' + path_sep() + 'idl-aurorax' + path_sep() + $
 ;  'libs' + path_sep() + 'aacgm' + path_sep() + 'coeffs' + path_sep() + 'aacgm_coeffs-14-'
