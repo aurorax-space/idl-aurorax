@@ -1,3 +1,8 @@
+Version 1.7.1 (2025-09-22)
+-------------------------
+- bugfix for AACGM paths
+
+
 Version 1.7.0 (2025-09-12)
 -------------------------
 - updates for ATM inversion routine
