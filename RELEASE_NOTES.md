@@ -1,3 +1,9 @@
+Version 1.8.0 (2025-12-09)
+-------------------------
+- added support for using with a proxy connection
+- converted all functions and procedures which interact with our API and data archive to use a standardized HTTP request helper function
+
+
 Version 1.7.1 (2025-09-22)
 -------------------------
 - bugfix for AACGM paths
