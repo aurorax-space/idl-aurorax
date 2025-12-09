@@ -47,8 +47,8 @@ pro aurorax_open_conjunctions_in_swarmaurora, request_id, xsize = xsize, ysize =
   if (isa(xsize) eq 0) then xsize = screen_size[0] * 0.95
   if (isa(ysize) eq 0) then ysize = screen_size[1] * 0.9
 
-  ; check that request is finished, and there aren't too many conjuncions
-  status = __aurorax_request_get_status('conjunctions', request_id)
+  ; check that request is finished, and there aren't too many conjunctions
+  status = __aurorax_request_get_status('conjunctions', request_id, print_header = 'aurorax_open_conjunctions_in_swarmaurora')
   if (isa(status.search_result.result_count) eq 0) then begin
     print, 'Error: this request has not completed yet, please wait and try again'
     return
@@ -111,7 +111,9 @@ pro aurorax_save_swarmaurora_custom_import_file, request_id, filename = filename
   req.setProperty, headers = 'User-Agent: idl-aurorax/' + __aurorax_version()
 
   ; make request
-  output = req.get(/string_array)
+  r = __aurorax_perform_api_request('get', 'aurorax_save_swarmaurora_custom_import_file', req)
+  if (r.status_code ne 200) then return
+  output = r.output
 
   ; cleanup
   obj_destroy, req
@@ -168,8 +170,8 @@ pro aurorax_open_conjunctions_in_aurorax, request_id, $
   if (isa(xsize) eq 0) then xsize = screen_size[0] * 0.95
   if (isa(ysize) eq 0) then ysize = screen_size[1] * 0.9
 
-  ; check that request is finished, and there aren't too many conjuncions
-  status = __aurorax_request_get_status('conjunctions', request_id)
+  ; check that request is finished, and there aren't too many conjunctions
+  status = __aurorax_request_get_status('conjunctions', request_id, print_header = 'aurorax_open_conjunctions_in_aurorax')
   if (isa(status.search_result.result_count) eq 0) then begin
     print, 'Error: this request has not completed yet, please wait and try again'
     return

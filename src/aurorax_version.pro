@@ -16,7 +16,7 @@
 
 function __aurorax_version
   compile_opt hidden
-  return, '1.7.1'
+  return, '1.8.0'
 end
 
 ;+
@@ -57,6 +57,21 @@ function aurorax_check_version, quiet = quiet, init_mode = init_mode
   req.setProperty, url_host = 'api.github.com'
   req.setProperty, url_path = 'repos/aurorax-space/idl-aurorax/releases/latest'
   req.setProperty, timeout = 5000
+
+  ; set proxy
+  proxy_hostname = getenv('AURORAX_PROXY_HOSTNAME')
+  proxy_port = getenv('AURORAX_PROXY_PORT')
+  if (proxy_hostname ne '' and proxy_port ne '') then begin
+    ; proxy hostname and port are configured, set them in the request object
+    req.setProperty, proxy_host = proxy_hostname
+    req.setProperty, proxy_port = fix(proxy_port)
+
+    ; set username and password
+    proxy_username = getenv('AURORAX_PROXY_USERNAME')
+    proxy_password = getenv('AURORAX_PROXY_PASSWORD')
+    if (proxy_username ne '') then req.setProperty, proxy_username = proxy_username
+    if (proxy_password ne '') then req.setProperty, proxy_password = proxy_password
+  endif
 
   ; check for error
   catch, error_status

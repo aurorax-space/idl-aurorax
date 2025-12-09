@@ -38,6 +38,13 @@ setenv, 'IGRF_COEFFS=' + !package_path + path_sep() + 'idl_aurorax' + path_sep()
 
 ; top level
 .run aurorax_version
+.run aurorax_proxy
+
+; helpers
+;
+; NOTE: these are here since they need to be compiled before some of 
+; the following routines
+.run aurorax_requests
 
 ; data
 .run aurorax_list_datasets
@@ -58,7 +65,6 @@ setenv, 'IGRF_COEFFS=' + !package_path + path_sep() + 'idl_aurorax' + path_sep()
 ; search
 .run aurorax_search_helpers
 .run aurorax_calibrate_helpers
-.run aurorax_requests
 .run aurorax_metadata_filters
 .run aurorax_availability
 .run aurorax_conjunctions
