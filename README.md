@@ -1,10 +1,10 @@
 <a href="https://aurorax.space/"><img alt="AuroraX" src="logo.svg" height="60"></a>
 
-![Stable version](https://img.shields.io/badge/Latest%20stable%20release-v1.5.0-orange)
+![Stable version](https://img.shields.io/badge/Latest%20stable%20release-v1.8.0-blue)
 ![IDL version required](https://img.shields.io/badge/IDL-8.8.3%2B-blue)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.12532077.svg)](https://doi.org/10.5281/zenodo.12532077)
 
-IDL-AuroraX is an IDL library providing data access and analysis support for All-Sky Imager data (THEMIS, TREx, REGO, etc.), the ability to utilize the TREx Auroral Transport Model, and interact with the AuroraX Search Engine. [AuroraX](https://aurorax.space) is a project working to be the world's first and foremost data platform for auroral science. The primary objective is to enable mining and exploration of existing and future auroral data, enabling key science and enhancing the benefits of the world's investment in auroral instrumentation. We have developed key systems/standards for uniform metadata generation and search, image content analysis, interfaces to leading international tools, and a community involvement that includes more than 80% of the world's data providers.
+IDL-AuroraX is an IDL library providing data access and analysis support for All-Sky Imager data (THEMIS, TREx, REGO, SMILE, etc.), the ability to utilize the TREx Auroral Transport Model, and interact with the AuroraX Search Engine. [AuroraX](https://aurorax.space) is a project working to be the world's first and foremost data platform for auroral science. The primary objective is to enable mining and exploration of existing and future auroral data, enabling key science and enhancing the benefits of the world's investment in auroral instrumentation. We have developed key systems/standards for uniform metadata generation and search, image content analysis, interfaces to leading international tools, and a community involvement that includes more than 80% of the world's data providers.
 
 IDL-AuroraX officially supports IDL 8.8.3+.
 
@@ -12,13 +12,14 @@ Some links to help:
 - [AuroraX main website](https://aurorax.space)
 - [IDL-AuroraX documentation](https://docs.aurorax.space/code/overview)
 - [Browse releases](https://github.com/aurorax-space/idl-aurorax/releases)
+- [Example gallery](https://data.phys.ucalgary.ca/working_with_data/index.html#idl)
 
 ## Usage
 
 For usage details, please visit the AuroraX documentation website, and the basic examples section.
 
 - [IDL-AuroraX documentation](https://docs.aurorax.space/code/overview)
-- [Basic usage examples](https://docs.aurorax.space/code/basic_usage/overview)
+- [Example gallery](https://data.phys.ucalgary.ca/working_with_data/index.html#idl)
 
 ## Installation
 
@@ -83,3 +84,4 @@ If you installed the code manually, you can download the latest Zip file and ove
 ## Limitations
 
 Note that for the AuroraX Search Engine capabilities, this IDL library only provides functionality to **retrieve** data. It does not have functions for uploading or editing data in the AuroraX Search Engine. Please use the Python library, [PyAuroraX](https://github.com/aurorax-space/pyaurorax) for this functionality.
+

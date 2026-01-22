@@ -454,7 +454,7 @@ function aurorax_conjunction_search, $
   if (verbose eq 1) then __aurorax_message, 'Request ID: ' + request_id
 
   ; wait for request to be done
-  status = __aurorax_request_wait_for_data('conjunctions', request_id, poll_interval, verbose)
+  status = __aurorax_request_wait_for_data('conjunctions', request_id, poll_interval, verbose, print_header = 'aurorax_conjunction_search')
   if (verbose eq 1) then __aurorax_message, 'Data is now available'
 
   ; humanize size of data to download
@@ -600,7 +600,9 @@ function aurorax_conjunction_describe, $
   req.setProperty, headers = ['Content-Type: application/json', 'User-Agent: idl-aurorax/' + __aurorax_version()]
 
   ; make request
-  output = req.put(post_str, /buffer, /string_array, /post)
+  r = __aurorax_perform_api_request('post', 'aurorax_conjunction_describe', req, post_str = post_str)
+  if (r.status_code ne 200) then return, !null
+  output = r.output
 
   ; cleanup this request
   obj_destroy, req

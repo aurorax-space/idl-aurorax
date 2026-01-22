@@ -48,13 +48,15 @@ function __aurorax_retrieve_availability, start_date, end_date, program, platfor
   req.setProperty, headers = 'User-Agent: idl-aurorax/' + __aurorax_version()
 
   ; make request
-  output = req.get(/string_array)
+  r = __aurorax_perform_api_request('get', 'aurorax_availability', req)
+  if (r.status_code ne 200) then return, !null
+  output = r.output
+
+  ; cleanup this request
+  obj_destroy, req
 
   ; serialize into struct
   data = json_parse(output, /tostruct)
-
-  ; cleanup
-  obj_destroy, req
 
   ; return
   return, data

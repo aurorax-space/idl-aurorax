@@ -1,4 +1,30 @@
-Version 1.5.0 (2025-03-23)
+Version 1.8.0 (2025-12-09)
+-------------------------
+- added support for using with a proxy connection
+- converted all functions and procedures which interact with our API and data archive to use a standardized HTTP request helper function
+
+
+Version 1.7.1 (2025-09-22)
+-------------------------
+- bugfix for AACGM paths
+
+
+Version 1.7.0 (2025-09-12)
+-------------------------
+- updates for ATM inversion routine
+  - changed `characteristic_energy` output flag and data to `mean_energy`.
+  - added `special_logic_keyword` parameter to help handle specific non-standard use cases on the backend ATM API.
+  - removed `atmospheric_attenuation_correction` keyword
+
+
+Version 1.6.0 (2025-07-07)
+-------------------------
+- added support for TREx ATM model version 2.0, enabled by default
+  - This includes additional 'forward' parameters, and an expanded inversion region which now includes the area around Poker Flat.
+- docstring updates
+
+
+Version 1.5.0 (2025-06-23)
 -------------------------
 - changed initialization process (refer to README)
 - added AACGM integration, including adding support for magentic coordinates in several functions (keograms, mosaics, contours, bounding box)

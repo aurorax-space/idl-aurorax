@@ -54,7 +54,7 @@ pro aurorax_example_atm_inverse1
   ; NOTE: just like the forward function, outputs are toggled on/off using a flag variable
   output_flags = aurorax_atm_inverse_get_output_flags()
   output_flags['energy_flux'] = 1
-  output_flags['characteristic_energy'] = 1
+  output_flags['mean_energy'] = 1
   output_flags['oxygen_correction_factor'] = 1
 
   ; we'll ask for the basic information: energy flux, characteristic energy, and oxygen correction factor
@@ -87,7 +87,7 @@ pro aurorax_example_atm_inverse1
 
   ; print the information we asked for
   print, 'Energy Flux:              ' + strcompress(string(data.data.energy_flux)) + ' erg/cm2/s'
-  print, 'Characteristic Energy:    ' + strcompress(string(data.data.characteristic_energy)) + ' eV'
+  print, 'Mean Energy:              ' + strcompress(string(data.data.mean_energy)) + ' eV'
   print, 'Oxygen Correction Factor: ' + strcompress(string(data.data.oxygen_correction_factor))
   print, ''
 end
@@ -102,6 +102,7 @@ pro aurorax_example_atm_inverse2
   time_stamp = '2021-11-04T06:00:00'
   latitude = 58.227808
   longitude = -103.680631
+
 
   ; set our input intensities for several wavelengths
   intensity_4278 = 2302.6
@@ -119,6 +120,7 @@ pro aurorax_example_atm_inverse2
     intensity_5577, $
     intensity_6300, $
     intensity_8446, $
+    precipitation_flux_spectral_type='maxwellian',$
     output_flags)
   print, '[All output example] Calculation received'
 
