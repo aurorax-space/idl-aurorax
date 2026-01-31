@@ -129,8 +129,8 @@ end
 
 ;+
 ; :Description:
-;       Realize a browser window showing conjunction search results
-;       in the AuroraX conjunction search website.
+;       Realize a browser window showing conjunction search results in the AuroraX conjunction 
+;       search website.
 ;
 ; :Parameters:
 ;       request_id: in, required, String

@@ -41,7 +41,6 @@
 ;       d = aurorax_ucalgary_download_best_skymap('THEMIS_ASI_SKYMAP_IDLSAV','atha','2020-01-01T00:00:00')
 ;       d = aurorax_ucalgary_download_best_skymap('TREX_RGB_SKYMAP_IDLSAV','gill','2023-02-01T06:00:00',/overwrite)
 ;+
-;-------------------------------------------------------------
 function aurorax_ucalgary_download_best_skymap, $
   dataset_name, $
   site_uid, $

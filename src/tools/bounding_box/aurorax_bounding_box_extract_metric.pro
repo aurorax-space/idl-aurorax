@@ -30,27 +30,25 @@
 ;         for the desired mode ([lon0,lon1,lat0,lat1], [min_elev,max_elev], ... etc.)
 ;
 ; :Keywords:
-;       percentile: in, optional, Float
-;         the percentile for which luminosity/intensity is extracted
 ;       metric: in, optional, String
 ;         the metric to compute, accepted is "median" (default), "mean", or "sum"
-;       time_stamp: in, optional, String
-;         the timestamp to use for magnetic coordinate conversions
+;       percentile: in, optional, Float
+;         the percentile for which luminosity/intensity is extracted
+;       show_preview: in, optional, Boolean
+;         plot a preview of the bounded area on top of the first image frame
 ;       skymap: in, optional, Struct
 ;         the skymap to use for georeferencing
 ;       altitude_km: in, optional, Integer or Float
 ;         the altitude of the image data for georeferencing - must be provided if
 ;         working with geographic or geomagnetic coordinates
+;       n_channels: in, optional, Integer
+;         manually specify the image data channels, otherwise its estimated based on shape
 ;       aacgm_date: in, optioinal, String
 ;         a date string in the format 'YYYY-MM-DD' specifying the date to use for AACGM
 ;         coordinate transformations
 ;       aacgm_height: in, optional, String
 ;         input altitude (km) for geomagnetic (AACGM) coordinate transformations - if
 ;         not supplied, default is 0.0
-;       n_channels: in, optional, Integer
-;         manually specify the image data channels, otherwise its estimated based on shape
-;       show_preview: in, optional, Boolean
-;         plot a preview of the bounded area on top of the first image frame
 ;
 ; :Returns:
 ;       Array

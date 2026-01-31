@@ -28,7 +28,7 @@
 ;         skymap object, it must be enclosed in a list.
 ;       altitude_km: in, required, Float
 ;         The altitude (in kilometers) at which the image data should be
-;         prepared for mosaicking.
+;         prepared for mosaicing.
 ;
 ; :Returns:
 ;       Struct

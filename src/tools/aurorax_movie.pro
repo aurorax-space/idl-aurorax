@@ -27,7 +27,7 @@
 ;     integer giving the frames per second to create movie at
 ;
 ; :Examples:
-;   aurorax_create_movie, file_search("path\to\images\*.png"), "movie.mp4", 30
+;   aurorax_movie, file_search("path\to\images\*.png"), "movie.mp4", 30
 ;-
 pro aurorax_movie, input_filenames, output_filename, fps
   ; Read the first image supplied to determine video size

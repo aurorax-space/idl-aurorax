@@ -41,7 +41,6 @@
 ;       d = aurorax_ucalgary_download_best_calibration('REGO_CALIBRATION_FLATFIELD_IDLSAV', '654', '2021-11-04T00:00:00')
 ;       d = aurorax_ucalgary_download_best_calibration('TREX_NIR_CALIBRATION_RAYLEIGHS_IDLSAV', '216', '2021-11-04T00:00:00', /overwrite)
 ;+
-;-------------------------------------------------------------
 function aurorax_ucalgary_download_best_calibration, $
   dataset_name, $
   device_uid, $

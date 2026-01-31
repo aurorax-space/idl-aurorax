@@ -17,28 +17,29 @@
 ; init
 print, '[idl-aurorax] Compiling routines'
 
-; aacgm
-; Note: IDL-AuroraX expects all AACGM_v2 files to be located within !packages_path by default.
+; set paths for AACGM data files
+; 
+; NOTE: IDL-AuroraX expects all AACGM_v2 files to be located within !packages_path by default.
 ;       If AACGM_v2 code / text files are not located in '*\.idl\idl\packages\idl_aurorax\libs\aacgm', 
-;       one may alter the below filepath to point to a different location by default.
+;       alter the below filepath to point to a different location by default.
 igrf_coeffs_path = !package_path + path_sep() + 'idl_aurorax' + path_sep() + $
   'libs' + path_sep() + 'aacgm' + path_sep() + 'magmodel_1590-2025.txt'
 aacgm_v2_dat_prefix_path = !package_path + path_sep() + 'idl_aurorax' + path_sep() + $
-    'libs' + path_sep() + 'aacgm' + path_sep() + 'coeffs' + path_sep() + 'aacgm_coeffs-14-'
-  
+  'libs' + path_sep() + 'aacgm' + path_sep() + 'coeffs' + path_sep() + 'aacgm_coeffs-14-'
+;igrf_coeffs_path = 'C:\Users\darrenc\Documents\GitHub\idl-aurorax\libs\aacgm\magmodel_1590-2025.txt'
+;aacgm_v2_dat_prefix_path = 'C:\Users\darrenc\Documents\Github\idl-aurorax\libs\aacgm\coeffs\aacgm_coeffs-14-'
+
+; check paths for AACGM
 igrf_coeff_exists = file_test(igrf_coeffs_path)
 !null = file_search(aacgm_v2_dat_prefix_path+'*', count=aacgm_v2_dat_exists)
-
 if ((igrf_coeff_exists eq 0) or (aacgm_v2_dat_exists eq 0)) then aacgm_found = 0
+print,aacgm_found
 if ((igrf_coeff_exists ne 0) and (aacgm_v2_dat_exists ne 0)) then aacgm_found = 1
+print,aacgm_found
 
-; NOTE: utilize second set for development, remember to uncomment when ready to package a release
+; initialize AACGM
 setenv, 'AACGM_v2_DAT_PREFIX=' + igrf_coeffs_path
 setenv, 'IGRF_COEFFS=' + aacgm_v2_dat_prefix_path
-;setenv, 'AACGM_v2_DAT_PREFIX=' + 'C:\Users\darrenc\Documents\GitHub' + path_sep() + 'idl-aurorax' + path_sep() + $
-;  'libs' + path_sep() + 'aacgm' + path_sep() + 'coeffs' + path_sep() + 'aacgm_coeffs-14-'
-;setenv, 'IGRF_COEFFS=' + 'C:\Users\darrenc\Documents\GitHub' + path_sep() + 'idl-aurorax' + path_sep() + $
-;  'libs' + path_sep() + 'aacgm' + path_sep() + 'magmodel_1590-2025.txt'
 .run genmag
 .run igrflib_v2
 .run aacgmlib_v2
@@ -121,6 +122,6 @@ print, '[idl-aurorax] Initialization complete'
 ; If they, weren't, print a message to notify the user
 if aacgm_found eq 0 then print, '[idl-aurorax] Warning: could not initialize AACGM_v2 library. IDL-AuroraX expects the AACGM coefficient and ' + $
   'magmodel_1590-2025.txt files to be saved at idl_aurorax' + path_sep() + 'libs' + path_sep() + 'aacgm' + path_sep() + '. If these files are saved ' + $
-  'elsewhere, you can (A) alter the aurorax_startup.pro file lines 24-27 to the correct paths (RECOMMENDED) or (b) manually set the environment variables ' + $
+  'elsewhere, you can (A) alter the aurorax_startup.pro file lines 25-28 to the correct paths (RECOMMENDED) or (b) manually set the environment variables ' + $
   'for AACGM every time you run @aurorax_startup, using the commands: `IDL> setenv, "AACGM_v2_DAT_PREFIX=...magmodel_1590-2025.txt"` and ' + $
   '`IDL> setenv, "IGRF_COEFFS=...coeffs' + path_sep() + 'aacgm_coeffs-14-"`.'
