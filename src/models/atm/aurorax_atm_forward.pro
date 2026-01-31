@@ -86,7 +86,7 @@
 ;         Proton characteristic energy, in eV. Default is 10000. Not this parameter should be specified if the
 ;         `proton_energy_flux` is not 0. This parameter is optional.
 ;       d_region: in, optional, Boolean
-;         Flag to enable D-region evaluation. Default is False. 
+;         Flag to enable D-region evaluation. Default is False.
 ;       nrlmsis_model_version: in, optional, String
 ;         NRLMSIS version number. Possible values are 00 or 2.0. Default is 2.0.
 ;       oxygen_correction_factor: in, optional, Float
@@ -97,7 +97,7 @@
 ;         Defined by L/v0, in which L is the dimension of the auroral structure, and v0 is
 ;         the cross-structure drift speed. Represented in seconds. Default is 600 (10 minutes).
 ;       atm_model_version: in, optional, String
-;         ATM model version number. Possible values are '1.0' and '2.0'. Default is '2.0'.
+;         ATM model version number. Possible values are '2.0'. Default is '2.0'.
 ;       custom_spectrum: in, optional, Struct
 ;         A struct containing two 1D float arrays. One array containing values representing the
 ;         energy in eV, and another representing flux in 1/cm2/sr/eV. Note that this array
@@ -106,7 +106,7 @@
 ;         A 2-dimensional float array containing values representing the energy in eV, and flux
 ;         in 1/cm2/sr/eV. The shape is expected to be [N, 2], with energy in [*, 0] and flux
 ;         in [*, 1].
-;         Note that this array cannot contain negative values (API Error 
+;         Note that this array cannot contain negative values (API Error
 ;         will be raised if so). This parameter is optional.
 ;         Users are responsible for fully covering the altitude range of interest in the
 ;         provided profile (80-800 km if d_region_flag=0, or 50-500 km if d_region_flag=1). The
@@ -164,44 +164,14 @@ function aurorax_atm_forward, $
     atm_model_version = '2.0'
   endif
 
-  ; Check that no version 2.0 params were passed if version 1.0 was requested
+  ; check that no version 2.0 params were passed if version 1.0 was requested
   if (atm_model_version eq '1.0') then begin
-    url_version_str = 'v1'
-    if (isa(kappa_energy_flux) eq 1) then begin
-      print, '[aurorax_atm_forward] Error: atm model version 1.0 does not support input ''kappa_energy_flux'''
-      return, !null
-    endif else if (isa(kappa_mean_energy) eq 1) then begin
-      print, '[aurorax_atm_forward] Error: atm model version 1.0 does not support input ''kappa_mean_energy'''
-      return, !null
-    endif else if (isa(kappa_k_index) eq 1) then begin
-      print, '[aurorax_atm_forward] Error: atm model version 1.0 does not support input ''kappa_k_index'''
-      return, !null
-    endif else if (isa(exponential_energy_flux) eq 1) then begin
-      print, '[aurorax_atm_forward] Error: atm model version 1.0 does not support input ''exponential_energy_flux'''
-      return, !null
-    endif else if (isa(exponential_characteristic_energy) eq 1) then begin
-      print, '[aurorax_atm_forward] Error: atm model version 1.0 does not support input ''exponential_characteristic_energy'''
-      return, !null
-    endif else if (isa(exponential_starting_energy) eq 1) then begin
-      print, '[aurorax_atm_forward] Error: atm model version 1.0 does not support input ''exponential_starting_energy'''
-      return, !null
-    endif else if (isa(proton_energy_flux) eq 1) then begin
-      print, '[aurorax_atm_forward] Error: atm model version 1.0 does not support input ''proton_energy_flux'''
-      return, !null
-    endif else if (isa(proton_characteristic_energy) eq 1) then begin
-      print, '[aurorax_atm_forward] Error: atm model version 1.0 does not support input ''proton_characteristic_energy'''
-      return, !null
-    endif else if (isa(d_region) eq 1) then begin
-      print, '[aurorax_atm_forward] Error: atm model version 1.0 does not support input ''d_region'''
-      return, !null
-    endif else if (isa(custom_neutral_profile) eq 1) then begin
-      print, '[aurorax_atm_forward] Error: atm model version 1.0 does not support input ''custom_neutral_profile'''
-      return, !null
-    endif
+    print, '[aurorax_atm_forward] Error : ATM model version 1.0 is no longer supported'
+    return, !null
   endif else if (atm_model_version eq '2.0') then begin
     url_version_str = 'v2'
   endif else begin
-    print, '[aurorax_atm_forward] Error : atm model version ' + atm_model_version + ' is not currently accepted.'
+    print, '[aurorax_atm_forward] Error : ATM model version ' + atm_model_version + ' is not currently accepted.'
     return, !null
   endelse
 
@@ -231,19 +201,19 @@ function aurorax_atm_forward, $
   if (isa(proton_energy_flux) eq 1) then request_hash['proton_energy_flux'] = proton_energy_flux
   if (isa(proton_characteristic_energy) eq 1) then request_hash['proton_characteristic_energy'] = proton_characteristic_energy
   if (isa(d_region) eq 1) then request_hash['d_region'] = d_region
-  
+
   if (isa(custom_neutral_profile) eq 1) then begin
     custom_neutral_profile_hash = hash('altitude', reform(custom_neutral_profile[0, *]), $
-                                       'o_density', reform(custom_neutral_profile[1, *]), $
-                                       'o2_density', reform(custom_neutral_profile[2, *]), $
-                                       'n2_density', reform(custom_neutral_profile[3, *]), $
-                                       'n_density', reform(custom_neutral_profile[4, *]), $
-                                       'no_density', reform(custom_neutral_profile[5, *]), $
-                                       'temperature', reform(custom_neutral_profile[6, *]))
-                                       
+      'o_density', reform(custom_neutral_profile[1, *]), $
+      'o2_density', reform(custom_neutral_profile[2, *]), $
+      'n2_density', reform(custom_neutral_profile[3, *]), $
+      'n_density', reform(custom_neutral_profile[4, *]), $
+      'no_density', reform(custom_neutral_profile[5, *]), $
+      'temperature', reform(custom_neutral_profile[6, *]))
+
     request_hash['custom_neutral_profile'] = custom_neutral_profile_hash
   endif
-  
+
   ; create post struct and serialize into a string
   post_str = json_serialize(request_hash, /lowercase)
 

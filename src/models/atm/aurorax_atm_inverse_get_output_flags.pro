@@ -44,28 +44,6 @@ function aurorax_atm_inverse_get_output_flags, set_all_true = set_all_true
   output_flags['energy_flux'] = 0
   output_flags['mean_energy'] = 0
   output_flags['oxygen_correction_factor'] = 0
-  output_flags['emission_4278'] = 0
-  output_flags['emission_5577'] = 0
-  output_flags['emission_6300'] = 0
-  output_flags['emission_8446'] = 0
-  output_flags['height_integrated_rayleighs_4278'] = 0
-  output_flags['height_integrated_rayleighs_5577'] = 0
-  output_flags['height_integrated_rayleighs_6300'] = 0
-  output_flags['height_integrated_rayleighs_8446'] = 0
-  output_flags['neutral_n2_density'] = 0
-  output_flags['neutral_n_density'] = 0
-  output_flags['neutral_o2_density'] = 0
-  output_flags['neutral_o_density'] = 0
-  output_flags['neutral_temperature'] = 0
-  output_flags['plasma_electron_density'] = 0
-  output_flags['plasma_electron_temperature'] = 0
-  output_flags['plasma_hall_conductivity'] = 0
-  output_flags['plasma_ion_temperature'] = 0
-  output_flags['plasma_ionisation_rate'] = 0
-  output_flags['plasma_noplus_density'] = 0
-  output_flags['plasma_o2plus_density'] = 0
-  output_flags['plasma_oplus_density'] = 0
-  output_flags['plasma_pederson_conductivity'] = 0
 
   ; set all true, if necessary
   if keyword_set(set_all_true) then begin

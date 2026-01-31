@@ -22,11 +22,6 @@
 ;       parameters. Note that this function utilizes the UCalgary Space Remote Sensing API to perform
 ;       the calculation.
 ;
-;       Note -- The `atmospheric_attenuation_correction` parameter was deprecated in v1.6.0, and removed
-;       in v1.7.0. Please ensure you perform this conversion yourself on the results, if desired.
-;
-;       Note -- As of v1.7.0, the output flag `characteristic_energy` was renamed to `mean_energy`.
-;
 ; :Parameters:
 ;       time_stamp: in, required, String
 ;         Timestamp in UTC, format must be YYYY-MM-DDTHH:MM:SS.
@@ -57,7 +52,7 @@
 ;         Use a special keyword provided by UCalgary staff to apply alternative logic during
 ;         an ATM inversion request.
 ;       atm_model_version: in, optional, String
-;         ATM model version number. Possible values are '1.0' and '2.0'. Default is '2.0'.
+;         ATM model version number. Possible values are '2.0'. Default is '2.0'.
 ;       no_cache: in, optional, Boolean
 ;         The UCalgary Space Remote Sensing API utilizes a caching layer for performing ATM
 ;         calculations. If this variation of input parameters has been run before (and the
@@ -97,10 +92,16 @@ function aurorax_atm_inverse, $
   if (not isa(atm_model_version)) then begin
     atm_model_version = '2.0'
   endif
+
+  ; check that no version 2.0 params were passed if version 1.0 was requested
   if (atm_model_version eq '1.0') then begin
-    url_version_str = 'v1'
-  endif else begin
+    print, '[aurorax_atm_inverse] Error : ATM model version 1.0 is no longer supported'
+    return, !null
+  endif else if (atm_model_version eq '2.0') then begin
     url_version_str = 'v2'
+  endif else begin
+    print, '[aurorax_atm_inverse] Error : ATM model version ' + atm_model_version + ' is not currently accepted.'
+    return, !null
   endelse
 
   ; set params
@@ -156,13 +157,6 @@ function aurorax_atm_inverse, $
       data['data', key] = value.toArray(type = 'float')
     endif
   endforeach
-
-  ; remove characteristic_energy
-  ;
-  ; NOTE: we can remove this later once it is fully removed from the
-  ; API (after an acceptable deprecation duration for the Python library
-  ; too)
-  data['data'].REMOVE,'characteristic_energy'
 
   ; finally convert to struct
   data = data.toStruct(/recursive)

@@ -1,3 +1,15 @@
+Version 1.9.0 (2026-01-31)
+-------------------------
+- improvements to AACGM initialization (primarily for installations not using ipm)
+- ATM model changes
+  - removed support for use of ATM model version 1.0. To use this version of the model, please use a previous version of this library.
+  - forward function
+    - renamed `height_integrated_rayleighs_lbh` output flag to `height_integrated_rayleighs_smile_uvi_lbh`
+    - renamed `emission_lbh` output flag to `emission_smile_uvi_lbh`
+    - renamed `plasma_pederson_conductivity` output flag to `plasma_pedersen_conductivity`
+- updated crib sheets
+
+
 Version 1.8.0 (2025-12-09)
 -------------------------
 - added support for using with a proxy connection

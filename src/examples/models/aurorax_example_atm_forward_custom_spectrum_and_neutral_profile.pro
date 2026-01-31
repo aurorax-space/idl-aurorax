@@ -80,16 +80,16 @@ pro aurorax_example_atm_forward_custom_spectrum_and_neutral_profile
 
   ; print the information we asked for
   print, 'Height-integrated Rayleighs:'
-  print, '  427.8nm: ' + strcompress(string(data.height_integrated_rayleighs_4278))
-  print, '  557.7nm: ' + strcompress(string(data.height_integrated_rayleighs_5577))
-  print, '  630.0nm: ' + strcompress(string(data.height_integrated_rayleighs_6300))
-  print, '  844.6nm: ' + strcompress(string(data.height_integrated_rayleighs_8446))
-  print, '  LBH:     ' + strcompress(string(data.height_integrated_rayleighs_lbh))
-  print, '  130.4nm: ' + strcompress(string(data.height_integrated_rayleighs_1304))
-  print, '  135.6nm: ' + strcompress(string(data.height_integrated_rayleighs_1356))
+  print, '  427.8nm:        ' + strcompress(string(data.height_integrated_rayleighs_4278))
+  print, '  557.7nm:        ' + strcompress(string(data.height_integrated_rayleighs_5577))
+  print, '  630.0nm:        ' + strcompress(string(data.height_integrated_rayleighs_6300))
+  print, '  844.6nm:        ' + strcompress(string(data.height_integrated_rayleighs_8446))
+  print, '  130.4nm:        ' + strcompress(string(data.height_integrated_rayleighs_1304))
+  print, '  135.6nm:        ' + strcompress(string(data.height_integrated_rayleighs_1356))
+  print, '  SMILE UVI LBH:  ' + strcompress(string(data.height_integrated_rayleighs_smile_uvi_lbh))
 
   ; Let's plot the data that we got back
-  w = window(dimensions=[400,700], location=[0,0])
+  w = window(dimensions=[575,700], location=[0,0])
   alt = data.altitudes
 
   ; Plot all of the emissions as a column of subplots
@@ -99,7 +99,7 @@ pro aurorax_example_atm_forward_custom_spectrum_and_neutral_profile
   p_green = plot(alt, data.emission_5577, name='557.7 nm', color='green', layout=[1,6,3], /current, xrange=[80,800], margin=[0.325,0.25,0.1,0.05], thick=3)
   p_red = plot(alt, data.emission_6300, name='630.0 nm', color='crimson', layout=[1,6,4], /current, xrange=[80,800], margin=[0.325,0.25,0.1,0.05], thick=3)
   p_nir = plot(alt, data.emission_8446, name='844.6 nm', color='blue violet', layout=[1,6,5], /current, xrange=[80,800], margin=[0.325,0.25,0.1,0.05], thick=3)
-  p_lbh = plot(alt, data.emission_lbh, name='LBH', color='indigo', layout=[1,6,6], /current, xrange=[80,800], margin=[0.325,0.25,0.1,0.05], thick=3)
+  p_lbh = plot(alt, data.emission_smile_uvi_lbh, name='SMILE UVI LBH', color='indigo', layout=[1,6,6], /current, xrange=[80,800], margin=[0.325,0.25,0.1,0.05], thick=3)
   p_green.ytitle = 'Volume Emission Rate (cm$^{-3}$ s$^{-1}$)'
   p_lbh.xtitle = 'Altitude (km)'
 
@@ -107,7 +107,7 @@ pro aurorax_example_atm_forward_custom_spectrum_and_neutral_profile
   l = legend(target=[p_1304, p_1356, p_blue, p_green, p_red, p_nir, p_lbh], position=[0.225,0.4], /normal, color='white', sample_width=0.05)
 
   ; Plot the plasma densities
-  w = window(dimensions=[500,250], location=[425,0])
+  w = window(dimensions=[500,250], location=[600,0])
   p_e_density = plot(alt, data.plasma_electron_density, name='Electron', color='green', /current, thick=3)
   p_o2_density = plot(alt, data.plasma_o2plus_density, name='O$^{2+}$', color='black', /overplot, thick=3)
   p_no_density = plot(alt, data.plasma_noplus_density, name='NO$^{+}$', color='blue', /overplot, thick=3)
@@ -118,24 +118,24 @@ pro aurorax_example_atm_forward_custom_spectrum_and_neutral_profile
   l = legend(target=[p_e_density, p_o2_density, p_no_density, p_o_density], position=[0.8,0.8], /normal, color='white')
 
   ; Plot plasma ionisation rate
-  w = window(dimensions=[500,250], location=[425,325])
+  w = window(dimensions=[500,250], location=[600,325])
   p_ion_rate = plot(alt, data.plasma_ionisation_rate, title='Plasma Ionization Rate', color='black', /current, thick=3, $
     ytitle='Ionization Rate (cm$^{-3} \cdot $s$^{-1}$)', xtitle='Altitude (km)')
 
     ; Plot electron and ion temperatures
-    w = window(dimensions=[500,250], location=[425,650])
+    w = window(dimensions=[500,250], location=[600,650])
   p_e_temp = plot(alt, data.plasma_electron_temperature, title='Plasma Temperature', name='Ion Temp.', color='blue', /current, thick=3, ytitle='Temperature (K)')
   p_ion_temp = plot(alt, data.plasma_ion_temperature, name='Electron Temp.', color='red', /overplot, thick=3, xrange=[80,800], xtitle='Altitude (km)')
   l = legend(target=[p_e_temp, p_ion_temp], position=[0.8,0.5], /normal, color='white')
 
   ; Plot plasma conductivities
-  w = window(dimensions=[500,250], location=[925,0])
-  p_pederson = plot(alt, data.plasma_pederson_conductivity, title='Conductivities', name='Pederson', color='green', /current, thick=3, ytitle='Conductivity (S/m)')
+  w = window(dimensions=[500,250], location=[1125,0])
+  p_pedersen = plot(alt, data.plasma_pedersen_conductivity, title='Conductivities', name='Pedersen', color='green', /current, thick=3, ytitle='Conductivity (S/m)')
   p_hall = plot(alt, data.plasma_hall_conductivity, name='Hall', color='black', /overplot, thick=3, xrange=[80,800], xtitle='Altitude (km)')
-  l = legend(target=[p_pederson, p_hall], position=[0.8,0.8], /normal, color='white')
+  l = legend(target=[p_pedersen, p_hall], position=[0.8,0.8], /normal, color='white')
 
   ; Plot plasma production rates
-  w = window(dimensions=[500,250], location=[925,325])
+  w = window(dimensions=[500,250], location=[1125,325])
   p_n_prod = plot(alt, data.production_rate_n, title='Production Rates', name='N Production Rate', color='red', /current, thick=3, ytitle='Production Rate (1/cm$^3$/s)')
   p_nplus_prod = plot(alt, data.production_rate_nplus, name='N$^+$ Production Rate', color='blue', /overplot, thick=3, xrange=[80,800], xtitle='Altitude (km)')
   l = legend(target=[p_n_prod, p_nplus_prod], position=[0.8,0.8], /normal, color='white')

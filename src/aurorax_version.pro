@@ -16,7 +16,7 @@
 
 function __aurorax_version
   compile_opt hidden
-  return, '1.8.0'
+  return, '1.9.0'
 end
 
 ;+

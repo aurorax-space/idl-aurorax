@@ -51,7 +51,7 @@ function aurorax_atm_forward_get_output_flags, $
   output_flags['height_integrated_rayleighs_5577'] = 0
   output_flags['height_integrated_rayleighs_6300'] = 0
   output_flags['height_integrated_rayleighs_8446'] = 0
-  output_flags['height_integrated_rayleighs_lbh'] = 0
+  output_flags['height_integrated_rayleighs_smile_uvi_lbh'] = 0
   output_flags['altitudes'] = 0
   output_flags['emission_1304'] = 0
   output_flags['emission_1356'] = 0
@@ -59,7 +59,7 @@ function aurorax_atm_forward_get_output_flags, $
   output_flags['emission_5577'] = 0
   output_flags['emission_6300'] = 0
   output_flags['emission_8446'] = 0
-  output_flags['emission_lbh'] = 0
+  output_flags['emission_smile_uvi_lbh'] = 0
   output_flags['neutral_n2_density'] = 0
   output_flags['neutral_n_density'] = 0
   output_flags['neutral_o2_density'] = 0
@@ -72,7 +72,7 @@ function aurorax_atm_forward_get_output_flags, $
   output_flags['plasma_electron_temperature'] = 0
   output_flags['plasma_ion_temperature'] = 0
   output_flags['plasma_hall_conductivity'] = 0
-  output_flags['plasma_pederson_conductivity'] = 0
+  output_flags['plasma_pedersen_conductivity'] = 0
   output_flags['plasma_ionisation_rate'] = 0
   output_flags['production_rate_o2plus'] = 0
   output_flags['production_rate_oplus'] = 0
@@ -96,7 +96,7 @@ function aurorax_atm_forward_get_output_flags, $
     output_flags['height_integrated_rayleighs_5577'] = 1
     output_flags['height_integrated_rayleighs_6300'] = 1
     output_flags['height_integrated_rayleighs_8446'] = 1
-    output_flags['height_integrated_rayleighs_lbh'] = 1
+    output_flags['height_integrated_rayleighs_smile_uvi_lbh'] = 1
   endif
 
   ; return
