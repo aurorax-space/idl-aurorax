@@ -22,24 +22,23 @@ print, '[idl-aurorax] Compiling routines'
 ; NOTE: IDL-AuroraX expects all AACGM_v2 files to be located within !packages_path by default.
 ;       If AACGM_v2 code / text files are not located in '*\.idl\idl\packages\idl_aurorax\libs\aacgm', 
 ;       alter the below filepath to point to a different location by default.
-igrf_coeffs_path = !package_path + path_sep() + 'idl_aurorax' + path_sep() + $
+igrf_coeffs = !package_path + path_sep() + 'idl_aurorax' + path_sep() + $
   'libs' + path_sep() + 'aacgm' + path_sep() + 'magmodel_1590-2025.txt'
-aacgm_v2_dat_prefix_path = !package_path + path_sep() + 'idl_aurorax' + path_sep() + $
+aacgm_dat_prefix = !package_path + path_sep() + 'idl_aurorax' + path_sep() + $
   'libs' + path_sep() + 'aacgm' + path_sep() + 'coeffs' + path_sep() + 'aacgm_coeffs-14-'
-;igrf_coeffs_path = 'C:\Users\darrenc\Documents\GitHub\idl-aurorax\libs\aacgm\magmodel_1590-2025.txt'
-;aacgm_v2_dat_prefix_path = 'C:\Users\darrenc\Documents\Github\idl-aurorax\libs\aacgm\coeffs\aacgm_coeffs-14-'
-
+; igrf_coeffs = 'C:\Users\darrenc\Documents\GitHub\idl-aurorax\libs\aacgm\magmodel_1590-2025.txt'
+; aacgm_dat_prefix = 'C:\Users\darrenc\Documents\Github\idl-aurorax\libs\aacgm\coeffs\aacgm_coeffs-14-'
+  
 ; check paths for AACGM
-igrf_coeff_exists = file_test(igrf_coeffs_path)
-!null = file_search(aacgm_v2_dat_prefix_path+'*', count=aacgm_v2_dat_exists)
-if ((igrf_coeff_exists eq 0) or (aacgm_v2_dat_exists eq 0)) then aacgm_found = 0
-print,aacgm_found
-if ((igrf_coeff_exists ne 0) and (aacgm_v2_dat_exists ne 0)) then aacgm_found = 1
-print,aacgm_found
+igrf_coeffs_exist = file_test(igrf_coeffs)
+!null = file_search(aacgm_dat_prefix+'*', count=aacgm_dat_exists)
+if ((igrf_coeffs_exist eq 0) or (aacgm_dat_exists eq 0)) then aacgm_found = 0
+if ((igrf_coeffs_exist ne 0) and (aacgm_dat_exists ne 0)) then aacgm_found = 1
 
 ; initialize AACGM
-setenv, 'AACGM_v2_DAT_PREFIX=' + igrf_coeffs_path
-setenv, 'IGRF_COEFFS=' + aacgm_v2_dat_prefix_path
+setenv, 'AACGM_v2_DAT_PREFIX=' + aacgm_dat_prefix
+setenv, 'IGRF_COEFFS=' + igrf_coeffs
+
 .run genmag
 .run igrflib_v2
 .run aacgmlib_v2

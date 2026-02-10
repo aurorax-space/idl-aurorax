@@ -161,7 +161,7 @@ function aurorax_ucalgary_download, $
         catch, /cancel
         req.getProperty, response_code = rspCode
         if (quiet_flag eq 0) then print, '[aurorax_download] URL download failed with error code ' + strtrim(string(rspCode), 2) + ': ' + url
-        file_delete, output_filename ; don't want an empty 1kb file to stick around
+        if (file_test(output_filename) eq 1) then file_delete, output_filename ; don't want an empty 1kb file to stick around
         obj_destroy, req
         continue
       endif
