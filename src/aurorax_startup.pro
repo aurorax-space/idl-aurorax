@@ -28,7 +28,7 @@ aacgm_dat_prefix = !package_path + path_sep() + 'idl_aurorax' + path_sep() + $
   'libs' + path_sep() + 'aacgm' + path_sep() + 'coeffs' + path_sep() + 'aacgm_coeffs-14-'
 ; igrf_coeffs = 'C:\Users\darrenc\Documents\GitHub\idl-aurorax\libs\aacgm\magmodel_1590-2025.txt'
 ; aacgm_dat_prefix = 'C:\Users\darrenc\Documents\Github\idl-aurorax\libs\aacgm\coeffs\aacgm_coeffs-14-'
-  
+
 ; check paths for AACGM
 igrf_coeffs_exist = file_test(igrf_coeffs)
 !null = file_search(aacgm_dat_prefix+'*', count=aacgm_dat_exists)
