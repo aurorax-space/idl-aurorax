@@ -1,3 +1,9 @@
+Version 1.9.1 (2026-02-10)
+-------------------------
+- bugfix for AACGM setup
+- added several new crib sheets
+
+
 Version 1.9.0 (2026-01-31)
 -------------------------
 - improvements to AACGM initialization (primarily for installations not using ipm)
