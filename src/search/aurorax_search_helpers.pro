@@ -66,62 +66,65 @@ function __aurorax_datetime_parser, input_str, interpret_as_start = start_kw, in
     end_flag = 1
   endif
 
+  ; Work on a local copy so we don't mutate the caller's variable
+  ts_str = input_str
+
   ; remove some characters (-, /, T)
-  input_str = input_str.replace('-', '')
-  input_str = input_str.replace('/', '')
-  input_str = input_str.replace('T', '')
-  input_str = input_str.replace('t', '')
-  input_str = input_str.replace(':', '')
-  input_str = input_str.replace(' ', '')
+  ts_str = ts_str.replace('-', '')
+  ts_str = ts_str.replace('/', '')
+  ts_str = ts_str.replace('T', '')
+  ts_str = ts_str.replace('t', '')
+  ts_str = ts_str.replace(':', '')
+  ts_str = ts_str.replace(' ', '')
 
   ; based on length, add in the extra info
-  if (strlen(input_str) eq 4) then begin
+  if (strlen(ts_str) eq 4) then begin
     ; year supplied
     if (start_flag eq 1) then begin
-      dt_str = input_str + '0101000000'
+      dt_str = ts_str + '0101000000'
     endif else begin
-      dt_str = input_str + '1231235959'
+      dt_str = ts_str + '1231235959'
     endelse
-  endif else if (strlen(input_str) eq 6) then begin
+  endif else if (strlen(ts_str) eq 6) then begin
     ; year and month supplied
     if (start_flag eq 1) then begin
-      dt_str = input_str + '01000000'
+      dt_str = ts_str + '01000000'
     endif else begin
       ; determine days for this month
       month_days = 31
-      mm = fix(strmid(input_str, 4, 2))
+      mm = fix(strmid(ts_str, 4, 2))
       if (mm eq 4 or mm eq 6 or mm eq 9 or mm eq 11) then month_days = 30
       if (mm eq 2) then begin
-        yy = fix(strmid(input_str, 0, 4))
+        yy = fix(strmid(ts_str, 0, 4))
         month_days = 28
         if (where(yy eq leap_years) ne -1) then month_days = 29 ; is leap year
       endif
-      dt_str = input_str + string(month_days, format = '(i2.2)') + '235959'
+      dt_str = ts_str + string(month_days, format = '(i2.2)') + '235959'
     endelse
-  endif else if (strlen(input_str) eq 8) then begin
+  endif else if (strlen(ts_str) eq 8) then begin
     ; year, month, day supplied
     if (start_flag eq 1) then begin
-      dt_str = input_str + '000000'
+      dt_str = ts_str + '000000'
     endif else begin
-      dt_str = input_str + '235959'
+      dt_str = ts_str + '235959'
     endelse
-  endif else if (strlen(input_str) eq 10) then begin
+  endif else if (strlen(ts_str) eq 10) then begin
     ; year, month, day, hour supplied
     if (start_flag eq 1) then begin
-      dt_str = input_str + '0000'
+      dt_str = ts_str + '0000'
     endif else begin
-      dt_str = input_str + '5959'
+      dt_str = ts_str + '5959'
     endelse
-  endif else if (strlen(input_str) eq 12) then begin
+  endif else if (strlen(ts_str) eq 12) then begin
     ; year, month, day, hour, minute supplied
     if (start_flag eq 1) then begin
-      dt_str = input_str + '00'
+      dt_str = ts_str + '00'
     endif else begin
-      dt_str = input_str + '59'
+      dt_str = ts_str + '59'
     endelse
-  endif else if (strlen(input_str) eq 14) then begin
+  endif else if (strlen(ts_str) eq 14) then begin
     ; year, month, day, hour, minute, second supplied
-    dt_str = input_str
+    dt_str = ts_str
   endif else begin
     print, 'Error: malformed datetime input string, string length unrecognized'
     return, ''
