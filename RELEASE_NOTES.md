@@ -1,3 +1,9 @@
+Version 1.9.2 (2026-05-12)
+-------------------------
+- bugfix for helpers method
+- added new crib sheet for satellite footprint overlay on ASI images
+
+
 Version 1.9.1 (2026-02-10)
 -------------------------
 - bugfix for AACGM setup

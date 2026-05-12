@@ -24,7 +24,7 @@ pro aurorax_example_movie_satellite_footprint_trex_rgb
   ; in CCD coordinates, using the skymap. The pattern extends to other satellites and
   ; ASI instruments.
   ;
-  ; The general prodedure is as follows: search ephemeris, interpolate each platform's lat/lon to
+  ; The general procedure is as follows: search ephemeris, interpolate each platform's lat/lon to
   ; the ASI cadence, download & optionally scale the ASI data, load the skymap, then for every
   ; frame, project each visible satellite's location and recent trail onto CCD pixels via
   ; aurorax_ccd_contour() and overplot. Finally, combine the PNGs into an MP4 with aurorax_movie().
@@ -60,13 +60,15 @@ pro aurorax_example_movie_satellite_footprint_trex_rgb
   ; Search for the spacecraft footprints over the event window.
   programs = ['tracers', 'real']
   response = aurorax_ephemeris_search(start_ts, end_ts, programs = programs, $
-  platforms = platform_names, instrument_types = 'footprint')
+    platforms = platform_names, instrument_types = 'footprint')
   ephemeris_data = response.data
   print, 'Got ', strtrim(string(n_elements(ephemeris_data)), 2), ' ephemeris records.'
 
   ; Split the ephemeris results by platform and linearly interpolate to the ASI cadence.
-  ; The AuroraX ephemeris search returns footprints at a 1-minute cadence (from
-  ; SSCWeb), so we interpolate up to the 3-second TREx RGB frame cadence here.
+  ; The AuroraX ephemeris search provides spacecraft location data at a 1-minute cadence
+  ; (taken from SSCWeb with no modifications), along with other supplemental metadata.
+  ; We can use the spacecraft B-trace data to interpolate the footprints to match the cadence
+  ; of the TREx RGB data.
   ;
   ; sat_ephemeris is a hash keyed by platform name; each entry holds a struct that gives
   ; {.julday, .lats, .lons} at the target cadence.
@@ -159,9 +161,9 @@ pro aurorax_example_movie_satellite_footprint_trex_rgb
     for k = 0, n_sats - 1 do begin
       pname = platform_names[k]
       if (frame_jd lt win_starts_jd[k]) or (frame_jd gt win_ends_jd[k]) then continue
-      if not sat_ephemeris.haskey(pname) then continue
-      
-      ; Grab the relevant footprintlocations for this frame
+      if not sat_ephemeris.hasKey(pname) then continue
+
+      ; Grab the relevant footprint locations for this frame
       eph = sat_ephemeris[pname]
       !null = min(abs(eph.julday - frame_jd), i_now)
       i_tail_start = (i_now - n_trail + 1) > 0
