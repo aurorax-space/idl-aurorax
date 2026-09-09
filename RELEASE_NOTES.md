@@ -1,3 +1,8 @@
+Version 1.10.0 (2026-09-09)
+-------------------------
+- added support for sub-minute precision conjunction searching (`/subminute_precision` keyword), updated crib sheet
+
+
 Version 1.9.2 (2026-05-12)
 -------------------------
 - bugfix for helpers method

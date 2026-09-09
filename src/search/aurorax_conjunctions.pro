@@ -171,7 +171,8 @@ function __aurorax_conjunctions_create_post_str, $
   ground, $
   space, $
   events, $
-  custom_locations
+  custom_locations, $
+  subminute_precision
   ; get ISO datetime strings
   if (verbose eq 1) then __aurorax_message, 'Parsing start and end timestamps'
   start_iso_dt = __aurorax_datetime_parser(start_ts, /interpret_as_start)
@@ -271,6 +272,12 @@ function __aurorax_conjunctions_create_post_str, $
   post_struct.conjunction_types = conjunction_types
   post_struct.max_distances = distances_hash
 
+  ; add the subminute precision flag if it was enabled; when omitted, the
+  ; API uses its default of one-minute precision
+  if (subminute_precision eq 1) then begin
+    post_struct = create_struct(post_struct, 'subminute_precision', boolean(1))
+  endif
+
   ; serialize into a string
   post_str = json_serialize(post_struct, /lowercase)
   post_str = post_str.replace('LOGICAL_OPERATOR', 'logical_operator') ; because of a bug in json_serialize where it doesn't lowercase nested hashes
@@ -335,6 +342,9 @@ end
 ;         search for south B-trace conjunctions
 ;       geographic: in, optional, Boolean
 ;         search for geographic conjunctions
+;       subminute_precision: in, optional, Boolean
+;         search for conjunctions using sub-minute precision, instead of the
+;         default one-minute precision
 ;       quiet: in, optional, Boolean
 ;         quiet output when searching, no print messages will be shown
 ;       dryrun: in, optional, Boolean
@@ -384,6 +394,7 @@ function aurorax_conjunction_search, $
   nbtrace = ct_nbtrace, $
   sbtrace = ct_sbtrace, $
   geographic = ct_geo, $
+  subminute_precision = smp, $
   quiet = q, $
   dryrun = dr
   ; set verbosity
@@ -393,6 +404,10 @@ function aurorax_conjunction_search, $
   ; set poll interval
   poll_interval = 1
   if (isa(pi) eq 1) then poll_interval = pi
+
+  ; set subminute precision flag
+  subminute_precision = 0
+  if keyword_set(smp) then subminute_precision = 1
 
   ; set dry run flag
   dry_run = 0
@@ -410,7 +425,8 @@ function aurorax_conjunction_search, $
     ground, $
     space, $
     events, $
-    custom_locations)
+    custom_locations, $
+    subminute_precision)
 
   ; stop here if in dry-run mode
   if (dry_run eq 1) then begin
@@ -551,6 +567,9 @@ end
 ;         search for south B-trace conjunctions
 ;       geographic: in, optional, Boolean
 ;         search for geographic conjunctions
+;       subminute_precision: in, optional, Boolean
+;         search for conjunctions using sub-minute precision, instead of the
+;         default one-minute precision
 ;
 ; :Returns:
 ;       String
@@ -574,9 +593,14 @@ function aurorax_conjunction_describe, $
   custom_locations = custom_locations, $
   nbtrace = ct_nbtrace, $
   sbtrace = ct_sbtrace, $
-  geographic = ct_geo
+  geographic = ct_geo, $
+  subminute_precision = smp
   ; init
   verbose = 0
+
+  ; set subminute precision flag
+  subminute_precision = 0
+  if keyword_set(smp) then subminute_precision = 1
 
   ; construct post structure
   post_str = __aurorax_conjunctions_create_post_str(verbose, $
@@ -589,7 +613,8 @@ function aurorax_conjunction_describe, $
     ground, $
     space, $
     events, $
-    custom_locations)
+    custom_locations, $
+    subminute_precision)
 
   ; set up request
   req = obj_new('IDLnetUrl')

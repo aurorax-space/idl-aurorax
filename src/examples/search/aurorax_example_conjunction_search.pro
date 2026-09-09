@@ -169,6 +169,15 @@ pro aurorax_example_conjunction_search
   ; To help answer this, you can use the `aurorax_create_response_format_template()` function. This will return a template
   ; for the `response_format` parameter. Take this, adjust as needed, and use for search requests.
   aurorax_example_conjunction_search11
+
+  ; --------------------
+  ; Search for conjunctions using sub-minute precision
+  ; --------------------
+  ;
+  ; By default, the conjunction search engine evaluates conjunctions using one-minute precision. The
+  ; search engine also supports evaluating conjunctions at a sub-minute precision. To enable this,
+  ; use the `/subminute_precision` keyword.
+  aurorax_example_conjunction_search12
 end
 
 pro aurorax_example_conjunction_search1
@@ -461,5 +470,24 @@ pro aurorax_example_conjunction_search11
     /nbtrace, $
     /quiet)
   print, '[Response format example] Found ' + string(n_elements(r['data']), format = '(I0)') + ' conjunctions'
+  print, ''
+end
+
+pro aurorax_example_conjunction_search12
+  ; search for conjunctions between THEMIS ASI and Swarm, using sub-minute precision
+  ;
+  ; define timeframe and distance parameters
+  distance = 500
+  start_dt = '2020-01-01T00:00:00'
+  end_dt = '2020-01-01T06:59:59'
+
+  ; create criteria blocks
+  ground = list(aurorax_create_criteria_block(programs = ['themis-asi'], /ground))
+  space = list(aurorax_create_criteria_block(programs = ['swarm'], /space))
+
+  ; perform search
+  print, '[Sub-minute precision example] Starting search ...'
+  r = aurorax_conjunction_search(start_dt, end_dt, distance, ground = ground, space = space, /nbtrace, /subminute_precision, /quiet)
+  print, '[Sub-minute precision example] Found ' + string(n_elements(r.data), format = '(I0)') + ' conjunctions'
   print, ''
 end
