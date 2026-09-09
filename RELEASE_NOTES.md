@@ -1,3 +1,20 @@
+Version 1.10.1 (2026-09-09)
+-------------------------
+- added a test suite, see `tests/README.md` for how to run it
+- bugfixes
+  - metadata filters created with `/operator_or` were silently built with 'AND' instead
+  - calibrating a single image raised an error instead of working
+  - dark frame calibration wrongly zeroed the last pixel of any image stack with no negative pixels
+  - supplying `data_product_types` to a data products search raised an error
+  - search durations of an hour or longer were reported without the hours (an hour showed as '0 minutes')
+  - February was treated as having 28 days in leap years outside 1980-2040
+  - several functions raised an error on invalid input rather than returning cleanly: an out-of-range criteria block count, a conjunction search with fewer than two criteria blocks, and a conjunction search given a distance that is neither a number nor a pairings hash
+  - `aurorax_fov_oplot` could stall a non-interactive session when given mismatched numbers of site latitudes and longitudes
+  - `aurorax_spectra_get_intensity` carried on after reporting an invalid `spect_loc`
+- corrected error messages that named the wrong function, and fixed typos in user-facing output
+- added a `.gitattributes` file to keep line endings consistent
+
+
 Version 1.10.0 (2026-09-09)
 -------------------------
 - added support for sub-minute precision conjunction searching (`/subminute_precision` keyword), updated crib sheet
