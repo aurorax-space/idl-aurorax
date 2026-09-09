@@ -49,38 +49,48 @@ pro aurorax_test_calibrate
   atest_equal, result[0, 0, 0], 0, 'the dark corner itself clamps to zero'
   atest_n_elements, size(result, /dimensions), 3, 'a multi frame stack stays three dimensional'
 
-  ; KNOWN BUG: the clamp is written as
+  ; Regression test. The clamp used to be written as
   ;   new_images[where(new_images lt 0)] = 0
   ; and when nothing is negative WHERE returns -1, which IDL reads as "the
-  ; last element". So a stack with no negative pixels has its very last
-  ; pixel silently zeroed. Pinned here; the fix is to guard the assignment
-  ; with a count, e.g. `idx = where(..., n_neg) & if n_neg gt 0 then ...`.
-  atest_equal, result[7, 7, 2], 0, $
-    'the last pixel of the stack is wrongly zeroed when no pixel is negative (known bug)'
+  ; last element" -- so a stack with no negative pixels had its very last
+  ; pixel silently zeroed. The count is now checked before assigning.
+  atest_equal, result[7, 7, 2], 270, $
+    'the last pixel of the stack is left alone when no pixel is negative'
   atest_equal, result[7, 7, 1], 180, 'the last pixel of an earlier frame is untouched'
+
+  ; a stack that genuinely does contain negatives still gets clamped
+  images = intarr(8, 8, 2) + 100
+  images[*, *, 0] = 5
+  images[0 : 4, 0 : 4, 0] = 50
+  images[0 : 4, 0 : 4, 1] = 10
+  result = __aurorax_perform_dark_frame_calibration(images, 5)
+  atest_equal, result[6, 6, 0], 0, 'a pixel darker than its corner mean clamps to zero'
+  atest_equal, result[6, 6, 1], 90, 'a brighter frame in the same stack is unaffected'
 
   ; -----------------------------------------------------------
   atest_suite, 'dark frame calibration -- single frame'
   ; -----------------------------------------------------------
   ;
-  ; KNOWN BUG: the routine opens with a guard that reforms a 2D frame up to
-  ; [cols,rows,1], but the very next statement is `new_images = long(images)`
-  ; and IDL's type conversion drops the trailing length-1 axis again. The
-  ; frame loop then reads its bound from the wrong axis -- it uses the row
-  ; count instead of the frame count -- and runs off the end of the array.
-  ;
-  ; The upshot is that calibrating a single image fails outright. Pinned
-  ; here so the limitation is recorded; the fix is to carry the frame count
-  ; in a variable rather than re-deriving it after the type conversion.
-  atest_note, 'the next two calls raise from inside the library -- that output is expected'
+  ; Regression test. The routine reforms a 2D frame up to [cols,rows,1], but
+  ; the following `long(images)` dropped the trailing length-1 axis again,
+  ; and the frame loop then took its bound from the row count instead of the
+  ; frame count and ran off the end of the array. Calibrating a single image
+  ; failed outright. The frame count is now captured before the conversion.
   single_frame = intarr(8, 8) + 100
   single_frame[0 : 4, 0 : 4] = 10
-  atest_raises, 'junk = __aurorax_perform_dark_frame_calibration(single_frame, 5)', $
-    'dark frame calibration of a single 2D frame raises (known bug)'
+  result = __aurorax_perform_dark_frame_calibration(single_frame, 5)
+  atest_not_null, result, 'a single 2D frame is calibrated rather than raising'
+  atest_n_elements, size(result, /dimensions), 2, 'a single frame comes back two dimensional'
+  atest_equal, result[6, 6], 90, 'the corner mean is subtracted from the single frame'
+  atest_equal, result[0, 0], 0, 'the dark corner clamps to zero'
+  atest_equal, result[7, 7], 90, 'the last pixel is not wrongly zeroed here either'
 
+  ; and through the public entry point
   single_frame = intarr(8, 8) + 100
-  atest_raises, 'junk = aurorax_calibrate_rego(single_frame)', $
-    'calibrating a single image through the public entry point raises too (known bug)'
+  single_frame[0 : 4, 0 : 4] = 10
+  result = aurorax_calibrate_rego(single_frame)
+  atest_not_null, result, 'calibrating a single image through the public entry point works'
+  atest_equal, result[6, 6], 90, 'the public entry point applies dark subtraction to it'
 
   ; -----------------------------------------------------------
   atest_suite, 'flatfield calibration'

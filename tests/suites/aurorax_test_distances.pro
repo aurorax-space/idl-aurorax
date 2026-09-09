@@ -121,16 +121,17 @@ pro aurorax_test_distances
   atest_suite, 'create distances hash -- invalid block counts'
   ; -----------------------------------------------------------
   ;
-  ; KNOWN BUG: when the block count is out of range the underlying derive
-  ; function returns an empty hash, and this routine then tries to build an
-  ; array from it and index the result. It faults instead of returning
-  ; something the caller can check. Pinned here so the behaviour is
-  ; documented; a graceful !null return would be better.
-  atest_note, 'the next two calls print errors from inside the library -- that output is expected'
-  atest_raises, 'junk = aurorax_create_advanced_distances_hash(500, ground_count = 1)', $
-    'a single block faults rather than returning cleanly (known bug)'
-  atest_raises, 'junk = aurorax_create_advanced_distances_hash(500, ground_count = 11)', $
-    'eleven blocks faults rather than returning cleanly (known bug)'
+  ; Regression test. An out of range block count used to fault here: the
+  ; derive function hands back an empty hash, and this routine went on to
+  ; build a zero-length array from it and index the result. It now returns
+  ; !null, which a caller can actually check.
+  atest_note, 'the next few calls print "must have between 2 and 10" errors -- that output is expected'
+  atest_null, aurorax_create_advanced_distances_hash(500, ground_count = 1), $
+    'a single block returns !null rather than faulting'
+  atest_null, aurorax_create_advanced_distances_hash(500, ground_count = 11), $
+    'eleven blocks returns !null rather than faulting'
+  atest_null, aurorax_create_advanced_distances_hash(500), $
+    'no blocks at all returns !null'
 
   ; -----------------------------------------------------------
   atest_suite, 'validate distances'

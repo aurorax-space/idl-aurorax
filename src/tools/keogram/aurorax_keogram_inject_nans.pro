@@ -51,9 +51,9 @@ function aurorax_keogram_inject_nans, $
   if keyword_set(cadence) then begin
     ; Give a warning if the user-supplied cadence is different then that determined from the data
     if cadence ne apparent_cadence then begin
-      print, '[aurorax_keogram_inject_nans] Warning: based on the keogram''s timestamp attribute, the apparent cadence is' + $
-        strcompress(string(apparent_cadence), /remove_all) + ' s, but ' + strcompress(string(apparent_cadence), /remove_all) + $
-        ' s was passed via the cadence kewyord. ensure that the selected cadence is correct for the dataset being wrong.'
+      print, '[aurorax_keogram_inject_nans] Warning: based on the keogram''s timestamp attribute, the apparent cadence is ' + $
+        strcompress(string(apparent_cadence), /remove_all) + ' s, but ' + strcompress(string(cadence), /remove_all) + $
+        ' s was passed via the cadence keyword. Ensure that the selected cadence is correct for the dataset being used.'
       return, !null
     endif
   endif else begin
@@ -87,7 +87,7 @@ function aurorax_keogram_inject_nans, $
 
   ; Check that timestamps are formatted as expected
   if strmid(start_ts, 2, 1) ne ':' or strmid(start_ts, 5, 1) ne ':' or strmid(end_ts, 2, 1) ne ':' or strmid(end_ts, 5, 1) ne ':' then begin
-    print, '[aurorax_keogram_inject_nans] Error: unexpected timestamp in keogram object. Expested format ''yyyy-mm-dd HH:MM:SS.MS utc'''
+    print, '[aurorax_keogram_inject_nans] Error: unexpected timestamp in keogram object. Expected format ''yyyy-mm-dd HH:MM:SS.MS utc'''
     return, !null
   endif
 

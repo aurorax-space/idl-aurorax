@@ -225,4 +225,26 @@ pro aurorax_test_conjunction_query
   if (n_elements(q) ne 0) then begin
     atest_n_elements, q['ground'], 9, 'all nine ground blocks are present'
   endif
+
+  ; a conjunction needs two things to be in conjunction, so one block is
+  ; refused up front rather than faulting inside the distances helper
+  atest_note, 'the next two calls print "not enough criteria blocks" errors -- that output is expected'
+  post_str = __atest_conj_query(ground = ground, nbtrace = 1)
+  atest_equal, typename(post_str), 'LIST', 'a single criteria block is rejected'
+  atest_n_elements, post_str, 0, 'the rejection result is empty'
+
+  post_str = __atest_conj_query(nbtrace = 1)
+  atest_equal, typename(post_str), 'LIST', 'no criteria blocks at all is rejected'
+
+  ; -----------------------------------------------------------
+  atest_suite, 'conjunction query -- bad distance argument'
+  ; -----------------------------------------------------------
+  ;
+  ; a distance that is neither a number nor a pairings hash used to fall
+  ; through both branches and leave the distances undefined, faulting when
+  ; the request struct was assembled
+  atest_note, 'the next call prints a "distance must be a number or a hash" error -- expected'
+  post_str = __atest_conj_query(ground = ground, space = space, nbtrace = 1, distance = 'far')
+  atest_equal, typename(post_str), 'LIST', 'a string distance is rejected'
+  atest_n_elements, post_str, 0, 'the rejection result is empty'
 end

@@ -130,7 +130,8 @@ function aurorax_spectra_get_intensity, $
   ; Turn input plotting timestamp and spect loc into arrays if they're scalars
   if isa(time_stamp, /scalar) then time_stamp = [time_stamp]
   if ~isa(spect_loc, /scalar) or ~isa(spect_loc, /int) then begin
-    print, '[aurorax_spectra_get_intensity] Error: ''spect_loc'' must be a scalar intege'
+    print, '[aurorax_spectra_get_intensity] Error: ''spect_loc'' must be a scalar integer'
+    return, !null
   endif
 
   ; Obtain indices along time dimension of spectra corresponding to requested timestamp(s)
@@ -142,7 +143,7 @@ function aurorax_spectra_get_intensity, $
 
     ; raise error if timestamp doesn't exist in data
     if idx eq !null then begin
-      print, '[aurorax_spectra_plot] Error: could not find data in spect_data for requested timestamp ' + t + '.'
+      print, '[aurorax_spectra_get_intensity] Error: could not find data in spect_data for requested timestamp ' + t + '.'
       return, !null
     endif
     ts_idx_arr = [ts_idx_arr, idx]

@@ -45,7 +45,7 @@ function __aurorax_data_product_create_post_str, verbose, start_ts, end_ts, prog
 
   ; create post struct and serialize into a string
   post_struct = {data_sources: data_sources_struct, start: start_iso_dt, end_ts: end_iso_dt, data_product_type_filters: list()}
-  if (isa(data_product_types) eq 1) then data_sources_struct.data_product_type_filters = list(data_product_types, /extract)
+  if (isa(data_product_types) eq 1) then post_struct.data_product_type_filters = list(data_product_types, /extract)
   post_str = json_serialize(post_struct, /lowercase)
   post_str = post_str.replace('LOGICAL_OPERATOR', 'logical_operator') ; because of a bug in json_serialize where it doesn't lowercase nested hashes
   post_str = post_str.replace('EXPRESSIONS', 'expressions') ; because of a bug in json_serialize where it doesn't lowercase nested hashes

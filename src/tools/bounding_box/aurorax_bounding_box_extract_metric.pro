@@ -393,7 +393,7 @@ function aurorax_bounding_box_extract_metric, $
         result = transpose([[result_r], [result_g], [result_b]])
       endif
     endif else begin
-      print, '[aurorax_bounding_box_extract_metric] Error: nrecognized image format with ' + strcompress(string(n_elements(size(images, /dimensions))), /remove_all) + ' dimensions.'
+      print, '[aurorax_bounding_box_extract_metric] Error: unrecognized image format with ' + strcompress(string(n_elements(size(images, /dimensions))), /remove_all) + ' dimensions.'
       return, !null
     endelse
 
@@ -708,7 +708,7 @@ function aurorax_bounding_box_extract_metric, $
         result = transpose([[result_r], [result_g], [result_b]])
       endif
     endif else begin
-      print, '[aurorax_bounding_box_extract_metric] Error: enrecognized image format with ' + strcompress(string(n_elements(size(images, /dimensions))), /remove_all) + ' dimensions.'
+      print, '[aurorax_bounding_box_extract_metric] Error: unrecognized image format with ' + strcompress(string(n_elements(size(images, /dimensions))), /remove_all) + ' dimensions.'
       return, !null
     endelse
 
@@ -930,7 +930,7 @@ function aurorax_bounding_box_extract_metric, $
         result = transpose([[result_r], [result_g], [result_b]])
       endif
     endif else begin
-      print, '[aurorax_bounding_box_extract_metric] Error: enrecognized image format with ' + strcompress(string(n_elements(size(images, /dimensions))), /remove_all) + ' dimensions.'
+      print, '[aurorax_bounding_box_extract_metric] Error: unrecognized image format with ' + strcompress(string(n_elements(size(images, /dimensions))), /remove_all) + ' dimensions.'
       return, !null
     endelse
 

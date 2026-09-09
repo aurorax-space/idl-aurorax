@@ -48,7 +48,7 @@ pro aurorax_example_conjunction_search
   ;
   ; An important part of being able to utilize the metadata filters is knowing the available keys and values. Each
   ; data source record has an attribute named `ephemeris_metadata_schema`. You can view this information by
-  ; retrieving data sources (using the `aurorax_list_sources()` or `aurorax_get_source()` functions) and exploring
+  ; retrieving data sources (using the `aurorax_list_sources()` function) and exploring
   ; their `ephemeris_metadata_filters` attributes. If you prefer to look at all the available metadata filters in
   ; a web browser instead, you can head on over to the AuroraX Conjunction Search webpage
   ; (https://aurorax.space/conjunctionSearch/standard). Select your data source(s), and click on the '+' icon for

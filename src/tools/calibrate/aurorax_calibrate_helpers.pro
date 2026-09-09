@@ -26,6 +26,14 @@ function __aurorax_perform_dark_frame_calibration, images, size
     images = reform(images, (size(images, /dimensions))[0], (size(images, /dimensions))[1], 1)
   endif
 
+  ; Number of frames to process
+  ;
+  ; NOTE: this has to be captured here, before the long() conversion below.
+  ; IDL drops a trailing length-1 dimension, so for a single frame the
+  ; converted array is 2D again -- re-deriving the frame count from it would
+  ; pick up the row count instead and run the loop off the end of the array.
+  n_frames = (size(images, /dimensions))[-1]
+
   ; Extract NxN box from lower left corner, compute means
   dark_means = ulong(mean(mean(images[0 : size - 1, 0 : size - 1, *], dimension = 1), dimension = 1))
 
@@ -37,11 +45,19 @@ function __aurorax_perform_dark_frame_calibration, images, size
   ;
 
   new_images = long(images)
-  for i = 0, (size(new_images, /dimensions))[-1] - 1 do begin
+  for i = 0, n_frames - 1 do begin
     new_images[*, *, i] = new_images[*, *, i] - dark_means[i]
   endfor
-  new_images[where(new_images lt 0)] = 0
-  images[*, *, *] = new_images[*, *, *]
+
+  ; clamp negatives to zero
+  ;
+  ; NOTE: the count is required. Without it, a stack containing no negative
+  ; pixels gets -1 back from where(), which IDL reads as "the last element",
+  ; silently zeroing the final pixel.
+  neg_idx = where(new_images lt 0, n_negative)
+  if (n_negative gt 0) then new_images[neg_idx] = 0
+
+  images[*] = new_images[*]
 
   ; If image was single frame to start, remove extra axis
   return, reform(images)
@@ -78,7 +94,7 @@ function __aurorax_perform_rayleighs_calibration, images, cal_rayleighs, exposur
     images = reform(images, (size(images, /dimensions))[0], (size(images, /dimensions))[1], 1)
   endif
 
-  ; convert types to maintin precision
+  ; convert types to maintain precision
   images = float(images)
   exposure_length_sec = float(exposure_length_sec)
 

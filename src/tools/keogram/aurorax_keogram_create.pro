@@ -123,7 +123,7 @@ function aurorax_keogram_create, $
     endif
   endif
 
-  ; handle creation of spectrograph keograms seperately
+  ; handle creation of spectrograph keograms separately
   if keyword_set(spectra) then begin
     instrument_type = 'spectrograph'
 

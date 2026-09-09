@@ -38,11 +38,11 @@
 ;+
 function aurorax_mosaic_prep_skymap, skymap_list, altitude_km
   if typename(skymap_list) ne 'LIST' then begin
-    print, '[aurorax_mosaic_prep_skymap] Error: Input skymaps must be stored in a list. Recieved type: ' + typename(skymap_list)
+    print, '[aurorax_mosaic_prep_skymap] Error: Input skymaps must be stored in a list. Received type: ' + typename(skymap_list)
     return, !null
   endif
   if not isa(altitude_km, /scalar) then begin
-    print, '[aurorax_mosaic_prep_skymap] Error: Altitude must be a scalar. Recieved type: ' + typename(altitude_km)
+    print, '[aurorax_mosaic_prep_skymap] Error: Altitude must be a scalar. Received type: ' + typename(altitude_km)
     return, !null
   endif
 

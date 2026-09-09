@@ -99,15 +99,23 @@ pro aurorax_test_metadata_filters
   mf = aurorax_create_metadata_filter(expressions)
   atest_equal, mf.logical_operator, 'AND', 'the logical operator defaults to AND'
 
-  ; KNOWN BUG: aurorax_create_metadata_filter computes an `operator` local
-  ; from the keywords and then ignores it, hardcoding 'AND' into the struct
-  ; (aurorax_metadata_filters.pro:147). /operator_or is therefore silently
-  ; dropped. This assertion pins the current behaviour so the suite stays
-  ; green; when the bug is fixed it will fail, and should be changed to
-  ; expect 'OR'.
+  ; Regression test. The operator used to be computed from the keywords and
+  ; then discarded, with 'AND' hardcoded into the struct -- so /operator_or
+  ; was silently dropped and the search quietly ANDed instead.
   mf = aurorax_create_metadata_filter(expressions, /operator_or)
-  atest_equal, mf.logical_operator, 'AND', $
-    '/operator_or currently still yields AND (known bug -- the operator is computed then discarded)'
+  atest_equal, mf.logical_operator, 'OR', '/operator_or gives OR'
+
+  ; and the choice has to survive into the query the API actually receives
+  ground = list(aurorax_create_criteria_block(programs = ['themis-asi'], metadata_filters = mf, /ground))
+  space = list(aurorax_create_criteria_block(programs = ['swarm'], /space))
+  post_str = __aurorax_conjunctions_create_post_str(0, '2020-01-01T00:00:00', '2020-01-01T23:59:59', $
+    500, 1, !null, !null, ground, space, !null, !null, 0)
+
+  atest_valid_json, post_str, 'an OR filtered query serializes', parsed = q
+  if (n_elements(q) ne 0) then begin
+    filters = ((q['ground'])[0])['ephemeris_metadata_filters']
+    atest_equal, filters['logical_operator'], 'OR', 'the OR operator reaches the payload'
+  endif
 
   ; -----------------------------------------------------------
   atest_suite, 'metadata filters -- reach the conjunction payload'

@@ -45,7 +45,7 @@ pro aurorax_example_data_products_search
   ;
   ; An important part of being able to utilize the metadata filters is knowing the available keys and values. Each data
   ; source record has an attribute named `data_product_metadata_schema`. You can view this information by retrieving
-  ; data sources (using the `aurorax_list_sources()` or `aurorax_get_source()` functions) and exploring their
+  ; data sources (using the `aurorax_list_sources()` function) and exploring their
   ; `data_product_metadata_schema` attributes.
   ;
   ; Let's look at a simple example where we search for data product data filtering for specifically daily keograms for

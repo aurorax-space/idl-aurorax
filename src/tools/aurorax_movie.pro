@@ -68,6 +68,6 @@ pro aurorax_movie, input_filenames, output_filename, fps
 
   ; Close video and print user message.
   vid = 0
-  print, 'Video succesfully created at ''' + output_filename + '''.'
+  print, 'Video successfully created at ''' + output_filename + '''.'
   error:
 end

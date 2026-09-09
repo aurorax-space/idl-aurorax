@@ -144,7 +144,7 @@ function aurorax_create_metadata_filter, expressions, operator_and = and_kw, ope
   endelse
 
   ; create struct
-  obj = {logical_operator: 'AND', expressions: expressions}
+  obj = {logical_operator: operator, expressions: expressions}
 
   ; return
   return, obj

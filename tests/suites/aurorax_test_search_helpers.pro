@@ -47,14 +47,19 @@ pro aurorax_test_search_helpers
   atest_equal, __aurorax_time2string(65.0d), '1 minute, 5.0 seconds', 'one minute and change'
   atest_equal, __aurorax_time2string(125.5d), '2 minutes, 5.5 seconds', 'several minutes is plural'
 
-  ; KNOWN BUG: there is no hours handling, and the minutes field is taken
-  ; modulo 60, so anything at or beyond an hour loses the hours entirely --
-  ; one hour renders as "0 minutes". Pinned here so the behaviour is
-  ; visible; a long conjunction search really can run this long.
-  atest_equal, __aurorax_time2string(3600.0d), '0 minutes, 0.0 seconds', $
-    'one hour renders as 0 minutes (known bug -- no hours support, minutes wrap at 60)'
-  atest_equal, __aurorax_time2string(3665.0d), '1 minute, 5.0 seconds', $
-    'an hour and five seconds is indistinguishable from 65 seconds (known bug)'
+  ; Regression test. There used to be no hours handling, and the minutes
+  ; field is taken modulo 60, so an hour-long search reported itself as
+  ; "0 minutes, 0.0 seconds" -- and an hour and five seconds was
+  ; indistinguishable from sixty-five seconds.
+  atest_equal, __aurorax_time2string(3600.0d), '1 hour, 0 minutes, 0.0 seconds', 'exactly one hour'
+  atest_equal, __aurorax_time2string(3665.0d), '1 hour, 1 minute, 5.0 seconds', $
+    'an hour and change is distinguishable from sixty-five seconds'
+  atest_equal, __aurorax_time2string(7325.5d), '2 hours, 2 minutes, 5.5 seconds', $
+    'several hours is plural'
+  atest_equal, __aurorax_time2string(3660.0d), '1 hour, 1 minute, 0.0 seconds', $
+    'a single minute past the hour stays singular'
+  atest_not_equal, __aurorax_time2string(3665.0d), __aurorax_time2string(65.0d), $
+    'an hour and five seconds no longer collides with sixty-five seconds'
 
   ; -----------------------------------------------------------
   atest_suite, 'request id extraction'

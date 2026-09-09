@@ -85,11 +85,11 @@ function aurorax_keogram_add_axis, $
   ; If date is supplied for magnetic transformations, check correct format
   if keyword_set(aacgm_date) then begin
     if ~isa(aacgm_date, /string, /scalar) then begin
-      print, '[aurorax_bounding_box_extract_metric] Error: keyword ''aacgm_date'' should be a scalar string in the format "YYYY-MM-DD"'
+      print, '[aurorax_keogram_add_axis] Error: keyword ''aacgm_date'' should be a scalar string in the format "YYYY-MM-DD"'
       return, !null
     endif
     if (strlen(aacgm_date) ne 10) or (strmid(aacgm_date,4,1) ne '-') or (strmid(aacgm_date,7,1) ne '-') then begin
-      print, '[aurorax_bounding_box_extract_metric] Error: keyword ''aacgm_date'' should be a scalar string in the format "YYYY-MM-DD"'
+      print, '[aurorax_keogram_add_axis] Error: keyword ''aacgm_date'' should be a scalar string in the format "YYYY-MM-DD"'
       return, !null
     endif
   endif

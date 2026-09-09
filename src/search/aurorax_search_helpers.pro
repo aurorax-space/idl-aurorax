@@ -52,7 +52,6 @@ function __aurorax_datetime_parser, input_str, interpret_as_start = start_kw, in
   ; string in the YYYY-MM-DDTHH:MM:SS format that will be used by the AuroraX
   ; API as part of requests
   dt_str = ''
-  leap_years = [1980, 1984, 1988, 1992, 1996, 2000, 2004, 2008, 2012, 2016, 2020, 2024, 2028, 2032, 2036, 2040]
 
   ; set flags
   start_flag = 1
@@ -97,7 +96,8 @@ function __aurorax_datetime_parser, input_str, interpret_as_start = start_kw, in
       if (mm eq 2) then begin
         yy = fix(strmid(ts_str, 0, 4))
         month_days = 28
-        if (where(yy eq leap_years) ne -1) then month_days = 29 ; is leap year
+        is_leap_year = (((yy mod 4) eq 0) and ((yy mod 100) ne 0)) or ((yy mod 400) eq 0)
+        if (is_leap_year eq 1) then month_days = 29
       endif
       dt_str = ts_str + string(month_days, format = '(i2.2)') + '235959'
     endelse
@@ -165,8 +165,18 @@ function __aurorax_time2string, time
   ; minutes
   tempTime = floor(tempTime / 60)
   if tempTime eq 0 then return, result
-  unit = (tempTime mod 60) eq 1 ? ' minute, ' : ' minutes, '
-  result = strtrim(string(tempTime mod 60, format = '(i2)') + unit + result, 2)
+  minutes = tempTime mod 60
+  unit = minutes eq 1 ? ' minute, ' : ' minutes, '
+  result = strtrim(string(minutes, format = '(i0)') + unit + result, 2)
+
+  ; hours
+  ;
+  ; NOTE: the minutes above are taken modulo 60, so without this an hour-long
+  ; search would report itself as '0 minutes'.
+  tempTime = floor(tempTime / 60)
+  if tempTime eq 0 then return, result
+  unit = tempTime eq 1 ? ' hour, ' : ' hours, '
+  result = strtrim(string(tempTime, format = '(i0)') + unit + result, 2)
 
   ; return
   return, result

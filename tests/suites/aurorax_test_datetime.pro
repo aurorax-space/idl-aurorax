@@ -88,13 +88,21 @@ pro aurorax_test_datetime
   atest_equal, __aurorax_datetime_parser('201602', /interpret_as_end), '2016-02-29T23:59:59', 'February 2016 -> 29 days (leap)'
   atest_equal, __aurorax_datetime_parser('200002', /interpret_as_end), '2000-02-29T23:59:59', 'February 2000 -> 29 days (leap century)'
 
-  ; KNOWN LIMITATION: leap years come from a hardcoded list spanning 1980-2040
-  ; (aurorax_search_helpers.pro:55). February in a leap year outside that range
-  ; is treated as 28 days. Pinned here so the behaviour is visible; if the list
-  ; is ever replaced with a real calculation, this assertion should be updated
-  ; to expect the 29th.
-  atest_equal, __aurorax_datetime_parser('204402', /interpret_as_end), '2044-02-28T23:59:59', $
-    'February 2044 -> 28 days (known limitation: outside the hardcoded leap year list)'
+  ; Regression test. Leap years used to come from a list hardcoded to
+  ; 1980-2040, so February in a leap year outside that span was silently
+  ; treated as 28 days. They are now worked out properly.
+  atest_equal, __aurorax_datetime_parser('204402', /interpret_as_end), '2044-02-29T23:59:59', $
+    'February 2044 -> 29 days (beyond the old hardcoded list)'
+  atest_equal, __aurorax_datetime_parser('197602', /interpret_as_end), '1976-02-29T23:59:59', $
+    'February 1976 -> 29 days (before the old hardcoded list)'
+
+  ; the century rule, which a naive "divisible by four" check would get wrong
+  atest_equal, __aurorax_datetime_parser('190002', /interpret_as_end), '1900-02-28T23:59:59', $
+    'February 1900 -> 28 days (divisible by 100 but not 400)'
+  atest_equal, __aurorax_datetime_parser('210002', /interpret_as_end), '2100-02-28T23:59:59', $
+    'February 2100 -> 28 days (divisible by 100 but not 400)'
+  atest_equal, __aurorax_datetime_parser('240002', /interpret_as_end), '2400-02-29T23:59:59', $
+    'February 2400 -> 29 days (divisible by 400)'
 
   ; -----------------------------------------------------------
   atest_suite, 'datetime parser -- input is not mutated'

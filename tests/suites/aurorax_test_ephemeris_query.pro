@@ -120,16 +120,40 @@ pro aurorax_test_ephemeris_query
   atest_suite, 'data product query -- data product type filter'
   ; -----------------------------------------------------------
   ;
-  ; KNOWN BUG: the builder assigns the data product type filter onto
-  ; data_sources_struct, which has no such tag -- the tag lives on
-  ; post_struct instead (aurorax_data_products.pro:48). Supplying
-  ; data_product_types therefore faults. Pinned here so the breakage is
-  ; recorded rather than discovered by a user.
-  atest_note, 'the next call raises from inside the library -- that output is expected'
-  atest_raises, $
-    'junk = __aurorax_data_product_create_post_str(0, ''2020-01-01T00:00:00'', ' + $
-    '''2020-01-01T23:59:59'', [''themis-asi''], !null, !null, [''keogram''], !null)', $
-    'supplying data_product_types faults (known bug -- assigned to a tag that does not exist)'
+  ; Regression test. The filter used to be assigned onto data_sources_struct,
+  ; which has no such tag -- so supplying data_product_types faulted, and
+  ; would have been a no-op even if the tag had existed, since post_struct
+  ; was already built by value. It now goes onto post_struct directly.
+  post_str = __aurorax_data_product_create_post_str(0, '2020-01-01T00:00:00', '2020-01-01T23:59:59', $
+    ['themis-asi'], !null, !null, ['keogram'], !null)
+
+  atest_valid_json, post_str, 'a query with a data product type filter serializes', parsed = q
+  if (n_elements(q) ne 0) then begin
+    atest_has_key, q, 'data_product_type_filters', 'the payload carries a data product type filter'
+    atest_n_elements, q['data_product_type_filters'], 1, 'one data product type was requested'
+    atest_equal, (q['data_product_type_filters'])[0], 'keogram', 'the requested type reaches the payload'
+  endif
+
+  ; several types at once
+  post_str = __aurorax_data_product_create_post_str(0, '2020-01-01T00:00:00', '2020-01-01T23:59:59', $
+    ['themis-asi'], !null, !null, ['keogram', 'montage'], !null)
+
+  atest_valid_json, post_str, 'a query with several data product types serializes', parsed = q
+  if (n_elements(q) ne 0) then begin
+    atest_n_elements, q['data_product_type_filters'], 2, 'both data product types were carried'
+    atest_equal, (q['data_product_type_filters'])[1], 'montage', 'the second type keeps its place'
+  endif
+
+  ; omitting the filter leaves the list empty rather than absent, so the API
+  ; always sees a well formed field
+  post_str = __aurorax_data_product_create_post_str(0, '2020-01-01T00:00:00', '2020-01-01T23:59:59', $
+    ['themis-asi'], !null, !null, !null, !null)
+
+  atest_valid_json, post_str, 'a query with no data product type filter serializes', parsed = q
+  if (n_elements(q) ne 0) then begin
+    atest_has_key, q, 'data_product_type_filters', 'the field is present even when unused'
+    atest_n_elements, q['data_product_type_filters'], 0, 'and is empty when unused'
+  endif
 
   ; -----------------------------------------------------------
   atest_suite, 'availability -- date validation happens before any request'

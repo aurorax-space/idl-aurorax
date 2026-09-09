@@ -30,7 +30,7 @@
 ;       cal_rayleighs: in, optional, Struct
 ;         the rayleighs calibration to use (if desired), usually a result of reading a calibration file
 ;       exposure_length_sec: in, optional, Float
-;         the exposure length for the image data being calibrated, defaults to 3.0
+;         the exposure length for the image data being calibrated, defaults to 2.0
 ;       no_dark_subtract: in, optional, Boolean
 ;         omits the dark subtraction step of the calibration process
 ;

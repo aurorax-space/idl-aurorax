@@ -124,31 +124,37 @@ reads the log knows the noise is deliberate.
 
 ## Conventions
 
-**Pin bugs rather than working around them.** Several tests assert behaviour
-that is wrong, marked `KNOWN BUG` or `KNOWN LIMITATION` with an explanation
-and, where it is short, the fix. This keeps the suite green so a real
-regression stands out, while keeping the defect visible. When one gets
-fixed, its test will fail — update it to expect the correct behaviour. The
-ones recorded today:
+**Pin a bug rather than working around it.** If you find a defect you are
+not fixing in the same change, assert the current behaviour and mark it
+`KNOWN BUG` or `KNOWN LIMITATION`, with an explanation and — where it is
+short — the fix. That keeps the suite green so a real regression stands out,
+while keeping the defect visible. When someone fixes it, the test fails and
+gets updated to expect the correct behaviour.
 
-- `aurorax_create_metadata_filter` computes a logical operator from its
-  keywords and then hardcodes `'AND'`, so `/operator_or` is silently dropped.
-- `__aurorax_perform_dark_frame_calibration` clamps negatives with
-  `new_images[where(new_images lt 0)] = 0`; when nothing is negative `where`
-  returns `-1`, which IDL reads as the last element, so the final pixel is
+There are no such markers in the suite right now. The defects the suite
+originally recorded have all been fixed, and their tests now assert the
+correct behaviour instead. They are worth knowing about as regressions to
+watch for:
+
+- `aurorax_create_metadata_filter` computed a logical operator from its
+  keywords and then hardcoded `'AND'`, so `/operator_or` was silently
+  dropped and the search quietly ANDed.
+- `__aurorax_perform_dark_frame_calibration` clamped negatives with
+  `new_images[where(new_images lt 0)] = 0`; with no negative pixel `where`
+  returns `-1`, which IDL reads as the last element, so the final pixel was
   wrongly zeroed.
-- The same routine cannot handle a single 2-D frame at all: its reform guard
-  is undone by the `long()` on the next line, and the frame loop then runs
-  off the end of the array.
-- `__aurorax_time2string` has no hours handling and takes minutes modulo 60,
-  so an hour renders as `0 minutes, 0.0 seconds`.
-- `aurorax_create_advanced_distances_hash` faults, rather than returning
-  cleanly, when the criteria block count is out of range.
-- `__aurorax_data_product_create_post_str` assigns the data product type
-  filter to a tag that does not exist on the struct it targets, so passing
-  `data_product_types` faults.
-- The datetime parser's leap years come from a list hardcoded to 1980–2040,
-  so February in a leap year outside that span is treated as 28 days.
+- The same routine could not handle a single 2-D frame: its reform guard was
+  undone by the `long()` on the next line, and the frame loop then ran off
+  the end of the array.
+- `__aurorax_time2string` had no hours handling and takes minutes modulo 60,
+  so an hour rendered as `0 minutes, 0.0 seconds`.
+- `aurorax_create_advanced_distances_hash` faulted, rather than returning
+  cleanly, when the criteria block count was out of range.
+- `__aurorax_data_product_create_post_str` assigned the data product type
+  filter to a tag that does not exist on the struct it targeted, so passing
+  `data_product_types` faulted.
+- The datetime parser's leap years came from a list hardcoded to 1980–2040,
+  so February in a leap year outside that span was treated as 28 days.
 
 **Build inputs fresh for each test.** IDL passes by reference, and several
 library routines modify their arguments in place — the calibration helpers

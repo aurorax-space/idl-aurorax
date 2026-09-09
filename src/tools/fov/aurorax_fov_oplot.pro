@@ -230,14 +230,12 @@ pro aurorax_fov_oplot, $
   if isa(site_lat, /scalar) then site_lat = [site_lat]
   if isa(site_lon, /scalar) then site_lon = [site_lon]
   if n_elements(site_lat) ne n_elements(site_lon) then begin
-    print, n_elements(site_lat)
-    print, n_elements(site_lon)
-    stop
-    print, '[aurorax_oplot_fov] Error: ensure ''site_lat'' and ''site_lat'' have the same number of elements'
+    print, '[aurorax_oplot_fov] Error: ensure ''site_lat'' and ''site_lon'' have the same number of elements ' + $
+      '(got ' + strtrim(n_elements(site_lat), 2) + ' and ' + strtrim(n_elements(site_lon), 2) + ')'
     goto, error_jump
   endif
 
-  ; Check site_name if supplied and conver to array if scalar
+  ; Check site_name if supplied and convert to array if scalar
   if keyword_set(site_name) then begin
     if not isa(site_name, /string) then begin
       print, '[aurorax_oplot_fov] Error: ensure ''site_name'' is of type String'
@@ -280,7 +278,7 @@ pro aurorax_fov_oplot, $
   endif
   foreach sl, site_lon do begin
     if (sl gt 180.0) or (sl lt -180.0) then begin
-      print, '[aurorax_oplot_fov] Error: ensure ''site_lon'' is within the valid range [-90,90]'
+      print, '[aurorax_oplot_fov] Error: ensure ''site_lon'' is within the valid range [-180,180]'
       goto, error_jump
     endif
   endforeach

@@ -412,7 +412,7 @@ function aurorax_keogram_create_custom, $
     metrics = ['mean', 'median', 'sum', 'percentile']
     if not keyword_set(metric) then metric = 'median'
     if where(metric eq metrics, /null) eq !null then begin
-      print, '(aurorax_bounding_box_extract_metric) Error: Metric ''' + string(metric) + ''' not recognized. Accepted metrics are: ' + strjoin(metrics, ',') + '.'
+      print, '[aurorax_keogram_create_custom] Error: Metric ''' + string(metric) + ''' not recognized. Accepted metrics are: ' + strjoin(metrics, ',') + '.'
       return, !null
     endif
 
@@ -484,7 +484,7 @@ function aurorax_keogram_create_custom, $
         preview_img[1 : *, x_idx_inside, y_idx_inside] = 255
       endif
     endif else begin
-      print, '[aurorax_keogram_create_custom] Error: Urecognized image shape of ' + strcompress(string(image_shape), /remove_all) + '.'
+      print, '[aurorax_keogram_create_custom] Error: Unrecognized image shape of ' + strcompress(string(image_shape), /remove_all) + '.'
       return, !null
     endelse
     path_counter += 1

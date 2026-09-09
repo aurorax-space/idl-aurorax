@@ -73,7 +73,7 @@ pro aurorax_example_create_mosaic_trex_spectrograph
     spect_skymap_list.add, skymap
   endforeach
 
-  ; Prep the ASI and spectrograph data/skymaps seperately
+  ; Prep the ASI and spectrograph data/skymaps separately
   altitude_km = 115.0
   prepped_asi_images = aurorax_mosaic_prep_images(image_list)
   prepped_asi_skymaps = aurorax_mosaic_prep_skymap(skymap_list, altitude_km)

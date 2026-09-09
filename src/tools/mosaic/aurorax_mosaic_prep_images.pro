@@ -146,17 +146,17 @@ function aurorax_mosaic_prep_images, $
 
   ; check that input emissions are valid
   if keyword_set(spect_emission) and (keyword_set(spect_band_signal) or keyword_set(spect_band_bg)) then begin
-    print, '[aurorax_spectra_get_intensity] Error: only one of ''spect_emission'' and ''spect_band_signal''/''spect_band_bg'' may be set'
+    print, '[aurorax_mosaic_prep_images] Error: only one of ''spect_emission'' and ''spect_band_signal''/''spect_band_bg'' may be set'
     return, !null
   endif else if ~keyword_set(spect_emission) and ~keyword_set(spect_band_signal) then begin
     spect_emission = 'green'
   endif else if keyword_set(spect_emission) then begin
     if ~isa(spect_emission, /string) then begin
-      print, '[aurorax_spectra_get_intensity] Error: ''spect_emission'' must be a string'
+      print, '[aurorax_mosaic_prep_images] Error: ''spect_emission'' must be a string'
       return, !null
     endif
     if where(['hbeta', 'blue', 'green', 'red'] eq spect_emission, /null) eq !null then begin
-      print, '[aurorax_spectra_get_intensity] Error: input spect_emission=''' + spect_emission + ''' is not recognized... ' + $
+      print, '[aurorax_mosaic_prep_images] Error: input spect_emission=''' + spect_emission + ''' is not recognized... ' + $
         'please select one of [''hbeta'', ''blue'', ''green'', ''red''], or pass in a manual wavelength range with ''spect_band_signal'''
       return, !null
     endif
@@ -176,14 +176,14 @@ function aurorax_mosaic_prep_images, $
   endif else if isa(spect_band_signal) then begin
     ; manually supplied wavelength range for integration
     if n_elements(spect_band_signal) ne 2 or (~isa(spect_band_signal, /float) and ~isa(spect_band_signal, /int)) then begin
-      print, '[aurorax_spectra_get_intensity] Error: ''spect_band_signal'' must be a 2-element array of wavelengths'
+      print, '[aurorax_mosaic_prep_images] Error: ''spect_band_signal'' must be a 2-element array of wavelengths'
       return, !null
     endif
     wavelength_range = spect_band_signal
 
     if isa(spect_band_bg) then begin
       if n_elements(spect_band_bg) ne 2 or (~isa(spect_band_bg, /float) and ~isa(spect_band_bg, /int)) then begin
-        print, '[aurorax_spectra_get_intensity] Error: ''spect_band_bg'' must be a 2-element array of wavelengths'
+        print, '[aurorax_mosaic_prep_images] Error: ''spect_band_bg'' must be a 2-element array of wavelengths'
         return, !null
       endif
       wavelength_bg_range = spect_band_bg

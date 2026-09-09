@@ -149,6 +149,14 @@ function aurorax_create_advanced_distances_hash, distance, $
     events_count = events_count, $
     custom_count = custom_count)
 
+  ; bail out if the block counts were rejected
+  ;
+  ; NOTE: the derive function signals a bad block count by handing back an
+  ; empty hash instead of a list, and has already printed the reason. Without
+  ; this check we would go on to build a zero-length array from it and index
+  ; the result, faulting instead of returning something the caller can test.
+  if (typename(keys) ne 'LIST' or n_elements(keys) eq 0) then return, !null
+
   ; create hash object
   values = intarr(n_elements(keys))
   for i = 0, n_elements(values) - 1 do begin
@@ -186,6 +194,11 @@ function __aurorax_conjunctions_create_post_str, $
       ' have been supplied. Please reduce the count and try again.'
     return, list()
   endif
+  if (criteria_block_count lt 2) then begin
+    __aurorax_message, 'Error: not enough criteria blocks, a conjunction needs at least 2 and ' + $
+      string(criteria_block_count, format = '(I0)') + ' have been supplied. Please add another and try again.'
+    return, list()
+  endif
 
   ; set distance
   if (isa(distance, /integer) eq 1 or isa(distance, /float) eq 1) then begin
@@ -209,7 +222,14 @@ function __aurorax_conjunctions_create_post_str, $
         'and try again (in most cases, the object is missing pairings)'
       return, list()
     endelse
-  endif
+  endif else begin
+    __aurorax_message, 'Error: distance must be a number or a hash of criteria block pairings, but ' + $
+      'a ' + typename(distance) + ' was supplied. Please correct it and try again.'
+    return, list()
+  endelse
+
+  ; the distances helper returns !null if it could not build the pairings
+  if (n_elements(distances_hash) eq 0) then return, list()
 
   ; set conjunction types
   conjunction_types = list()
