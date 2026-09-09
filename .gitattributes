@@ -1,0 +1,13 @@
+# Line endings
+#
+# Text is stored LF in the repository and checked out CRLF, which is what
+# this project already does by way of core.autocrlf. Stating it here makes
+# it a property of the repository rather than of each contributor's Git
+# config, so a checkout is consistent either way -- and an editor or script
+# that writes the "wrong" endings can no longer turn a one-line change into
+# a whole-file diff.
+#
+# text=auto lets Git decide what is text; anything it detects as binary is
+# left alone. Do not add an `eol` override for a path you want left as-is:
+# `eol` implies textness, so it wins over `-text` and forces conversion.
+*   text=auto eol=crlf
