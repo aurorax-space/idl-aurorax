@@ -107,7 +107,7 @@ end
 
 ;+
 ; :Description:
-;       Read data files that were downloaded from the UCalgary Open Data Platform.
+;       Read data files that were downloaded from the UCalgary Open Science Platform.
 ;
 ; :Parameters:
 ;       dataset: in, required, Struct

@@ -51,7 +51,7 @@ end
 
 ;+
 ; :Description:
-;       Download data from the UCalgary Open Data Platform, for the given
+;       Download data from the UCalgary Open Science Platform, for the given
 ;       dataset, timeframe, and optional site/device.
 ;
 ; :Parameters:
