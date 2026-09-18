@@ -17,7 +17,7 @@
 ;+
 ; :Description:
 ;       Retrieve the URLs of files available for download from the UCalgary
-;       Open Data Platform, for the given dataset, timeframe, and optional
+;       Open Science Platform, for the given dataset, timeframe, and optional
 ;       site/device. This function is used by the aurorax_ucalgary_download()
 ;       function.
 ;

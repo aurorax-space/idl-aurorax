@@ -23,7 +23,7 @@ pro aurorax_example_montage_smile_asi
   ; Montages are simply a series of images displayed as a grid.
   ;
   ; Note that montages are included in the automatically-generated summary
-  ; products available on the Open Data Platform:
+  ; products available on the Open Science Platform:
   ;     https://data-portal.phys.ucalgary.ca/archive/smile_asi/montage
   ;
   ; This crib sheet walks through the process of creating your own montage
