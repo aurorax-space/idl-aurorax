@@ -54,8 +54,8 @@
 ;       Hash
 ;
 ; :Examples:
-;       expression = aurorax_create_metadata_filter_expression('calgary_apa_ml_v1',list('classified as APA'),/OPERATOR_IN)
-;       expression = aurorax_create_metadata_filter_expression('calgary_apa_ml_v1_confidence',95,/OPERATOR_GE)
+;       expression = aurorax_create_metadata_filter_expression('ucalgary_themis_apa_ml_v2',list('classified as APA'),/OPERATOR_IN)
+;       expression = aurorax_create_metadata_filter_expression('ucalgary_themis_apa_ml_v2_confidence',95,/OPERATOR_GE)
 ;       expression = aurorax_create_metadata_filter_expression('tii_on','true',/OPERATOR_IN)
 ;       expression = aurorax_create_metadata_filter_expression('tii_quality_vixh','0,2',/OPERATOR_BETWEEN)
 ;+
@@ -128,8 +128,8 @@ end
 ;       Hash
 ;
 ; :Examples:
-;       expression1 = aurorax_create_metadata_filter_expression('calgary_apa_ml_v1', list('classified as APA'),/OPERATOR_IN)
-;       expression2 = aurorax_create_metadata_filter_expression('calgary_apa_ml_v1_confidence', 95,/OPERATOR_GE)
+;       expression1 = aurorax_create_metadata_filter_expression('ucalgary_themis_apa_ml_v2', list('classified as APA'),/OPERATOR_IN)
+;       expression2 = aurorax_create_metadata_filter_expression('ucalgary_themis_apa_ml_v2_confidence', 95,/OPERATOR_GE)
 ;       expressions = list(expression1, expression2)
 ;       metadata_filters = aurorax_create_metadata_filter(expressions,/OPERATOR_AND)
 ;+

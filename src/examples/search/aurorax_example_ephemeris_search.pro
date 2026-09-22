@@ -24,8 +24,8 @@ pro aurorax_example_ephemeris_search
   ; data in several formats (geodetic lat/lon, geomagnetic lat/lon, GSM coordinates), along with metadata that enables
   ; enhanced filtering.
   ;
-  ; More information about ephemeris records in AuroraX can be found at https://docs.aurorax.space/about_the_data/overview/
-  ; and https://docs.aurorax.space/about_the_data/categories/#ephemeris.
+  ; More information about ephemeris records in AuroraX can be found at https://aurorax.space/docs/data/overview
+  ; and https://aurorax.space/docs/data/categories#ephemeris.
   ;
   ; A common stumbling block for making search queries is being unclear on the values that you can use for the program,
   ; platform, instrument type, etc. The AuroraX search engine is underpinned by 'data sources', and this is where the

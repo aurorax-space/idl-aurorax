@@ -1,6 +1,6 @@
 <a href="https://aurorax.space/"><img alt="AuroraX" src="logo.svg" height="60"></a>
 
-![Stable version](https://img.shields.io/badge/Latest%20stable%20release-v1.10.1-blue)
+![Stable version](https://img.shields.io/badge/Latest%20stable%20release-v1.10.2-blue)
 ![IDL version required](https://img.shields.io/badge/IDL-8.8.3%2B-blue)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.12532077.svg)](https://doi.org/10.5281/zenodo.12532077)
 
@@ -10,16 +10,16 @@ IDL-AuroraX officially supports IDL 8.8.3+.
 
 Some links to help:
 - [AuroraX main website](https://aurorax.space)
-- [IDL-AuroraX documentation](https://docs.aurorax.space/code/overview)
+- [IDL-AuroraX documentation](https://aurorax.space/docs/developer/idl-aurorax)
 - [Browse releases](https://github.com/aurorax-space/idl-aurorax/releases)
-- [Example gallery](https://data.phys.ucalgary.ca/working_with_data/index.html#idl)
+- [Example gallery](https://data.phys.ucalgary.ca/tools/software/crib_sheets/idl.html)
 
 ## Usage
 
 For usage details, please visit the AuroraX documentation website, and the basic examples section.
 
-- [IDL-AuroraX documentation](https://docs.aurorax.space/code/overview)
-- [Example gallery](https://data.phys.ucalgary.ca/working_with_data/index.html#idl)
+- [IDL-AuroraX documentation](https://aurorax.space/docs/developer/idl-aurorax)
+- [Example gallery](https://data.phys.ucalgary.ca/tools/software/crib_sheets/idl.html)
 
 ## Installation
 

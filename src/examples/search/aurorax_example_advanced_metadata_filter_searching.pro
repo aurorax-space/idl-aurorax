@@ -60,9 +60,10 @@ pro aurorax_example_advanced_metadata_filter_searching
   ; ---------------------
   ;
   ; For some metadata filter keys, the values are a numerical number. For example, the values for the
-  ; `calgary_cloud_ml_v1` key are a string/list-of-strings, but the `calgary_cloud_ml_v1_confidence` key is a
-  ; number between 0 and 100. To integrate these numerical keys into our expressions, we have a few different
-  ; operators at our disposal: `=`, `!=`, `>`, `<`, `>=`, `<=`, and `between`.
+  ; `ucalgary_themis_cloud_ml_v2` key are a string/list-of-strings, but the
+  ; `ucalgary_themis_cloud_ml_v2_confidence` key is a number between 0 and 100. To integrate these numerical
+  ; keys into our expressions, we have a few different operators at our disposal: `=`, `!=`, `>`, `<`, `>=`,
+  ; `<=`, and `between`.
 
   ; Let's have a look at a simple example using the `>=` operator. We're going to find conjunctions with Swarm
   ; where the UCalgary cloud ML model thinks any THEMIS ASI data is not cloudy and that classification has
@@ -228,8 +229,8 @@ pro aurorax_example_advanced_metadata_filter_searching4
 
   ; set ground criteria block
   expressions = list( $
-    aurorax_create_metadata_filter_expression('calgary_cloud_ml_v1', 'classified as not cloudy', /operator_in), $
-    aurorax_create_metadata_filter_expression('calgary_cloud_ml_v1_confidence', 75, /operator_ge))
+    aurorax_create_metadata_filter_expression('ucalgary_themis_cloud_ml_v2', 'classified as not cloudy', /operator_in), $
+    aurorax_create_metadata_filter_expression('ucalgary_themis_cloud_ml_v2_confidence', 75, /operator_ge))
   metadata_filters = aurorax_create_metadata_filter(expressions, /operator_and)
   ground = list(aurorax_create_criteria_block(programs = ['themis-asi'], metadata_filters = metadata_filters, /ground))
 
@@ -254,8 +255,8 @@ pro aurorax_example_advanced_metadata_filter_searching5
 
   ; set ground criteria block
   expressions = list( $
-    aurorax_create_metadata_filter_expression('calgary_cloud_ml_v1', 'classified as not cloudy', /operator_in), $
-    aurorax_create_metadata_filter_expression('calgary_cloud_ml_v1_confidence', [75, 90], /operator_between))
+    aurorax_create_metadata_filter_expression('ucalgary_themis_cloud_ml_v2', 'classified as not cloudy', /operator_in), $
+    aurorax_create_metadata_filter_expression('ucalgary_themis_cloud_ml_v2_confidence', [75, 90], /operator_between))
   metadata_filters = aurorax_create_metadata_filter(expressions, /operator_and)
   ground = list(aurorax_create_criteria_block(programs = ['themis-asi'], metadata_filters = metadata_filters, /ground))
 

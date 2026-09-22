@@ -84,8 +84,8 @@ pro aurorax_test_metadata_filters
   ; -----------------------------------------------------------
   atest_suite, 'metadata filters -- assembly'
   ; -----------------------------------------------------------
-  e1 = aurorax_create_metadata_filter_expression('calgary_apa_ml_v1', list('classified as APA'), /operator_in)
-  e2 = aurorax_create_metadata_filter_expression('calgary_apa_ml_v1_confidence', 95, /operator_ge)
+  e1 = aurorax_create_metadata_filter_expression('ucalgary_themis_apa_ml_v2', list('classified as APA'), /operator_in)
+  e2 = aurorax_create_metadata_filter_expression('ucalgary_themis_apa_ml_v2_confidence', 95, /operator_ge)
   expressions = list(e1, e2)
 
   mf = aurorax_create_metadata_filter(expressions, /operator_and)

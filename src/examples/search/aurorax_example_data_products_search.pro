@@ -21,8 +21,8 @@ pro aurorax_example_data_products_search
   ; The AuroraX database also includes records describing data products for auroral data, such as keograms,
   ; montages, summary plots, etc. We can search for data products much we searching for ephemeris and conjunctions.
   ;
-  ; More information about data product records can be found at https://docs.aurorax.space/about_the_data/overview/
-  ; and https://docs.aurorax.space/about_the_data/categories/#data-products
+  ; More information about data product records can be found at https://aurorax.space/docs/data/overview
+  ; and https://aurorax.space/docs/data/categories#data-products
   ;
   ; A common stumbling block for making search queries is being unclear on the values that you can use for the
   ; program, platform, instrument type, etc. The AuroraX search engine is underpinned by 'data sources', and

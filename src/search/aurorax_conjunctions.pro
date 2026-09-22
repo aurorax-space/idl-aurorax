@@ -391,8 +391,8 @@ end
 ;       distance = 500
 ;       start_ts = '2008-01-01T00:00:00'
 ;       end_ts = '2008-01-31T23:59:59'
-;       expression1 = aurorax_create_metadata_filter_expression('calgary_apa_ml_v1', list('classified as APA'),/OPERATOR_IN)
-;       expression2 = aurorax_create_metadata_filter_expression('calgary_apa_ml_v1_confidence', 95,/OPERATOR_GE)
+;       expression1 = aurorax_create_metadata_filter_expression('ucalgary_themis_apa_ml_v2', list('classified as APA'),/OPERATOR_IN)
+;       expression2 = aurorax_create_metadata_filter_expression('ucalgary_themis_apa_ml_v2_confidence', 95,/OPERATOR_GE)
 ;       expressions = list(expression1, expression2)
 ;       ground_metadata_filters = aurorax_create_metadata_filter(expressions,/OPERATOR_AND)
 ;       ground1 = aurorax_create_criteria_block(programs=['themis-asi'],metadata_filters=ground_metadata_filters,/GROUND)

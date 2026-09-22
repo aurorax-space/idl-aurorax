@@ -1,3 +1,11 @@
+Version 1.10.2 (2026-09-22)
+-------------------------
+- updated crib sheets to bring in line with the newly-released ML models
+- updated examples and docstrings to use the `ucalgary_themis_apa_ml_v2` and `ucalgary_themis_cloud_ml_v2` metadata filter keys, replacing the retired `calgary_apa_ml_v1` and `calgary_cloud_ml_v1` keys
+- updated documentation links to the new docs website at https://aurorax.space/docs
+- removed the OATH model examples from `aurorax_example_ml_enhanced_searching`
+
+
 Version 1.10.1 (2026-09-09)
 -------------------------
 - added a test suite, see `tests/README.md` for how to run it
