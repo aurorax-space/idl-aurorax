@@ -1,9 +1,7 @@
 Version 1.10.2 (2026-09-22)
 -------------------------
-- updated crib sheets to bring in line with the newly-released ML models
-- updated examples and docstrings to use the `ucalgary_themis_apa_ml_v2` and `ucalgary_themis_cloud_ml_v2` metadata filter keys, replacing the retired `calgary_apa_ml_v1` and `calgary_cloud_ml_v1` keys
-- updated documentation links to the new docs website at https://aurorax.space/docs
-- removed the OATH model examples from `aurorax_example_ml_enhanced_searching`
+- updated machine learning metadata filter examples and tests to use the new v2 THEMIS ASI model keys (`ucalgary_themis_apa_ml_v2` and `ucalgary_themis_cloud_ml_v2`, and their `_confidence` counterparts)
+- updated all documentation links to the new AuroraX documentation site, as docs.aurorax.space has been retired in favour of https://aurorax.space/docs
 
 
 Version 1.10.1 (2026-09-09)
