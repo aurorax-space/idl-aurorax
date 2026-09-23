@@ -54,7 +54,10 @@ pro aurorax_example_atm_forward_custom_neutral_profile
   output_flags = aurorax_atm_forward_get_output_flags(/set_all_true)
 
   ; run model, using our custom neutral profile as input
-  result = aurorax_atm_forward(time_stamp, latitude, longitude, output_flags, custom_neutral_profile=custom_neutral_profile_arr)
+  result = aurorax_atm_forward(time_stamp, latitude, longitude, output_flags, $
+                               maxwellian_energy_flux = 10.0, $
+                               maxwellian_characteristic_energy = 5000.0, $
+                               custom_neutral_profile=custom_neutral_profile_arr)
   data = result.data
 
   ; print results

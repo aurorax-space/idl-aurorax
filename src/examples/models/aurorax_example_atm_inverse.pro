@@ -42,15 +42,16 @@ pro aurorax_example_atm_inverse
   ; We can also do a request and specify the output flags to return everything that the ATM 'inverse'
   ; endpoint has to offer. Below, we're going to do that and plot all data.
   ;
-  ; For this request, we're going to also change the precipitation flux spectral type to maxwellian, to
-  ; illustrate that either 'gaussian' or 'maxwellian' can be used.
+  ; For this request we use the maxwellian spectral type (the first example used gaussian). The spectral
+  ; type is required.
   aurorax_example_atm_inverse2
 
   ; --------------------------------
   ; Inverse calculation and pass results back into a forward calculation
   ; --------------------------------
   ;
-  ; Lastly, we can do an inversion calculation and then feed the results back into the forward routine.
+  ; Lastly, we can do an inversion calculation and then feed the results back into the forward routine,
+  ; passing the inverted mean energy as maxwellian_mean_energy.
   aurorax_example_atm_inverse3
 end
 
@@ -85,6 +86,7 @@ pro aurorax_example_atm_inverse1
     intensity_5577, $
     intensity_6300, $
     intensity_8446, $
+    precipitation_flux_spectral_type = 'gaussian', $
     output_flags)
   print, '[Simple example] Calculation received'
 
@@ -166,6 +168,9 @@ pro aurorax_example_atm_inverse3
   output_flags = aurorax_atm_forward_get_output_flags(/enable_only_height_integrated_rayleighs) ; initialize output flags, all will be False by default
 
   ; make the forward request
+  ;
+  ; NOTE: the inversion returns the mean energy, so we pass it as maxwellian_mean_energy
+  ; (the characteristic energy is half of the mean energy)
   print, '[Inverse->forward example] Performing forward calculation'
   data = aurorax_atm_forward($
     time_stamp, $
@@ -173,7 +178,7 @@ pro aurorax_example_atm_inverse3
     longitude, $
     output_flags, $
     maxwellian_energy_flux=data.data.energy_flux, $
-    maxwellian_characteristic_energy=data.data.mean_energy)
+    maxwellian_mean_energy=data.data.mean_energy)
   print, '[Inverse->forward example] Forward results received'
   
   ; print the information we asked for

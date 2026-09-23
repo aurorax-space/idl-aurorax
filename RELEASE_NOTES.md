@@ -1,3 +1,14 @@
+Version 1.11.0 (2026-09-23)
+-------------------------
+- ATM changes (requires UCalgary SRS API >= 1.78.0)
+  - forward: added the `maxwellian_mean_energy` keyword as an alternative to `maxwellian_characteristic_energy` (at most one may be given)
+  - forward: removed default Maxwellian spectrum; at least one energy flux or a `custom_spectrum` must be given
+  - inverse: `precipitation_flux_spectral_type` is now required (previously defaulted to `gaussian`)
+  - inverse: `characteristic_energy` is no longer returned by the API
+  - fixed the inverse-to-forward example, which passed the mean energy as the characteristic energy
+  - docstring fixes: inverse location limits, the custom neutral profile description, and the custom spectrum flux units
+
+
 Version 1.10.2 (2026-09-22)
 -------------------------
 - updated machine learning metadata filter examples and tests to use the new v2 THEMIS ASI model keys (`ucalgary_themis_apa_ml_v2` and `ucalgary_themis_cloud_ml_v2`, and their `_confidence` counterparts)

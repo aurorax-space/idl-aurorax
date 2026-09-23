@@ -22,15 +22,19 @@
 ;       parameters. Note that this function utilizes the UCalgary Space Remote Sensing API to perform
 ;       the calculation.
 ;
+;       Note -- The returned mean_energy is the mean energy of the assumed spectrum. For a maxwellian
+;       inversion it is 2x the characteristic energy, so pass it to aurorax_atm_forward() as
+;       maxwellian_mean_energy (or halve it for maxwellian_characteristic_energy).
+;
 ; :Parameters:
 ;       time_stamp: in, required, String
 ;         Timestamp in UTC, format must be YYYY-MM-DDTHH:MM:SS.
 ;       geo_lat: in, required, Float
-;         Latitude in geodetic coordinates. Currently limited to the Transition Region Explorer
-;         (TREx) region of >=50.0 and <61.5 degrees. An error will be raised if outside of this range.
+;         Latitude in geodetic coordinates. Currently limited to >50.0 and <71.5 degrees. An error
+;         will be raised if outside of this range.
 ;       geo_lon: in, required, Float
-;         Longitude in geodetic coordinates. Currently limited to the Transition Region Explorer
-;         (TREx) region of >=-110 and <-70 degrees. An error will be raised if outside of this range.
+;         Longitude in geodetic coordinates. Currently limited to >=-160 and <-75 degrees. An error
+;         will be raised if outside of this range.
 ;       intensity_4278: in, required, Float
 ;         Intensity of the 427.8nm (blue) wavelength in Rayleighs.
 ;       intensity_5577: in, required, Float
@@ -41,11 +45,12 @@
 ;         Intensity of the 844.6nm (near infrared) wavelength in Rayleighs.
 ;       output_flags: in, required, Hash
 ;         Flags to indicate which values are included in the output, generated
-;         using the aurorax_atm_forward_get_output_flags() function.
+;         using the aurorax_atm_inverse_get_output_flags() function.
 ;
 ; :Keywords:
-;       precipitation_flux_spectral_type: in, optional, String
-;         The precipitation flux spectral type to use. Possible values are gaussian or maxwellian. The default is gaussian.
+;       precipitation_flux_spectral_type: in, required, String
+;         The assumed precipitation spectrum, 'gaussian' or 'maxwellian'. For 'gaussian', mean_energy is the peak
+;         energy. For 'maxwellian', mean_energy is 2x the characteristic energy. Required as of v1.11.0.
 ;       nrlmsis_model_version: in, optional, String
 ;         NRLMSIS version number. Possible values are 00 or 2.0. Default is 2.0.
 ;       special_logic_keyword: in, optional, String
@@ -104,6 +109,16 @@ function aurorax_atm_inverse, $
     return, !null
   endelse
 
+  ; spectral type is required
+  stype_ok = 0
+  if (isa(precipitation_flux_spectral_type, /string) eq 1) then begin
+    if (precipitation_flux_spectral_type eq 'gaussian' or precipitation_flux_spectral_type eq 'maxwellian') then stype_ok = 1
+  endif
+  if (stype_ok eq 0) then begin
+    print, "[aurorax_atm_inverse] Error : precipitation_flux_spectral_type is required and must be 'gaussian' or 'maxwellian'"
+    return, !null
+  endif
+  
   ; set params
   request_hash = hash()
   request_hash['timestamp'] = time_stamp
@@ -131,7 +146,7 @@ function aurorax_atm_inverse, $
   req.setProperty, headers = ['Content-Type: application/json', 'User-Agent: idl-aurorax/' + __aurorax_version()]
 
   ; make request
-  r = __aurorax_perform_api_request('post', 'aurorax_atm_forward', req, post_str = post_str)
+  r = __aurorax_perform_api_request('post', 'aurorax_atm_inverse', req, post_str = post_str)
   if (r.status_code ne 200) then return, !null
   output = r.output
 

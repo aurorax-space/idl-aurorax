@@ -40,8 +40,9 @@ pro aurorax_example_atm_forward
   ; First will show how to do a basic request, and plot the results.
   ;
   ; Requests take a series of input parameters. Some parameters are required, and some are optional with default values
-  ; that will be set if they are not supplied. The following request we'll be performing utilizes all default values for
-  ; the optional parameter (marked as such with a comment on that line).
+  ; that will be set if they are not supplied. The following request uses a 10 erg/cm2/s, 5 keV Maxwellian spectrum,
+  ; and default values for every other optional parameter. At least one energy flux must be nonzero (or a custom
+  ; spectrum supplied), since all energy fluxes default to 0.
   ;
   ; ATM requests require that users toggle ON outputs they wish to have returned. This allows you to get back only what
   ; you want. This mechanism is controlled by the `aurorax_atm_forward_get_output_flags()` function that should be created
@@ -87,7 +88,9 @@ pro aurorax_example_atm_forward1
 
   ; make the request
   print, '[Simple example] Performing calculation'
-  data = aurorax_atm_forward(time_stamp, latitude, longitude, output_flags)
+  data = aurorax_atm_forward(time_stamp, latitude, longitude, output_flags, $
+                             maxwellian_energy_flux = 10.0, $          ; 10 erg/cm2/s Maxwellian spectrum...
+                             maxwellian_characteristic_energy = 5000.0) ; ...with a characteristic energy of 5 keV
   print, '[Simple example] Calculation received'
 
   ; print results
@@ -117,7 +120,8 @@ pro aurorax_example_atm_forward2
   output_flags = aurorax_atm_forward_get_output_flags(/set_all_true)
 
   ; make the request
-  result = aurorax_atm_forward(time_stamp, latitude, longitude, output_flags)
+  result = aurorax_atm_forward(time_stamp, latitude, longitude, output_flags, $
+                               maxwellian_energy_flux = 10.0, maxwellian_characteristic_energy = 5000.0)
 
   ; show results
   data = result.data

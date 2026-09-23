@@ -32,6 +32,10 @@
 ;       The initial/boundary conditions are given by IRI. The output yields the mean
 ;       density/VER over [0-L] at time T0.
 ;
+;       Spectral components with a nonzero energy flux are summed, except the exponential component, which
+;       overrides everything above exponential_starting_energy. At least one energy flux must be nonzero, or a
+;       custom_spectrum supplied, otherwise the API returns an error (as of v1.11.0 there is no default spectrum).
+;
 ; :Parameters:
 ;       time_stamp: in, required, String
 ;         Timestamp in UTC, format must be YYYY-MM-DDTHH:MM:SS.
@@ -45,13 +49,17 @@
 ;
 ; :Keywords:
 ;       maxwellian_energy_flux: in, optional, Float
-;         Maxwellian energy flux in erg/cm2/s. Default is 10.
+;         Maxwellian energy flux in erg/cm2/s. Default is 0, meaning the Maxwellian component is disabled.
 ;       gaussian_energy_flux: in, optional, Float
 ;         Gaussian energy flux in erg/cm2/s. Default is 0.0. Note that gaussian_peak_energy
 ;         and gaussian_spectral_width must be specified if the gaussian_energy_flux is not 0.
 ;       maxwellian_characteristic_energy: in, optional, Float
-;         Maxwellian characteristic energy in eV. Default is 5000. Note that maxwellian_characteristic_energy
-;         must be specified if the maxwellian_energy_flux is not 0.
+;         Maxwellian characteristic energy E0 in eV. Specify at most one of maxwellian_characteristic_energy or
+;         maxwellian_mean_energy. If maxwellian_energy_flux is nonzero and neither is given, the API uses 5000 eV.
+;       maxwellian_mean_energy: in, optional, Float
+;         Maxwellian mean energy in eV, equal to 2x the characteristic energy. This is the mean_energy returned by a
+;         maxwellian aurorax_atm_inverse() call, so it can be passed here directly. Cannot be combined with
+;         maxwellian_characteristic_energy.
 ;       gaussian_peak_energy: in, optional, Float
 ;         Gaussian peak energy in eV. Default is 1000. Note this parameter must be specified
 ;         if the gaussian_energy_flux is not 0.
@@ -100,14 +108,13 @@
 ;         ATM model version number. Possible values are '2.0'. Default is '2.0'.
 ;       custom_spectrum: in, optional, Struct
 ;         A struct containing two 1D float arrays. One array containing values representing the
-;         energy in eV, and another representing flux in 1/cm2/sr/eV. Note that this array
+;         energy in eV, and another representing flux in 1/cm2/s/eV. Note that this array
 ;         cannot contain negative values.
 ;       custom_neutral_profile: in, optional, Float
-;         A 2-dimensional float array containing values representing the energy in eV, and flux
-;         in 1/cm2/sr/eV. The shape is expected to be [N, 2], with energy in [*, 0] and flux
-;         in [*, 1].
-;         Note that this array cannot contain negative values (API Error
-;         will be raised if so). This parameter is optional.
+;         A 2-dimensional float array containing, in order, altitude (km), densities of O, O2, N2, N and NO
+;         (cm^-3), and temperature (K). The shape is expected to be [7, N], with altitude in [0, *] and
+;         temperature in [6, *]. Note that this array cannot contain negative values (API Error will be raised
+;         if so). This parameter is optional.
 ;         Users are responsible for fully covering the altitude range of interest in the
 ;         provided profile (80-800 km if d_region_flag=0, or 50-500 km if d_region_flag=1). The
 ;         model only performs interpolation, not extrapolation.
@@ -130,6 +137,7 @@ function aurorax_atm_forward, $
   output_flags, $
   maxwellian_energy_flux = maxwellian_energy_flux, $
   maxwellian_characteristic_energy = maxwellian_characteristic_energy, $
+  maxwellian_mean_energy = maxwellian_mean_energy, $
   gaussian_energy_flux = gaussian_energy_flux, $
   gaussian_peak_energy = gaussian_peak_energy, $
   gaussian_spectral_width = gaussian_spectral_width, $
@@ -175,6 +183,12 @@ function aurorax_atm_forward, $
     return, !null
   endelse
 
+  ; only one Maxwellian energy may be given
+  if (isa(maxwellian_characteristic_energy) eq 1 and isa(maxwellian_mean_energy) eq 1) then begin
+    print, '[aurorax_atm_forward] Error : only one of maxwellian_characteristic_energy or maxwellian_mean_energy can be specified. The characteristic energy is half the mean energy.'
+    return, !null
+  endif
+
   ; set params
   request_hash = hash()
   request_hash['timestamp'] = time_stamp
@@ -185,6 +199,7 @@ function aurorax_atm_forward, $
   if (isa(maxwellian_energy_flux) eq 1) then request_hash['maxwellian_energy_flux'] = maxwellian_energy_flux
   if (isa(gaussian_energy_flux) eq 1) then request_hash['gaussian_energy_flux'] = gaussian_energy_flux
   if (isa(maxwellian_characteristic_energy) eq 1) then request_hash['maxwellian_characteristic_energy'] = maxwellian_characteristic_energy
+  if (isa(maxwellian_mean_energy) eq 1) then request_hash['maxwellian_mean_energy'] = maxwellian_mean_energy
   if (isa(gaussian_peak_energy) eq 1) then request_hash['gaussian_peak_energy'] = gaussian_peak_energy
   if (isa(gaussian_spectral_width) eq 1) then request_hash['gaussian_spectral_width'] = gaussian_spectral_width
   if (isa(nrlmsis_model_version) eq 1) then request_hash['nrlmsis_model_version'] = nrlmsis_model_version

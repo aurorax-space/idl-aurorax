@@ -150,4 +150,27 @@ pro aurorax_test_atm_flags
   r = aurorax_atm_inverse('2021-11-04T06:00:00', 51.05, -114.07, 100.0, 200.0, 300.0, 400.0, flags, $
     atm_model_version = '3.0')
   atest_null, r, 'the inverse model refuses an unknown version'
+  
+  ; -----------------------------------------------------------
+  atest_suite, 'ATM spectral type and Maxwellian energy guards'
+  ; -----------------------------------------------------------
+  ;
+  ; As of 1.11.0 the inverse requires a spectral type, and the forward accepts
+  ; only one of the two Maxwellian energies. Both are checked before any
+  ; network call.
+  atest_note, 'the next three calls print ATM errors -- that output is expected'
+
+  flags = aurorax_atm_inverse_get_output_flags(/set_all_true)
+  r = aurorax_atm_inverse('2021-11-04T06:00:00', 58.2, -103.7, 100.0, 200.0, 300.0, 400.0, flags)
+  atest_null, r, 'the inverse model refuses a request without precipitation_flux_spectral_type'
+
+  flags = aurorax_atm_inverse_get_output_flags(/set_all_true)
+  r = aurorax_atm_inverse('2021-11-04T06:00:00', 58.2, -103.7, 100.0, 200.0, 300.0, 400.0, flags, $
+    precipitation_flux_spectral_type = 'kappa')
+  atest_null, r, 'the inverse model refuses an unknown precipitation_flux_spectral_type'
+
+  flags = aurorax_atm_forward_get_output_flags(/enable_only_height_integrated_rayleighs)
+  r = aurorax_atm_forward('2021-11-04T06:00:00', 58.2, -103.7, flags, maxwellian_energy_flux = 2.0, $
+    maxwellian_characteristic_energy = 2000.0, maxwellian_mean_energy = 4000.0)
+  atest_null, r, 'the forward model refuses both Maxwellian energies at once'
 end
