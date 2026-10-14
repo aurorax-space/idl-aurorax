@@ -1,8 +1,13 @@
 Version 1.12.0 (2026-10-14)
 -------------------------
-- added `aurorax_geocentric_to_geodetic()` to convert the geocentric spacecraft locations and footprints retrieved from NASA SSCWeb (GEO frame) to geodetic WGS84 before plotting on skymaps or maps
-- `aurorax_ephemeris_search()` now documents the record fields: spacecraft values are SSCWeb geocentric, `nbtrace`/`sbtrace` are the field-line footprints traced to 100 km, and `location_geo` is the sub-satellite point
-- the satellite footprint crib sheets (`aurorax_example_movie_satellite_footprint_trex_rgb`, `aurorax_example_ephemeris_oplot_mosaic`, `aurorax_example_ephemeris_multi_oplot_mosaic`) now plot the `nbtrace` footprint converted to geodetic instead of the `location_geo` sub-satellite point
+- added `aurorax_geocentric_to_geodetic()` to support converting geocentric spacecraft locations and footprints to geodetic
+- updated `aurorax_ephemeris_search()` docstrings to state: 
+  - spacecraft ephemeris location values are geocentric, retrieved from SSCWeb
+  - `nbtrace`/`sbtrace` are the field-line footprints traced to 100 km
+  - `location_geo` is the sub-satellite point
+- updated crib sheets that plot satellite footprints 
+  - `aurorax_example_movie_satellite_footprint_trex_rgb`, `aurorax_example_ephemeris_oplot_mosaic`, and `aurorax_example_ephemeris_multi_oplot_mosaic` now plot the `nbtrace` footprint converted to geodetic instead of the `location_geo` sub-satellite point
+  - note that these updates change the plotted location of spacecrafts by ~20km
 
 
 Version 1.11.0 (2026-09-23)
