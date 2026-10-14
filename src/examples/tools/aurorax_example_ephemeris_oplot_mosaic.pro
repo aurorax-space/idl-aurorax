@@ -45,20 +45,28 @@ pro aurorax_example_ephemeris_oplot_mosaic
   response = aurorax_ephemeris_search(start_t, end_t, programs = program, platforms = platform, instrument_types = instrument_type)
   ephemeris_data = response.data
 
-  ; Create arrays of lats and lons of footprint for all timestamps
-  ; e will also extract the exact location of the spacecraft in our mosaic
+  ; Create arrays of lats and lons of the north B-trace footprint for all timestamps.
+  ; We will also extract the exact location of the spacecraft at our mosaic's timestamp.
   footprint_lats = []
   footprint_lons = []
   for i = 0, n_elements(ephemeris_data) - 1 do begin
-    footprint_lats = [footprint_lats, (ephemeris_data[i].location_geo).lat]
-    footprint_lons = [footprint_lons, (ephemeris_data[i].location_geo).lon]
+    footprint_lats = [footprint_lats, (ephemeris_data[i].nbtrace).lat]
+    footprint_lons = [footprint_lons, (ephemeris_data[i].nbtrace).lon]
 
     ; Extract location of spacecraft if it matches our mosaic's timestamp
     if ephemeris_data[i].epoch eq mosaic_timestamp then begin
-      conjunction_lon = (ephemeris_data[i].location_geo).lon
-      conjunction_lat = (ephemeris_data[i].location_geo).lat
+      conjunction_lon = (ephemeris_data[i].nbtrace).lon
+      conjunction_lat = (ephemeris_data[i].nbtrace).lat
     endif
   endfor
+
+  ; SSCWeb footprints are geocentric (traced to 100 km); the map is geodetic
+  geod = aurorax_geocentric_to_geodetic(footprint_lats, footprint_lons, altitude_km = 100.0)
+  footprint_lats = geod.lats
+  footprint_lons = geod.lons
+  geod = aurorax_geocentric_to_geodetic(conjunction_lat, conjunction_lon, altitude_km = 100.0)
+  conjunction_lat = geod.lats
+  conjunction_lon = geod.lons
 
   ; Now, let's construct a mosaic for a time within the Swarm A overflight timeframe
 
