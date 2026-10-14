@@ -21,8 +21,8 @@ pro aurorax_example_ephemeris_search
   ;
   ; The AuroraX conjunction search is underpinned by a large database of 'ephemeris' records. These records represent
   ; each minute that a ground instrument was operating, or a spacecraft was in orbit. Ephemeris records have location
-  ; data in several formats (geodetic lat/lon, geomagnetic lat/lon, GSM coordinates), along with metadata that enables
-  ; enhanced filtering.
+  ; data in several formats (geographic lat/lon, north/south B-trace footprints, and GSM coordinates; spacecraft
+  ; values are geocentric, straight from SSCWeb), along with metadata that enables enhanced filtering.
   ;
   ; More information about ephemeris records in AuroraX can be found at https://aurorax.space/docs/data/overview
   ; and https://aurorax.space/docs/data/categories#ephemeris.
@@ -154,7 +154,7 @@ end
 
 pro aurorax_example_ephemeris_search4
   ; Do a simple ephemeris search for an hour of Swarm A data, with a specific response format. The response
-  ; format will include the data source identifier, program, and platform. It will also include the geodetic
+  ; format will include the data source identifier, program, and platform. It will also include the geographic
   ; location, the epoch, and any metadata.
   ;
   ; set our response format

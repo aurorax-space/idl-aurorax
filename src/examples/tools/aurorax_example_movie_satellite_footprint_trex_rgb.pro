@@ -67,8 +67,9 @@ pro aurorax_example_movie_satellite_footprint_trex_rgb
   ; Split the ephemeris results by platform and linearly interpolate to the ASI cadence.
   ; The AuroraX ephemeris search provides spacecraft location data at a 1-minute cadence
   ; (taken from SSCWeb with no modifications), along with other supplemental metadata.
-  ; We can use the spacecraft B-trace data to interpolate the footprints to match the cadence
-  ; of the TREx RGB data.
+  ; We use the north B-trace footprint (nbtrace; SSCWeb's field-line trace to 100 km, in
+  ; geocentric coordinates), convert it to geodetic with aurorax_geocentric_to_geodetic()
+  ; to match the skymap, and interpolate it to the cadence of the TREx RGB data.
   ;
   ; sat_ephemeris is a hash keyed by platform name; each entry holds a struct that gives
   ; {.julday, .lats, .lons} at the target cadence.
@@ -83,13 +84,18 @@ pro aurorax_example_movie_satellite_footprint_trex_rgb
       jd = julday(long(strmid(e, 5, 2)), long(strmid(e, 8, 2)), long(strmid(e, 0, 4)), $
         long(strmid(e, 11, 2)), long(strmid(e, 14, 2)), long(strmid(e, 17, 2)))
       p_jd = [p_jd, jd]
-      p_lats = [p_lats, (ephemeris_data[i].location_geo).lat]
-      p_lons = [p_lons, (ephemeris_data[i].location_geo).lon]
+      p_lats = [p_lats, (ephemeris_data[i].nbtrace).lat]
+      p_lons = [p_lons, (ephemeris_data[i].nbtrace).lon]
     endfor
     if n_elements(p_jd) eq 0 then begin
       print, 'WARNING: no ephemeris records returned for ', pname
       continue
     endif
+
+    ; SSCWeb footprints are geocentric (traced to 100 km); the skymap is geodetic
+    geod = aurorax_geocentric_to_geodetic(p_lats, p_lons, altitude_km = 100.0)
+    p_lats = geod.lats
+    p_lons = geod.lons
 
     ; Build the fine-cadence Julian-day grid spanning the original window.
     duration_sec = (p_jd[-1] - p_jd[0]) * 86400.0d

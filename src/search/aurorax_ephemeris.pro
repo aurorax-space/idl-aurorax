@@ -110,7 +110,14 @@ end
 ;           that they wanted it to send.
 ;
 ; :Returns:
-;       Struct
+;       Struct, with the search response. The `data` field is an array of ephemeris
+;       records with the fields data_source, epoch, location_geo, location_gsm,
+;       nbtrace, sbtrace and metadata. Spacecraft values come from NASA SSCWeb
+;       unmodified, so they are geocentric (SSCWeb GEO frame): location_geo is the
+;       sub-satellite point, nbtrace/sbtrace are the field-line footprints traced to
+;       100 km. Ground instrument locations are the sites' geodetic coordinates. Use
+;       aurorax_geocentric_to_geodetic() on spacecraft values before plotting them on
+;       skymaps or maps.
 ;
 ; :Examples:
 ;       ; simple example

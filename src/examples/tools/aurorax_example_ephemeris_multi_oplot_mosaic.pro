@@ -45,8 +45,8 @@ pro aurorax_example_ephemeris_multi_oplot_mosaic
   response = aurorax_ephemeris_search(start_t, end_t, programs = program, platforms = platforms, instrument_types = instrument_type)
   ephemeris_data = response.data
 
-  ; Create arrays of lats and lons of footprint for all timestamps
-  ; e will also extract the exact location of the spacecraft in our mosaic
+  ; Create arrays of lats and lons of the north B-trace footprint for all timestamps.
+  ; We will also extract the exact location of each spacecraft at our mosaic's timestamp.
   swarm_a_lats = []
   swarm_a_lons = []
   swarm_c_lats = []
@@ -55,26 +55,40 @@ pro aurorax_example_ephemeris_multi_oplot_mosaic
     ; Add lat/lon to the proper arrays by checking the platform field of each element
     if (ephemeris_data[i].data_source).platform eq 'swarma' then begin
       ; if this iteration is Swarm A
-      swarm_a_lats = [swarm_a_lats, (ephemeris_data[i].location_geo).lat]
-      swarm_a_lons = [swarm_a_lons, (ephemeris_data[i].location_geo).lon]
+      swarm_a_lats = [swarm_a_lats, (ephemeris_data[i].nbtrace).lat]
+      swarm_a_lons = [swarm_a_lons, (ephemeris_data[i].nbtrace).lon]
 
       ; Extract location of spacecraft if it matches our mosaic's timestamp
       if ephemeris_data[i].epoch eq mosaic_timestamp then begin
-        swarm_a_conjunction_lon = (ephemeris_data[i].location_geo).lon
-        swarm_a_conjunction_lat = (ephemeris_data[i].location_geo).lat
+        swarm_a_conjunction_lon = (ephemeris_data[i].nbtrace).lon
+        swarm_a_conjunction_lat = (ephemeris_data[i].nbtrace).lat
       endif
     endif else if (ephemeris_data[i].data_source).platform eq 'swarmc' then begin
       ; if this iteration is Swarm C
-      swarm_c_lats = [swarm_c_lats, (ephemeris_data[i].location_geo).lat]
-      swarm_c_lons = [swarm_c_lons, (ephemeris_data[i].location_geo).lon]
+      swarm_c_lats = [swarm_c_lats, (ephemeris_data[i].nbtrace).lat]
+      swarm_c_lons = [swarm_c_lons, (ephemeris_data[i].nbtrace).lon]
 
       ; Extract location of spacecraft if it matches our mosaic's timestamp
       if ephemeris_data[i].epoch eq mosaic_timestamp then begin
-        swarm_c_conjunction_lon = (ephemeris_data[i].location_geo).lon
-        swarm_c_conjunction_lat = (ephemeris_data[i].location_geo).lat
+        swarm_c_conjunction_lon = (ephemeris_data[i].nbtrace).lon
+        swarm_c_conjunction_lat = (ephemeris_data[i].nbtrace).lat
       endif
     endif
   endfor
+
+  ; SSCWeb footprints are geocentric (traced to 100 km); the map is geodetic
+  geod = aurorax_geocentric_to_geodetic(swarm_a_lats, swarm_a_lons, altitude_km = 100.0)
+  swarm_a_lats = geod.lats
+  swarm_a_lons = geod.lons
+  geod = aurorax_geocentric_to_geodetic(swarm_a_conjunction_lat, swarm_a_conjunction_lon, altitude_km = 100.0)
+  swarm_a_conjunction_lat = geod.lats
+  swarm_a_conjunction_lon = geod.lons
+  geod = aurorax_geocentric_to_geodetic(swarm_c_lats, swarm_c_lons, altitude_km = 100.0)
+  swarm_c_lats = geod.lats
+  swarm_c_lons = geod.lons
+  geod = aurorax_geocentric_to_geodetic(swarm_c_conjunction_lat, swarm_c_conjunction_lon, altitude_km = 100.0)
+  swarm_c_conjunction_lat = geod.lats
+  swarm_c_conjunction_lon = geod.lons
 
   ; Now, let's construct a mosaic for a time within the overflight timeframe
 

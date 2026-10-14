@@ -361,7 +361,8 @@ end
 ;       sbtrace: in, optional, Boolean
 ;         search for south B-trace conjunctions
 ;       geographic: in, optional, Boolean
-;         search for geographic conjunctions
+;         search for geographic conjunctions (spacecraft locations of all three types are SSCWeb
+;         geocentric values; ground locations are the sites' geodetic coordinates)
 ;       subminute_precision: in, optional, Boolean
 ;         search for conjunctions using sub-minute precision, instead of the
 ;         default one-minute precision
@@ -586,7 +587,8 @@ end
 ;       sbtrace: in, optional, Boolean
 ;         search for south B-trace conjunctions
 ;       geographic: in, optional, Boolean
-;         search for geographic conjunctions
+;         search for geographic conjunctions (spacecraft locations of all three types are SSCWeb
+;         geocentric values; ground locations are the sites' geodetic coordinates)
 ;       subminute_precision: in, optional, Boolean
 ;         search for conjunctions using sub-minute precision, instead of the
 ;         default one-minute precision
